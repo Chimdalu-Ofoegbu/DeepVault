@@ -154,7 +154,7 @@ Phase mapping finalized by gsd-roadmapper on 2026-05-09 against ROADMAP.md. Ever
 | SETUP-05 | Phase 0 | Complete |
 | SETUP-06 | Phase 0 | Complete (00-06) |
 | SETUP-07 | Phase 0 | Complete (00-06) |
-| SETUP-08 | Phase 0 | Complete (00-07; Task 4 branch-protection awaits human action) |
+| SETUP-08 | Phase 0 | Complete (00-07 artifacts + 00-08 closure; Task 4 branch-protection awaits human action — recipe in 00-07-SUMMARY.md Resume Signal) |
 | MATH-01 | Phase 1 | Pending |
 | MATH-02 | Phase 1 | Pending |
 | MATH-03 | Phase 1 | Pending |

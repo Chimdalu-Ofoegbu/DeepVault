@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
 status: executing
-stopped_at: Plan 00-07 complete-with-checkpoint (CI 5-job matrix + golden-vectors stub + branch-protection doc; Task 4 awaiting human action)
-last_updated: "2026-05-09T06:25:00Z"
+stopped_at: Phase 0 COMPLETE-WITH-CHECKPOINTS (8/8 plans done; 3 outstanding human-action items: Plan 02 Task 4 wallet provisioning, Plan 07 Task 4 GitHub repo + branch protection, Plan 08 Task 3 fresh-clone verification). Phase 1 unblocked.
+last_updated: "2026-05-09T07:00:00Z"
 last_activity: 2026-05-09
 progress:
   total_phases: 7
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 8
-  completed_plans: 7
-  percent: 87
+  completed_plans: 8
+  percent: 100
 ---
 
 # Project State
@@ -21,16 +21,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-08)
 
 **Core value:** A working PLP+Hedge vault on DeepBook Predict with a credible, auditable risk dashboard, deployed on mainnet by 2026-06-16. Quality of vault math, backtest, and dashboard polish > component count.
-**Current focus:** Phase 0 — Setup & Ground Rules
+**Current focus:** Phase 1 — Math Foundation (SVI Parity Gate) — next-up
 
 ## Current Position
 
-Phase: 0 (Setup & Ground Rules) — EXECUTING
+Phase: 0 (Setup & Ground Rules) — COMPLETE-WITH-CHECKPOINTS
 Plan: 8 of 8
-Status: Ready to execute (Plan 00-07 complete-with-checkpoint; Task 4 human action awaited)
+Status: Phase 0 closed (all 8 plans complete; 3 outstanding human-action items documented in SUMMARIES; none block Phase 1 math work)
+Next phase: Phase 1 — Math Foundation (SVI Parity Gate); requirements MATH-01..06; depends on Phase 0
 Last activity: 2026-05-09
 
-Progress: [█████████░] 87%
+Progress: [██████████] 100% Phase 0 / 14% milestone
 
 ## Performance Metrics
 
@@ -59,6 +60,7 @@ Progress: [█████████░] 87%
 | Phase 0 P00-05 | 8min | 4 tasks | 4 files |
 | Phase 0 P00-06 | 4min | 3 tasks | 3 files |
 | Phase 0 P00-07 | 6min | 3 tasks (auto) + 1 checkpoint | 3 files |
+| Phase 0 P00-08 | 4min | 2 tasks (auto) + 1 checkpoint | 2 files (README + closure SUMMARY) |
 
 ## Accumulated Context
 
@@ -98,6 +100,7 @@ Recent decisions affecting current work:
 - [Phase ?]: Plan 00-07: shared/golden-vectors.json shipped as strict empty array `[]` (not wrapping object); Phase 1 MATH-05 fills with Gatheral-paper test cases for SVI parity gate.
 - [Phase ?]: Plan 00-07: docs/CI-BRANCH-PROTECTION.md ships both UI click-path (Settings → Branches) and gh CLI scripted path (gh api PUT branches/main/protection) for one-time setup; Task 4 awaits human action because gh repo create requires explicit owner/visibility/auth confirmation and required-status-checks only become selectable after each named job has run on default branch.
 - [Phase ?]: Plan 00-07: Local default branch is currently 'master' (git init default); Resume Signal in 00-07-SUMMARY.md flags that user must `git branch -M main` before first push so workflow triggers fire (Pitfall 0-D guard).
+- [Phase 0]: Plan 00-08: README polished from skeleton to judge-readable form (Status, Architecture at a Glance, Quick Start, Stack, Build Log Week 1 with Phase 0 closure entry, Hosting placeholder). 00-08-SUMMARY.md is the Phase 0 closure traceability matrix: 8/8 SETUP-XX PASS, 16/16 D-XX attributed, 5/5 ROADMAP success criteria cross-checked, 12/12 pitfalls (4 cross-cutting + 8 Phase-0-specific) mitigated. 3 outstanding human-action items: Plan 02 Task 4 (wallet provisioning), Plan 07 Task 4 (GitHub repo + branch protection), Plan 08 Task 3 (fresh-clone end-to-end verification). None block Phase 1 math.
 
 ### Pending Todos
 
@@ -114,6 +117,7 @@ Open verification gaps to resolve in Phase 0/1:
 - Predict mainnet contract addresses + USDsui type tag + mainnet `predict-server` URL — Phase 5 precondition
 - Task 4 of Plan 00-02 BLOCKED-on-human: testnet + mainnet Sui wallet provisioning per D-06; resume-signal in 00-02-SUMMARY.md
 - Task 4 of Plan 00-07 BLOCKED-on-human: gh repo create deepvault --public, git branch -M main, git push -u origin main, configure branch protection (5 required status checks); resume-signal in 00-07-SUMMARY.md "Resume Signal" section
+- Task 3 of Plan 00-08 BLOCKED-on-human: fresh-clone end-to-end verification (clean clone + make install/codegen/test/lint exit 0 + idempotency + 5-criterion ROADMAP cross-check). Depends on Plan 07 Task 4 landing first (repo must be on GitHub). Resume-signal in 00-08-SUMMARY.md "Resume signal" section.
 
 ## Hard Policy Locks (from ROADMAP.md)
 
@@ -136,6 +140,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-09T06:25:00Z
-Stopped at: Plan 00-07 complete-with-checkpoint (CI 5-job matrix + golden-vectors.json + branch-protection doc; Task 4 awaiting human action — gh repo create + push to main + configure branch protection)
-Resume file: .planning/phases/00-setup-ground-rules/00-07-SUMMARY.md (see "Resume Signal" section for Task 4 instructions)
+Last session: 2026-05-09T07:00:00Z
+Stopped at: Phase 0 COMPLETE-WITH-CHECKPOINTS (Plan 00-08 done: README polish + closure SUMMARY committed; 3 outstanding human-action items documented). Phase 1 (Math Foundation — SVI Parity Gate) is next-up; no Phase 0 artifact blocks Phase 1 math work.
+Resume file: .planning/phases/00-setup-ground-rules/00-08-SUMMARY.md (closure traceability matrix; "Resume signal" section has fresh-clone verification recipe). Outstanding checkpoints also tracked in 00-02-SUMMARY.md and 00-07-SUMMARY.md.

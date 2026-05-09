@@ -42,7 +42,7 @@ Drop in this order, never reverse:
 - Integer phases (0-6): Planned milestone work for v1 submission
 - Decimal phases (e.g., 2.1): Reserved for urgent insertions (marked INSERTED)
 
-- [ ] **Phase 0: Setup & Ground Rules** - Repo scaffold, version pinning, weekly-Monday ritual, code-freeze rule, hedge-ratio policy locked
+- [x] **Phase 0: Setup & Ground Rules** - Repo scaffold, version pinning, weekly-Monday ritual, code-freeze rule, hedge-ratio policy locked (COMPLETE-WITH-CHECKPOINTS 2026-05-09; 3 outstanding human-action items: Plan 02 Task 4 wallet provisioning, Plan 07 Task 4 GitHub repo + branch protection, Plan 08 Task 3 fresh-clone verification — none block Phase 1)
 - [ ] **Phase 1: Math Foundation (SVI Parity Gate)** - Three-way SVI evaluator parity (Move + Python + TS) with arbitrage-free checker
 - [ ] **Phase 2: Vault Move Package + Testnet Deploy** - `deepvault::` package with supply/redeem/rebalance, end-to-end testnet supply→hedge→redeem cycle
 - [ ] **Phase 3: Backtest Harness + Two-Protocol PTB** - 30-day handbook backtest with lookahead audit + Margin+Predict atomic PTB on testnet
@@ -70,7 +70,7 @@ Drop in this order, never reverse:
 - [x] 00-05-PLAN.md — DeepBookV3 fork via subtree + scripts/predict-diff.sh + Monday cron workflow
 - [x] 00-06-PLAN.md — CONTRIBUTING.md + docs/HEDGE-POLICY.md + docs/MAINNET-FUNDING.md (policy locks)
 - [x] 00-07-PLAN.md — .github/workflows/ci.yml 5-job matrix + golden-vectors.json placeholder + branch-protection guide (Tasks 1-3 complete; Task 4 awaiting human action — see 00-07-SUMMARY.md Resume Signal)
-- [ ] 00-08-PLAN.md — README polish + end-to-end Phase 0 verification + Phase 0 closure SUMMARY
+- [x] 00-08-PLAN.md — README polish + Phase 0 closure SUMMARY (Tasks 1-2 complete; Task 3 fresh-clone end-to-end verification BLOCKED-on-human, recipe in 00-08-SUMMARY.md Resume signal)
 
 ### Phase 1: Math Foundation (SVI Parity Gate)
 **Goal**: A single SSVI evaluator algorithm implemented in three runtimes (Move, Python, TypeScript) producing bit-for-bit identical output on a shared golden-vector suite, with a working arbitrage-free checker.
@@ -153,7 +153,7 @@ Decimal phases (e.g., 2.1) reserved for urgent insertions and execute between th
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 0. Setup & Ground Rules | 6/8 | In Progress|  |
+| 0. Setup & Ground Rules | 8/8 | Complete-with-checkpoints | 2026-05-09 |
 | 1. Math Foundation (SVI Parity Gate) | 0/TBD | Not started | - |
 | 2. Vault Move Package + Testnet Deploy | 0/TBD | Not started | - |
 | 3. Backtest Harness + Two-Protocol PTB | 0/TBD | Not started | - |

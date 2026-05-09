@@ -89,7 +89,7 @@ Drop in this order, never reverse:
 - [x] 01-04-PLAN.md (Wave 3) — Golden-vector emitter: 120+ vectors (Tier A/B/C/C2) + Move companion
 - [x] 01-05-PLAN.md (Wave 4) — Move evaluator: helpers/{i64,math,isqrt,phi,ln} + svi_view + tests
 - [x] 01-06-PLAN.md (Wave 4) — TypeScript evaluator: math/isqrt/phi/ln/svi.ts + Vitest setup + tests
-- [ ] 01-07-PLAN.md (Wave 5) — CI parity job wiring: 3-runtime cross-check + forbidden-token grep
+- [x] 01-07-PLAN.md (Wave 5) — CI parity job wiring: 3-runtime cross-check + forbidden-token grep
 - [ ] 01-08-PLAN.md (Wave 6) — Arb-checker (Python + TS) + g(k) array + Tier C JackJacquier fixture
 
 ### Phase 2: Vault Move Package + Testnet Deploy

@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
 status: executing
-stopped_at: Phase 01-06 complete (3/3 tasks, 303 Vitest tests pass incl. 131-vector golden parity loop bit-equal with Python at 1 unit/1e9, MATH-03 satisfied, Plan 01-07 CI parity job unblocked)
-last_updated: "2026-05-09T17:00:00.000Z"
+stopped_at: Phase 01-07 complete (2/2 tasks; Python + TS parity_runner CLIs ship; CI parity job wires three-way assertion + forbidden-token grep; job KEY parity preserved; MATH-05 satisfied; Plan 01-08 unblocked)
+last_updated: "2026-05-09T16:20:52.594Z"
 last_activity: 2026-05-09
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 16
-  completed_plans: 14
-  percent: 88
+  completed_plans: 15
+  percent: 94
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 01 (math-foundation-svi-parity-gate) — EXECUTING
-Plan: 7 of 8
+Plan: 8 of 8
 Status: Ready to execute
 Next phase: Phase 1 — Math Foundation (SVI Parity Gate); requirements MATH-01..06; depends on Phase 0
 Last activity: 2026-05-09
@@ -67,6 +67,7 @@ Progress: [████████████░░░░░] 75% Phase 1 / 88
 | Phase 01 P01-04 | 8min | 2 tasks | 5 files |
 | Phase 01 P01-05 | 12 | 3 tasks | 11 files |
 | Phase 01 P01-06 | 8min | 3 tasks | 11 files |
+| Phase 01 P01-07 | 9min | - tasks | - files |
 
 ## Accumulated Context
 
@@ -131,6 +132,9 @@ Recent decisions affecting current work:
 - [Phase ?]: Phase 01-06: TS evaluator triple+ (math/isqrt/phi/ln/svi.ts) cloned bigint-only from vendored Predict SHA 1159d79a; Vitest 4.1.5 wired in dashboard/ workspace; 303 tests pass in 1.3s incl. 100-input cross-runtime sqrt parity vs Python snapshot AND 131-valid-vector total_variance + binary_price parity loops within 1 unit at 1e9
 - [Phase ?]: Phase 01-06: MATH-03 satisfied — TS evaluator bit-equal with Python on every valid golden vector. Combined with Plan 01-03 (MATH-01) + Plan 01-05 (MATH-02), three-way parity gate is provably real on 131 vectors; Plan 01-07 can wire all three runtime test commands as required-status-checks
 - [Phase ?]: Phase 01-06: BigInt `/` truncates toward zero natively (matches Move u128 + Python _signed_div_trunc); plain BigInt arithmetic is bit-equal with Python by construction — no _signedDivTrunc helper needed. Documented in svi.ts. NO Number/parseFloat/Math.X in any of the 5 evaluator files; all numeric literals carry the `n` suffix
+- [Phase ?]: Phase 01-07: CI parity job replaces Phase 0 stub with three-way assertion (Python + TS + Move parity_runners + forbidden-token grep on TS evaluator); job KEY parity preserved per CONTRIBUTING.md branch protection invariant; MATH-05 satisfied
+- [Phase ?]: Phase 01-07: parity_runners use tolerance default 1 unit at 1e9 (re-routed D-14); empirically all 141 vectors pass at exact equality across Python + TS + Move; 1-unit guardrail is forward-defense not bug-permit
+- [Phase ?]: Phase 01-07: two-step Move CI invocation (--filter golden_vectors targeted + unfiltered sanity) mitigates T-01-38 silent-malformed-filter; total parity job ~30s wall-clock
 
 ### Pending Todos
 
@@ -170,6 +174,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-09T17:00:00.000Z
-Stopped at: Phase 01-06 complete (3/3 tasks, 303 Vitest tests pass incl. 131-vector golden parity loop bit-equal with Python at 1 unit/1e9, MATH-03 satisfied, Plan 01-07 CI parity job unblocked)
+Last session: 2026-05-09T16:20:52.570Z
+Stopped at: Phase 01-07 complete (2/2 tasks; Python + TS parity_runner CLIs ship; CI parity job wires three-way assertion + forbidden-token grep; job KEY parity preserved; MATH-05 satisfied; Plan 01-08 unblocked)
 Resume file: None

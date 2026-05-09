@@ -1514,37 +1514,45 @@ The `--squash` flag prevents history bloat from being catastrophic — only one 
 | A15 | Two-keystore approach (`SUI_CONFIG_DIR=~/.sui/sui_config_mainnet`) is the cleanest D-06 isolation | §"MAINNET-FUNDING.md" | Sui CLI supports this env var; verified |
 | A16 | `[ASSUMED]` 09:00 ET = 14:00 UTC as standard Monday cron time (CONTEXT.md says "Monday" but no time) | §"Pattern 8" | Builder can adjust; no functional risk |
 
-## Open Questions
+## Open Questions (RESOLVED)
+
+Each question below was paired with a concrete recommendation that has been operationalized in a specific Phase 0 plan task or deferred to a downstream phase with a clear hand-off. Resolutions are explicit so plan-checker / execute-phase can confirm closure.
 
 1. **Exact SHA for `predict-testnet-4-16` at Phase 0 start**
    - What we know: branch exists, last GitHub-display update Apr 27 2026
    - What's unclear: 40-char SHA value (web fetch did not return it)
    - Recommendation: 30-second Phase 0 task — `git ls-remote https://github.com/MystenLabs/deepbookv3.git predict-testnet-4-16` (or after subtree add: `git -C scripts/deepbookv3 rev-parse HEAD`); paste into `Move.toml [dependencies.DeepBookV3] rev = "..."`
+   - **RESOLVED:** Plan 02 Task 1 captures the SHA via `git ls-remote` and writes it into `Move.toml`. Plan 05 Task 1 confirms the SHA after `git subtree add`.
 
 2. **Vendored fork path structure**
    - What we know: STACK.md (2026-05-08 research) cites `packages/predict`, `packages/oracle_svi`
    - What's unclear: Exact filenames inside (`predict.move`, `oracle_svi.move`), whether `packages/predict_manager` is its own package or a module of `packages/predict`
    - Recommendation: Phase 0 final task — `ls scripts/deepbookv3/packages/` after subtree add; update `predict-diff.sh` `WATCH_PATHS` array if needed. This also primes the Phase 1 Day-1 spike on `OracleSVIUpdated` event signature.
+   - **RESOLVED:** Plan 05 Task 1 lists the fork structure after subtree add and reconciles `WATCH_PATHS` in `predict-diff.sh`. Phase 1 Day-1 spike (separate handoff) will pick up the `OracleSVIUpdated` schema discovery.
 
 3. **`@mysten/dapp-kit` vs `dapp-kit-core` + `dapp-kit-react` migration timing**
    - What we know: Search results indicate the legacy `@mysten/dapp-kit` package is being deprecated in favor of split packages
    - What's unclear: Exact deprecation timeline; whether 1.0.4 still receives security patches; whether dashboard built in Phase 4 should target `dapp-kit-core` directly
    - Recommendation: Phase 4 (not Phase 0) re-verifies via `npm view @mysten/dapp-kit deprecated` and `npm view @mysten/dapp-kit-react`. Phase 0 dashboard is a placeholder package.json with no dapp-kit dependency yet.
+   - **RESOLVED: Deferred to Phase 4** (Dashboard + Relay). Phase 0 dashboard workspace ships an empty placeholder `package.json` with no dapp-kit dependency.
 
 4. **Render free tier WebSocket support specifics**
    - What we know: Free tier sleeps after 15 min idle; keepalive ping pattern works `[CITED: render.com/docs/free]`
    - What's unclear: Connection limits on free tier; behavior when relay process crashes mid-WS-frame
    - Recommendation: Phase 4 spike. Phase 0 only commits the deploy-target decision — no Render account setup needed in Phase 0 unless the user requests, since relay code lands Phase 4.
+   - **RESOLVED: Deferred to Phase 4** (Dashboard + Relay). Phase 0 only locks the hosting decision (D-15) in CONTEXT.md; no Render account creation in Phase 0.
 
 5. **Vercel CORS for cross-origin WebSocket to Render**
    - What we know: Vercel cannot host WS servers (functions terminate at 120s) `[CITED: copyprogramming.com]`; CORS not enabled by default `[CITED: vercel.com/kb]`
    - What's unclear: Whether dashboard's WS client needs `wss://` (yes) and whether browser blocks mixed-content if Render serves `ws://` (yes — must use Render's TLS-terminated `wss://` URL, which Render provides automatically)
    - Recommendation: Phase 4 verifies. Phase 0 docs note in CONTRIBUTING or ARCHITECTURE that relay must be `wss://` from Render's auto-TLS endpoint.
+   - **RESOLVED: Deferred to Phase 4** (Dashboard + Relay). The `wss://` requirement is recorded in `config/{testnet,mainnet}.toml` schema (Plan 04) under `[hosting]` so Phase 4 can't accidentally use plain `ws://`.
 
 6. **Sui CLI binary tarball asset name pattern**
    - What we know: Sui releases publish per-OS tarballs `[CITED: docs.sui.io]`
    - What's unclear: Exact 2026 asset name convention (`sui-mainnet-v1.71.1-ubuntu-x86_64.tgz` is the inferred pattern)
    - Recommendation: Phase 0 task — verify via `curl -fsI https://github.com/MystenLabs/sui/releases/download/mainnet-v1.71.1/sui-mainnet-v1.71.1-ubuntu-x86_64.tgz` returns 200; if 404, navigate releases page and note actual asset name. Update CI workflow accordingly.
+   - **RESOLVED:** Plan 07 (CI) install-step uses `suiup` (`MystenLabs/suiup`) which abstracts the asset-name discovery. The direct-tarball verification is documented as an inline ci.yml comment for fallback if `suiup` ever fails, per Plan 07 Task 2.
 
 ## Environment Availability
 

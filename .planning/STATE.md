@@ -4,14 +4,14 @@ milestone: v1.1
 milestone_name: milestone
 status: executing
 stopped_at: Phase 0 context gathered
-last_updated: "2026-05-09T04:25:57.108Z"
+last_updated: "2026-05-09T04:37:43.972Z"
 last_activity: 2026-05-09
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 8
-  completed_plans: 1
-  percent: 13
+  completed_plans: 2
+  percent: 25
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 0 (Setup & Ground Rules) — EXECUTING
-Plan: 2 of 8
+Plan: 3 of 8
 Status: Ready to execute
 Last activity: 2026-05-09
 
@@ -53,6 +53,7 @@ Progress: [░░░░░░░░░░] 0%
 
 *Updated after each plan completion*
 | Phase 0 P1 | 3min | 3 tasks | 10 files |
+| Phase 0 P02 | 5min | 4 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -68,6 +69,9 @@ Recent decisions affecting current work:
 - Quality bar over component count — math correctness > deploy hygiene > demo polish > composability breadth
 - BTC-only at v1 — multi-asset is post-submission
 - [Phase ?]: Plan 00-01: Repo bootstrap landed — public MIT, pnpm workspaces, indexer/dashboard placeholders
+- [Phase ?]: Plan 00-02: DeepBookV3 SHA captured 1159d79af33c70e09e406310e1d8f067832ede9d on predict-testnet-4-16 (resolves Open Question #1)
+- [Phase ?]: Plan 00-02: Used 'uv sync' (no --frozen) on first run; lockfile committed; Makefile install enforces 'uv sync --locked' going forward (Pitfall 0-C)
+- [Phase ?]: Plan 00-02: Task 4 (wallet provisioning) deferred as human-action checkpoint; DEV-BOOTSTRAP.md uses [TBD] placeholders for both addresses
 
 ### Pending Todos
 
@@ -82,6 +86,7 @@ Open verification gaps to resolve in Phase 0/1:
 - Predict mainnet launch ETA unknown — tracked weekly Monday; if not shipped by 2026-06-09, mainnet redeploy degrades to documented fallback
 - `react-plotly.js` last published 2022 — Phase 4 contingency: 30-line `Plotly.newPlot()` fallback hook ready
 - Predict mainnet contract addresses + USDsui type tag + mainnet `predict-server` URL — Phase 5 precondition
+- Task 4 of Plan 00-02 BLOCKED-on-human: testnet + mainnet Sui wallet provisioning per D-06; resume-signal in 00-02-SUMMARY.md
 
 ## Hard Policy Locks (from ROADMAP.md)
 
@@ -104,6 +109,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-09T04:25:29.728Z
+Last session: 2026-05-09T04:37:14.764Z
 Stopped at: Phase 0 context gathered
 Resume file: None

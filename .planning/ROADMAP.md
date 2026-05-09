@@ -64,7 +64,7 @@ Drop in this order, never reverse:
   5. Every push to GitHub triggers a CI run that executes Move tests, TypeScript Vitest, Python pytest, and the golden-vector parity check (initially empty, gate wired).
 **Plans**: 8 plans
 - [x] 00-01-PLAN.md — Repo bootstrap (.gitignore, LICENSE, root package.json, pnpm-workspace.yaml, placeholder workspaces, README skeleton)
-- [ ] 00-02-PLAN.md — Toolchain pins (Move.toml SHA-pin, backtest pyproject + uv sync, Makefile, two-wallet provisioning, DEV-BOOTSTRAP.md)
+- [x] 00-02-PLAN.md — Toolchain pins (Move.toml SHA-pin, backtest pyproject + uv sync, Makefile, two-wallet provisioning, DEV-BOOTSTRAP.md)
 - [ ] 00-03-PLAN.md — shared/strategy.toml + scripts/codegen.py + Makefile codegen target (locked hedge values)
 - [ ] 00-04-PLAN.md — config/{testnet,mainnet}.toml scaffolds (schema parity, Pitfall 14 mitigation)
 - [ ] 00-05-PLAN.md — DeepBookV3 fork via subtree + scripts/predict-diff.sh + Monday cron workflow
@@ -153,7 +153,7 @@ Decimal phases (e.g., 2.1) reserved for urgent insertions and execute between th
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 0. Setup & Ground Rules | 1/8 | In Progress|  |
+| 0. Setup & Ground Rules | 2/8 | In Progress|  |
 | 1. Math Foundation (SVI Parity Gate) | 0/TBD | Not started | - |
 | 2. Vault Move Package + Testnet Deploy | 0/TBD | Not started | - |
 | 3. Backtest Harness + Two-Protocol PTB | 0/TBD | Not started | - |

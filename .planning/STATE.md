@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
-status: executing
-stopped_at: Phase 01-07 complete (2/2 tasks; Python + TS parity_runner CLIs ship; CI parity job wires three-way assertion + forbidden-token grep; job KEY parity preserved; MATH-05 satisfied; Plan 01-08 unblocked)
-last_updated: "2026-05-09T16:20:52.594Z"
+status: verifying
+stopped_at: Phase 01-08 complete (3/3 tasks; arb_checker.{py,ts} ship + JackJacquier Tier C fixture + golden-vectors.json regenerated with real min_g_k via arb_checker.check_arb; MATH-04 satisfied; Phase 1 closed — all 6 MATH requirements DONE across 8 plans; Phase 2 unblocked)
+last_updated: "2026-05-09T17:35:00.000Z"
 last_activity: 2026-05-09
 progress:
   total_phases: 7
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 16
-  completed_plans: 15
-  percent: 94
+  completed_plans: 16
+  percent: 100
 ---
 
 # Project State
@@ -21,17 +21,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-08)
 
 **Core value:** A working PLP+Hedge vault on DeepBook Predict with a credible, auditable risk dashboard, deployed on mainnet by 2026-06-16. Quality of vault math, backtest, and dashboard polish > component count.
-**Current focus:** Phase 01 — math-foundation-svi-parity-gate
+**Current focus:** Phase 01 — math-foundation-svi-parity-gate (CLOSED — all 6 MATH requirements DONE)
 
 ## Current Position
 
-Phase: 01 (math-foundation-svi-parity-gate) — EXECUTING
-Plan: 8 of 8
-Status: Ready to execute
-Next phase: Phase 1 — Math Foundation (SVI Parity Gate); requirements MATH-01..06; depends on Phase 0
+Phase: 01 (math-foundation-svi-parity-gate) — COMPLETE
+Plan: 8 of 8 (all complete)
+Status: Phase complete — ready for verification
+Next phase: Phase 2 — Vault & Strategy (PLP+Hedge vault, predict_adapter, rebalance); imports parity-gate-protected svi_view::binary_price; depends on Phase 1
 Last activity: 2026-05-09
 
-Progress: [████████████░░░░░] 75% Phase 1 / 88% milestone
+Progress: [█████████████████] 100% Phase 1 / 100% milestone
 
 ## Performance Metrics
 
@@ -68,6 +68,7 @@ Progress: [████████████░░░░░] 75% Phase 1 / 88
 | Phase 01 P01-05 | 12 | 3 tasks | 11 files |
 | Phase 01 P01-06 | 8min | 3 tasks | 11 files |
 | Phase 01 P01-07 | 9min | - tasks | - files |
+| Phase 01 P01-08 | 7min | 3 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -135,6 +136,11 @@ Recent decisions affecting current work:
 - [Phase ?]: Phase 01-07: CI parity job replaces Phase 0 stub with three-way assertion (Python + TS + Move parity_runners + forbidden-token grep on TS evaluator); job KEY parity preserved per CONTRIBUTING.md branch protection invariant; MATH-05 satisfied
 - [Phase ?]: Phase 01-07: parity_runners use tolerance default 1 unit at 1e9 (re-routed D-14); empirically all 141 vectors pass at exact equality across Python + TS + Move; 1-unit guardrail is forward-defense not bug-permit
 - [Phase ?]: Phase 01-07: two-step Move CI invocation (--filter golden_vectors targeted + unfiltered sanity) mitigates T-01-38 silent-malformed-filter; total parity job ~30s wall-clock
+- [Phase 01]: Phase 01-08: Off-chain arb-free checker shipped (Python + TS); 19 new tests; backtest 50→61, dashboard 303→311. arb_checker.{py,ts} are the ONLY numpy/Math.X-allowed modules in the evaluator codebase (visualization-bound, not parity-bound per CONTEXT.md D-05); CI parity job's forbidden-token grep targets math/isqrt/phi/ln/svi.ts only.
+- [Phase 01]: Phase 01-08: MATH-04 satisfied — arb-checker delivers full g(k) array (length 200 at FLOAT_SCALING) for Phase 4 dashboard rendering. shared/golden-vectors.json regenerated with real min_g_k via arb_checker.check_arb: 131 valid vectors → min_g_k ≥ 0 (zero false positives), 10 arb-violating B-arb-* → min_g_k = -F sentinel (degenerate ATM-variance path). Move companion byte-identical (no min_g_k accessor — closed-form arb-check on-chain per D-05).
+- [Phase 01]: Phase 01-08: Float-internal computation pattern established for off-chain visualization-bound modules: dequantize → Gatheral closed-form g(k) in float → rounded back to int/bigint at FLOAT_SCALING at function boundary. Saves ~100 lines of integer op-order discipline per runtime; correct because module is provably off-chain-only.
+- [Phase 01]: Phase 01-08: Tier C JackJacquier fixture shipped as documented stub per CONTEXT.md re-route D-17 (5 vectors, expected_w stub-derived from deepvault.svi). Notebook execution + sui move test capture for Tier C2 source upgrade DEFERRED to Phase 6 (blocked by upstream LICENSE absence + Sui CLI unavailability + testnet wallet provisioning gates). Whitepaper claim ladder unchanged — spec already documents Tier C2 source as deferred to 01-08, and 01-08 forwards to Phase 6.
+- [Phase 01]: Phase 01 CLOSED — all 6 MATH requirements (MATH-01..MATH-06) DONE across 8 plans. CI parity gate enforced (MATH-05); three-way bit-equal parity on 141 vectors at 1 unit tolerance at 1e9; arb-checker delivers g(k) array (MATH-04 differentiator). Phase 2 (vault.rebalance) UNBLOCKED.
 
 ### Pending Todos
 
@@ -170,10 +176,11 @@ Open verification gaps to resolve in Phase 0/1:
 
 | Category | Item | Status | Deferred At |
 |----------|------|--------|-------------|
-| *(none)* | | | |
+| Tier C JackJacquier source upgrade | Execute upstream notebook against pinned (svi, k) tuples + capture outputs to backtest/tests/fixtures/jackjacquier_ssvi_outputs.json + pin notebook git SHA | Deferred to Phase 6 closeout (whitepaper credibility lift; not on critical path) | Phase 01-08 |
+| Tier C2 PredictTests source upgrade | Run local `sui move test` against `oracle::compute_nd2` for 10 PredictTests-stub vectors + capture outputs + overwrite expected w/binary_price in shared/golden-vectors.json | Deferred to Phase 6 closeout (blocked by Sui CLI unavailability + testnet wallet provisioning per Plan 00-02 Task 4 BLOCKED-on-human) | Phase 01-08 |
 
 ## Session Continuity
 
-Last session: 2026-05-09T16:20:52.570Z
-Stopped at: Phase 01-07 complete (2/2 tasks; Python + TS parity_runner CLIs ship; CI parity job wires three-way assertion + forbidden-token grep; job KEY parity preserved; MATH-05 satisfied; Plan 01-08 unblocked)
+Last session: 2026-05-09T17:35:00.000Z
+Stopped at: Phase 01-08 complete (3/3 tasks; arb_checker.{py,ts} ship + JackJacquier Tier C fixture + golden-vectors.json regenerated with real min_g_k via arb_checker.check_arb; MATH-04 satisfied; Phase 1 closed — all 6 MATH requirements DONE across 8 plans; Phase 2 unblocked)
 Resume file: None

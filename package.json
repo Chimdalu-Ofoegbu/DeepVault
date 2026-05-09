@@ -1,0 +1,23 @@
+{
+  "name": "deepvault",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Composable PLP+Hedge structured product on Sui DeepBook Predict",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=10"
+  },
+  "scripts": {
+    "build": "pnpm -r run build",
+    "test": "pnpm -r run test",
+    "lint": "pnpm -r run lint",
+    "typecheck": "pnpm -r exec tsc --noEmit"
+  },
+  "devDependencies": {
+    "prettier": "3.3.3",
+    "eslint": "9.13.0",
+    "typescript": "5.6.3"
+  },
+  "packageManager": "pnpm@10.0.0"
+}

@@ -62,7 +62,15 @@ Drop in this order, never reverse:
   3. Running `scripts/predict-diff.sh` reports any new commits on the `predict-testnet-4-16` branch since last sweep, and a calendar reminder fires every Monday.
   4. `CONTRIBUTING.md` documents the 2026-05-30 code-freeze rule, the no-refactor-after-vault-ships policy, and the hedge-ratio policy (fixed-ratio v1, parameterized for future dynamic) — all committed before Phase 1 closes.
   5. Every push to GitHub triggers a CI run that executes Move tests, TypeScript Vitest, Python pytest, and the golden-vector parity check (initially empty, gate wired).
-**Plans**: TBD
+**Plans**: 8 plans
+- [ ] 00-01-PLAN.md — Repo bootstrap (.gitignore, LICENSE, root package.json, pnpm-workspace.yaml, placeholder workspaces, README skeleton)
+- [ ] 00-02-PLAN.md — Toolchain pins (Move.toml SHA-pin, backtest pyproject + uv sync, Makefile, two-wallet provisioning, DEV-BOOTSTRAP.md)
+- [ ] 00-03-PLAN.md — shared/strategy.toml + scripts/codegen.py + Makefile codegen target (locked hedge values)
+- [ ] 00-04-PLAN.md — config/{testnet,mainnet}.toml scaffolds (schema parity, Pitfall 14 mitigation)
+- [ ] 00-05-PLAN.md — DeepBookV3 fork via subtree + scripts/predict-diff.sh + Monday cron workflow
+- [ ] 00-06-PLAN.md — CONTRIBUTING.md + docs/HEDGE-POLICY.md + docs/MAINNET-FUNDING.md (policy locks)
+- [ ] 00-07-PLAN.md — .github/workflows/ci.yml 5-job matrix + golden-vectors.json placeholder + branch-protection guide
+- [ ] 00-08-PLAN.md — README polish + end-to-end Phase 0 verification + Phase 0 closure SUMMARY
 
 ### Phase 1: Math Foundation (SVI Parity Gate)
 **Goal**: A single SSVI evaluator algorithm implemented in three runtimes (Move, Python, TypeScript) producing bit-for-bit identical output on a shared golden-vector suite, with a working arbitrage-free checker.

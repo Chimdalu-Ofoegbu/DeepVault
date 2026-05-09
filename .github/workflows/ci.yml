@@ -138,6 +138,10 @@ jobs:
         run: |
           cd backtest && uv run --no-project python ../scripts/codegen.py
 
+      - name: Regenerate golden vectors
+        run: |
+          cd backtest && uv run --no-project python ../scripts/golden_emit.py
+
       - name: Verify no drift
         run: |
           if ! git diff --exit-code --stat \
@@ -146,8 +150,10 @@ jobs:
               dashboard/src/lib/strategy_constants.ts \
               contracts/sources/phi_coefficients.move \
               backtest/src/deepvault/phi_coefficients.py \
-              dashboard/src/lib/phi_coefficients.ts; then
-            echo "::error::generated files out of sync — run 'make codegen' (or 'python scripts/codegen.py') locally and commit the regenerated files. See CONTRIBUTING.md §'Editing generated code' and §6 (MATH: prefix for phi_coefficients changes)."
+              dashboard/src/lib/phi_coefficients.ts \
+              shared/golden-vectors.json \
+              contracts/tests/golden_vectors_data.move; then
+            echo "::error::generated files out of sync — run 'make codegen' AND 'python scripts/golden_emit.py' locally and commit the regenerated files. See CONTRIBUTING.md §'Editing generated code' and §6 (MATH: prefix for SVI math changes)."
             exit 1
           fi
 

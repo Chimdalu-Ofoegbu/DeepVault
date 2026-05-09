@@ -4,14 +4,14 @@ milestone: v1.1
 milestone_name: milestone
 status: executing
 stopped_at: Phase 0 context gathered
-last_updated: "2026-05-09T04:08:15.883Z"
-last_activity: 2026-05-09 -- Phase 0 planning complete
+last_updated: "2026-05-09T04:25:57.108Z"
+last_activity: 2026-05-09
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 8
-  completed_plans: 0
-  percent: 0
+  completed_plans: 1
+  percent: 13
 ---
 
 # Project State
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 
 ## Current Position
 
-Phase: 0 of 6 (Setup & Ground Rules)
-Plan: 0 of TBD in current phase
+Phase: 0 (Setup & Ground Rules) — EXECUTING
+Plan: 2 of 8
 Status: Ready to execute
-Last activity: 2026-05-09 -- Phase 0 planning complete
+Last activity: 2026-05-09
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -52,6 +52,7 @@ Progress: [░░░░░░░░░░] 0%
 - Trend: —
 
 *Updated after each plan completion*
+| Phase 0 P1 | 3min | 3 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -66,6 +67,7 @@ Recent decisions affecting current work:
 - Live SVI surface but no time-travel slider — Brief Week-10 cut
 - Quality bar over component count — math correctness > deploy hygiene > demo polish > composability breadth
 - BTC-only at v1 — multi-asset is post-submission
+- [Phase ?]: Plan 00-01: Repo bootstrap landed — public MIT, pnpm workspaces, indexer/dashboard placeholders
 
 ### Pending Todos
 
@@ -102,6 +104,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-09T03:14:55.512Z
+Last session: 2026-05-09T04:25:29.728Z
 Stopped at: Phase 0 context gathered
-Resume file: .planning/phases/00-setup-ground-rules/00-CONTEXT.md
+Resume file: None

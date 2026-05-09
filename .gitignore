@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+# Sui / wallets — NEVER commit keystores
+.sui/
+**/.sui/
+sui_config*/
+*.keystore
+
+# Build artifacts
+build/
+dist/
+contracts/build/
+*.tgz
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Editor
+.idea/
+.vscode/
+.DS_Store
+
+# Local-only state
+.predict-diff-state.local
+
+# Misc
+*.log
+coverage/

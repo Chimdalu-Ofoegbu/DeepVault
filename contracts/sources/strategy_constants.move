@@ -28,7 +28,15 @@ module deepvault::strategy_constants {
     // Oracle
     public fun max_staleness_seconds(): u64 { 300 }
 
-    // SVI placeholders (Phase 1 may extend)
+    // SVI (locked per re-routes D-01, D-10, D-13, D-14)
+    public fun svi_parameterization(): vector<u8> { b"raw_svi_5param" }
+    public fun svi_scale(): u8 { 9 }
     public fun svi_grid_points_for_arb_check(): u64 { 200 }
     public fun svi_strike_range_sigma(): u64 { 4 }
+    public fun svi_k_max_log_strike(): u64 { 2500000000 }
+    public fun svi_a_max(): u64 { 4000000000 }
+    public fun svi_b_max(): u64 { 8000000000 }
+    public fun svi_sigma_min(): u64 { 1 }
+    public fun svi_sigma_max(): u64 { 4000000000 }
+    public fun svi_m_abs_max(): u64 { 2500000000 }
 }

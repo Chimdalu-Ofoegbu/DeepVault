@@ -30,7 +30,14 @@ WORST_CASE_SETTLEMENT_HAIRCUT_BPS: Final[int] = 10000
 # Oracle
 MAX_STALENESS_SECONDS: Final[int] = 300
 
-# SVI
-SVI_PARAMETERIZATION: Final[str] = "ssvi"
+# SVI (locked per re-routes D-01, D-10, D-13, D-14)
+SVI_PARAMETERIZATION: Final[str] = "raw_svi_5param"
+SVI_SCALE: Final[int] = 9
 SVI_GRID_POINTS_FOR_ARB_CHECK: Final[int] = 200
 SVI_STRIKE_RANGE_SIGMA: Final[int] = 4
+SVI_K_MAX_LOG_STRIKE: Final[int] = 2500000000
+SVI_A_MAX: Final[int] = 4000000000
+SVI_B_MAX: Final[int] = 8000000000
+SVI_SIGMA_MIN: Final[int] = 1
+SVI_SIGMA_MAX: Final[int] = 4000000000
+SVI_M_ABS_MAX: Final[int] = 2500000000

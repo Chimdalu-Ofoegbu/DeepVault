@@ -42,10 +42,22 @@ worst_case_settlement_haircut_bps = 10000       # 100% — assume full Predict a
 max_staleness_seconds = 300         # 5 min; vault refuses supply/rebalance if exceeded
 
 [svi]
-# SSVI parameterization placeholders — Phase 1 fills full schema after Gatheral evaluator audit.
-parameterization = "ssvi"
-grid_points_for_arb_check = 200     # ≥200-point g(k) grid scan per MATH-04
-strike_range_sigma = 4              # ±4σ around spot for arb scan
+# LOCKED per re-routed D-01, D-10, D-13, D-14 (CONTEXT.md "Re-routes from RESEARCH.md (2026-05-09)").
+# Math layer matches on-chain Predict — see shared/svi-spec.md.
+# Re-tunable ONLY via MATH: commit-prefix (CONTRIBUTING.md §6) with paired svi-spec.md update.
+parameterization = "raw_svi_5param"            # re-route D-01: matches OracleSVIUpdated event struct
+scale = 9                                      # re-route D-10: FLOAT_SCALING = 1e9 (matches deepbook_predict::constants::float_scaling)
+grid_points_for_arb_check = 200                # MATH-04: ≥200-point g(k) grid scan
+strike_range_sigma = 4                         # MATH-04: ±4σ around spot for arb scan
+k_max_log_strike = 2_500_000_000               # max safe input domain at 1e9 → ±2.5; svi-spec.md §3
+# Per-param permissive bounds for raw SVI (a, b, rho, m, sigma) — matches Predict's on-chain
+# acceptance envelope. Phase 1 svi_view enforces these as hard pre-conditions.
+a_max     = 4_000_000_000                      # max ATM total variance ≈ 400% annualized; sane upper bound
+b_max     = 8_000_000_000                      # smile-wing slope; permissive
+sigma_min = 1                                  # > 0 strict; on-chain asserts non-zero
+sigma_max = 4_000_000_000                      # ATM curvature; permissive
+m_abs_max = 2_500_000_000                      # |m| ≤ 2.5 at 1e9; matches k bound
+# rho is signed in (-F, +F); abs bound enforced as |rho| < F = 1_000_000_000 directly in svi_view.
 
 [meta]
 btc_decimals = 8

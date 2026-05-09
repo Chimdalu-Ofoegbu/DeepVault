@@ -90,15 +90,17 @@ def emit_move(data: dict) -> str:
     parts.append(
         f"    public fun max_staleness_seconds(): u64 {{ {oracle['max_staleness_seconds']} }}\n"
     )
-    parts.append("\n    // SVI placeholders (Phase 1 may extend)\n")
-    parts.append(
-        f"    public fun svi_grid_points_for_arb_check(): u64 "
-        f"{{ {svi['grid_points_for_arb_check']} }}\n"
-    )
-    parts.append(
-        f"    public fun svi_strike_range_sigma(): u64 "
-        f"{{ {svi['strike_range_sigma']} }}\n"
-    )
+    parts.append("\n    // SVI (locked per re-routes D-01, D-10, D-13, D-14)\n")
+    parts.append(f'    public fun svi_parameterization(): vector<u8> {{ b"{svi["parameterization"]}" }}\n')
+    parts.append(f"    public fun svi_scale(): u8 {{ {svi['scale']} }}\n")
+    parts.append(f"    public fun svi_grid_points_for_arb_check(): u64 {{ {svi['grid_points_for_arb_check']} }}\n")
+    parts.append(f"    public fun svi_strike_range_sigma(): u64 {{ {svi['strike_range_sigma']} }}\n")
+    parts.append(f"    public fun svi_k_max_log_strike(): u64 {{ {svi['k_max_log_strike']} }}\n")
+    parts.append(f"    public fun svi_a_max(): u64 {{ {svi['a_max']} }}\n")
+    parts.append(f"    public fun svi_b_max(): u64 {{ {svi['b_max']} }}\n")
+    parts.append(f"    public fun svi_sigma_min(): u64 {{ {svi['sigma_min']} }}\n")
+    parts.append(f"    public fun svi_sigma_max(): u64 {{ {svi['sigma_max']} }}\n")
+    parts.append(f"    public fun svi_m_abs_max(): u64 {{ {svi['m_abs_max']} }}\n")
     parts.append("}\n")
     return "".join(parts)
 
@@ -139,12 +141,17 @@ def emit_python(data: dict) -> str:
     )
     parts.append("# Oracle\n")
     parts.append(f"MAX_STALENESS_SECONDS: Final[int] = {oracle['max_staleness_seconds']}\n\n")
-    parts.append("# SVI\n")
+    parts.append("# SVI (locked per re-routes D-01, D-10, D-13, D-14)\n")
     parts.append(f'SVI_PARAMETERIZATION: Final[str] = "{svi["parameterization"]}"\n')
-    parts.append(
-        f"SVI_GRID_POINTS_FOR_ARB_CHECK: Final[int] = {svi['grid_points_for_arb_check']}\n"
-    )
+    parts.append(f"SVI_SCALE: Final[int] = {svi['scale']}\n")
+    parts.append(f"SVI_GRID_POINTS_FOR_ARB_CHECK: Final[int] = {svi['grid_points_for_arb_check']}\n")
     parts.append(f"SVI_STRIKE_RANGE_SIGMA: Final[int] = {svi['strike_range_sigma']}\n")
+    parts.append(f"SVI_K_MAX_LOG_STRIKE: Final[int] = {svi['k_max_log_strike']}\n")
+    parts.append(f"SVI_A_MAX: Final[int] = {svi['a_max']}\n")
+    parts.append(f"SVI_B_MAX: Final[int] = {svi['b_max']}\n")
+    parts.append(f"SVI_SIGMA_MIN: Final[int] = {svi['sigma_min']}\n")
+    parts.append(f"SVI_SIGMA_MAX: Final[int] = {svi['sigma_max']}\n")
+    parts.append(f"SVI_M_ABS_MAX: Final[int] = {svi['m_abs_max']}\n")
     return "".join(parts)
 
 
@@ -181,10 +188,18 @@ def emit_typescript(data: dict) -> str:
     )
     parts.append("  // Oracle\n")
     parts.append(f"  MAX_STALENESS_SECONDS: {oracle['max_staleness_seconds']},\n\n")
-    parts.append("  // SVI\n")
+    parts.append("  // SVI (locked per re-routes D-01, D-10, D-13, D-14)\n")
     parts.append(f"  SVI_PARAMETERIZATION: '{svi['parameterization']}' as const,\n")
+    parts.append(f"  SVI_SCALE: {svi['scale']},\n")
     parts.append(f"  SVI_GRID_POINTS_FOR_ARB_CHECK: {svi['grid_points_for_arb_check']},\n")
     parts.append(f"  SVI_STRIKE_RANGE_SIGMA: {svi['strike_range_sigma']},\n")
+    # u64-equivalent fields use bigint literal `n` suffix (RESEARCH.md Pitfall B)
+    parts.append(f"  SVI_K_MAX_LOG_STRIKE: {svi['k_max_log_strike']}n,\n")
+    parts.append(f"  SVI_A_MAX: {svi['a_max']}n,\n")
+    parts.append(f"  SVI_B_MAX: {svi['b_max']}n,\n")
+    parts.append(f"  SVI_SIGMA_MIN: {svi['sigma_min']}n,\n")
+    parts.append(f"  SVI_SIGMA_MAX: {svi['sigma_max']}n,\n")
+    parts.append(f"  SVI_M_ABS_MAX: {svi['m_abs_max']}n,\n")
     parts.append("} as const;\n")
     return "".join(parts)
 

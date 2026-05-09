@@ -1,0 +1,87 @@
+# shared/cody_phi_coefficients.toml
+# Single source of truth for Cody 1969 normal-CDF rational Chebyshev coefficients.
+# Edit this file, then run `make codegen` to regenerate three files:
+#   - contracts/sources/phi_coefficients.move
+#   - backtest/src/deepvault/phi_coefficients.py
+#   - dashboard/src/lib/phi_coefficients.ts
+#
+# DO NOT edit the generated files directly — they are overwritten on next codegen.
+# CI's `codegen-drift` job (extended in Plan 01-02) fails the build if generated files
+# are out of sync.
+#
+# Values transcribed VERBATIM from the vendored DeepBookV3 fork:
+#   scripts/deepbookv3/packages/predict/sources/helper/math.move:31-65
+#   SHA: 1159d79af33c70e09e406310e1d8f067832ede9d
+#
+# Source comment from line 32 of the vendored file:
+#   // Source: W.J. Cody (1969), as implemented in GSL gauss.c
+#
+# This file is MATH: policy per CONTRIBUTING.md §6 — changes require a `MATH:` commit
+# prefix and a paired update to shared/svi-spec.md.
+
+schema_version = 1
+last_updated = "2026-05-09"
+upstream_move = "scripts/deepbookv3/packages/predict/sources/helper/math.move:31-65"
+upstream_sha = "1159d79af33c70e09e406310e1d8f067832ede9d"
+source_paper = "W.J. Cody (1969), as implemented in GSL gauss.c"
+
+[small]
+# Small range: |x| < 0.66291 -> Φ(x) = 0.5 + x * P(x²) / Q(x²)
+# Threshold from vendored math.move:35 — SMALL_THRESHOLD: u128 = 662_910_000
+threshold = 662_910_000
+
+[small.numerator]
+# P(x²): A0..A4 from vendored math.move:36-40
+a0 = 2_235_252_035
+a1 = 161_028_231_069
+a2 = 1_067_689_485_460
+a3 = 18_154_981_253_344
+a4 = 65_682_338
+
+[small.denominator]
+# Q(x²): B0..B3 from vendored math.move:41-44
+b0 = 47_202_581_905
+b1 = 976_098_551_738
+b2 = 10_260_932_208_619
+b3 = 45_507_789_335_027
+
+[medium]
+# Medium range: 0.66291 ≤ |x| < √32 ≈ 5.657 -> complement = exp(-x²/2) * P(|x|) / Q(|x|)
+# Threshold from vendored math.move:47 — MEDIUM_THRESHOLD: u128 = 5_656_854_249
+threshold = 5_656_854_249
+
+[medium.numerator]
+# P(|x|): C0..C8 from vendored math.move:48-56
+c0 = 398_941_512
+c1 = 8_883_149_794
+c2 = 93_506_656_132
+c3 = 597_270_276_395
+c4 = 2_494_537_585_290
+c5 = 6_848_190_450_536
+c6 = 11_602_651_437_647
+c7 = 9_842_714_838_384
+c8 = 11
+
+[medium.denominator]
+# Q(|x|): D0..D7 from vendored math.move:57-64
+d0 = 22_266_688_044
+d1 = 235_387_901_782
+d2 = 1_519_377_599_408
+d3 = 6_485_558_298_267
+d4 = 18_615_571_640_885
+d5 = 34_900_952_721_146
+d6 = 38_912_003_286_093
+d7 = 19_685_429_676_860
+
+[large]
+# Large range: |x| ≥ medium.threshold (≈ √32) -> clamp to 0 (negative) or F (positive).
+# No coefficients; the threshold IS medium.threshold; this block exists for documentation.
+
+[auxiliary]
+# Auxiliary u128 constants used by normal_cdf_u128 in vendored math.move.
+# F (FLOAT_SCALING) = 1e9 — matches strategy.toml [svi].scale = 9 (do NOT duplicate the value
+#   into the generated phi_coefficients files; consumers import SVI_SCALE / FLOAT_SCALING from
+#   strategy_constants instead). Kept here only for source-of-truth documentation.
+# LN2_U128 from vendored math.move:24 — used by normal_cdf_u128 at math.move:228-230 for
+#   the medium-range exp(-x²/2) reduction.
+ln2_u128 = 693_147_180

@@ -1,1 +1,4937 @@
-[]
+[
+  {
+    "expected": {
+      "binary_price": "0x196128c6",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x8583b00"
+    },
+    "id": "A-01",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2625a00",
+      "b": "0xbebc200",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0xba43b7400"
+    },
+    "source": "Gatheral2014-§3.2-boundary-eta2-rho0-ATM",
+    "tier": "A"
+  },
+  {
+    "expected": {
+      "binary_price": "0x135ec243",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x87672e6"
+    },
+    "id": "A-02",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2625a00",
+      "b": "0xbebc200",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x5f5e100",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0xcddb51e10"
+    },
+    "source": "Gatheral2014-§3.2-boundary-eta2-rho0-OTM-call",
+    "tier": "A"
+  },
+  {
+    "expected": {
+      "binary_price": "0x1fa19868",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x87672e6"
+    },
+    "id": "A-03",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2625a00",
+      "b": "0xbebc200",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x5f5e100",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0xa88a026b0"
+    },
+    "source": "Gatheral2014-§3.2-boundary-eta2-rho0-OTM-put",
+    "tier": "A"
+  },
+  {
+    "expected": {
+      "binary_price": "0x18ef485a",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0xa21fe80"
+    },
+    "id": "A-04",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x11e1a300",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "sigma": "0x17d78400",
+      "strike": "0xba43b7400"
+    },
+    "source": "Gatheral2014-§4.1-mild-no-skew-ATM",
+    "tier": "A"
+  },
+  {
+    "expected": {
+      "binary_price": "0x137cd532",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0xa5a58f0"
+    },
+    "id": "A-05",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x11e1a300",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x5f5e100",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "sigma": "0x17d78400",
+      "strike": "0xcddb51e10"
+    },
+    "source": "Gatheral2014-§4.1-mild-no-skew-OTM-call",
+    "tier": "A"
+  },
+  {
+    "expected": {
+      "binary_price": "0x1e8d7c28",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0xa5a58f0"
+    },
+    "id": "A-06",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x11e1a300",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x5f5e100",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "sigma": "0x17d78400",
+      "strike": "0xa88a026b0"
+    },
+    "source": "Gatheral2014-§4.1-mild-no-skew-OTM-put",
+    "tier": "A"
+  },
+  {
+    "expected": {
+      "binary_price": "0x19bf2807",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x700e860"
+    },
+    "id": "A-07",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x1c9c380",
+      "b": "0xee6b280",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": true
+      },
+      "sigma": "0x14dc9380",
+      "strike": "0xba43b7400"
+    },
+    "source": "Gatheral2014-§4.2-neg-skew-ATM",
+    "tier": "A"
+  },
+  {
+    "expected": {
+      "binary_price": "0xd5dce1f",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x6e6a2ad"
+    },
+    "id": "A-08",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x1c9c380",
+      "b": "0xee6b280",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0xbebc200",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": true
+      },
+      "sigma": "0x14dc9380",
+      "strike": "0xe38105a90"
+    },
+    "source": "Gatheral2014-§4.2-neg-skew-OTM-call",
+    "tier": "A"
+  },
+  {
+    "expected": {
+      "binary_price": "0x25932a79",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x8b0662d"
+    },
+    "id": "A-09",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x1c9c380",
+      "b": "0xee6b280",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0xbebc200",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": true
+      },
+      "sigma": "0x14dc9380",
+      "strike": "0x98801ff90"
+    },
+    "source": "Gatheral2014-§4.2-neg-skew-OTM-put",
+    "tier": "A"
+  },
+  {
+    "expected": {
+      "binary_price": "0x196128c6",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x8583b00"
+    },
+    "id": "A-10",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x4c4b400",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0xbebc200",
+        "neg": false
+      },
+      "sigma": "0x23c34600",
+      "strike": "0xba43b7400"
+    },
+    "source": "Gatheral2014-§4.3-pos-skew-ATM",
+    "tier": "A"
+  },
+  {
+    "expected": {
+      "binary_price": "0xa025e5b",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x91fd8b7"
+    },
+    "id": "A-11",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x4c4b400",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x11e1a300",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0xbebc200",
+        "neg": false
+      },
+      "sigma": "0x23c34600",
+      "strike": "0xfb6e488e0"
+    },
+    "source": "Gatheral2014-§4.3-pos-skew-OTM-call",
+    "tier": "A"
+  },
+  {
+    "expected": {
+      "binary_price": "0x2b794091",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x868bdb7"
+    },
+    "id": "A-12",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x4c4b400",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x11e1a300",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0xbebc200",
+        "neg": false
+      },
+      "sigma": "0x23c34600",
+      "strike": "0x89fcf7298"
+    },
+    "source": "Gatheral2014-§4.3-pos-skew-OTM-put",
+    "tier": "A"
+  },
+  {
+    "expected": {
+      "binary_price": "0x17ce1003",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0xf7f4900"
+    },
+    "id": "A-13",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x3938700",
+      "b": "0x17d78400",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x1dcd6500",
+        "neg": true
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0xba43b7400"
+    },
+    "source": "Gatheral2014-§4.4-strong-neg-skew-ATM",
+    "tier": "A"
+  },
+  {
+    "expected": {
+      "binary_price": "0x62d929d",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0xe797c58"
+    },
+    "id": "A-14",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x3938700",
+      "b": "0x17d78400",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x1dcd6500",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x1dcd6500",
+        "neg": true
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x1331928300"
+    },
+    "source": "Gatheral2014-§4.4-strong-neg-skew-OTM-call",
+    "tier": "A"
+  },
+  {
+    "expected": {
+      "binary_price": "0x27793255",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x1a653e58"
+    },
+    "id": "A-15",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x3938700",
+      "b": "0x17d78400",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x1dcd6500",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x1dcd6500",
+        "neg": true
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x70f9a27a0"
+    },
+    "source": "Gatheral2014-§4.4-strong-neg-skew-OTM-put",
+    "tier": "A"
+  },
+  {
+    "expected": {
+      "binary_price": "0x19362bee",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x8ff9e12"
+    },
+    "id": "A-16",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2aea540",
+      "b": "0xd693a40",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x5f5e100",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x5f5e100",
+        "neg": true
+      },
+      "sigma": "0x1ad27480",
+      "strike": "0xba43b7400"
+    },
+    "source": "Gatheral2014-§4.5-shifted-smile-m0.1-ATM",
+    "tier": "A"
+  },
+  {
+    "expected": {
+      "binary_price": "0x1364c08e",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x8b79910"
+    },
+    "id": "A-17",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2aea540",
+      "b": "0xd693a40",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x5f5e100",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x5f5e100",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x5f5e100",
+        "neg": true
+      },
+      "sigma": "0x1ad27480",
+      "strike": "0xcddb51e10"
+    },
+    "source": "Gatheral2014-§4.5-shifted-smile-m0.1-OTM-call",
+    "tier": "A"
+  },
+  {
+    "expected": {
+      "binary_price": "0x1efb13d1",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x98dfa82"
+    },
+    "id": "A-18",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2aea540",
+      "b": "0xd693a40",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x5f5e100",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x5f5e100",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x5f5e100",
+        "neg": true
+      },
+      "sigma": "0x1ad27480",
+      "strike": "0xa88a026b0"
+    },
+    "source": "Gatheral2014-§4.5-shifted-smile-m0.1-OTM-put",
+    "tier": "A"
+  },
+  {
+    "expected": {
+      "binary_price": "0x196128c6",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x8583b00"
+    },
+    "id": "A-19",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x1312d00",
+      "b": "0x8f0d180",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0xbebc200",
+        "neg": true
+      },
+      "sigma": "0x2faf0800",
+      "strike": "0xba43b7400"
+    },
+    "source": "Gatheral2014-§4.6-long-dated-low-vol-ATM",
+    "tier": "A"
+  },
+  {
+    "expected": {
+      "binary_price": "0xdf844b7",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x83507f0"
+    },
+    "id": "A-20",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x1312d00",
+      "b": "0x8f0d180",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0xbebc200",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0xbebc200",
+        "neg": true
+      },
+      "sigma": "0x2faf0800",
+      "strike": "0xe38105a90"
+    },
+    "source": "Gatheral2014-§4.6-long-dated-low-vol-OTM-call",
+    "tier": "A"
+  },
+  {
+    "expected": {
+      "binary_price": "0x255cb476",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x8ec22f0"
+    },
+    "id": "A-21",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x1312d00",
+      "b": "0x8f0d180",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0xbebc200",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0xbebc200",
+        "neg": true
+      },
+      "sigma": "0x2faf0800",
+      "strike": "0x98801ff90"
+    },
+    "source": "Gatheral2014-§4.6-long-dated-low-vol-OTM-put",
+    "tier": "A"
+  },
+  {
+    "expected": {
+      "binary_price": "0x3b7d5249",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x1742bd73"
+    },
+    "id": "B-001",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x77359400",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": true
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x19354a082"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x2f83a503",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x6a247dd6"
+    },
+    "id": "B-002",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x77359400",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": true
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x19354a082"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x3b93b9d2",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x127e0973"
+    },
+    "id": "B-003",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x77359400",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": true
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x19354a082"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x33b48333",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x524cf9d6"
+    },
+    "id": "B-004",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x77359400",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": true
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x19354a082"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x3b996db0",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0xeea8273"
+    },
+    "id": "B-005",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x77359400",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x19354a082"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x36d3aba1",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x406b56d6"
+    },
+    "id": "B-006",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x77359400",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x19354a082"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x3b9ab16c",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0xb56fb73"
+    },
+    "id": "B-007",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x77359400",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": false
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x19354a082"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x3990143b",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x2e89b3d6"
+    },
+    "id": "B-008",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x77359400",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x19354a082"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x3b9aca00",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x6924773"
+    },
+    "id": "B-009",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x77359400",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": false
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x19354a082"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x3b81247d",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x16b22fd6"
+    },
+    "id": "B-010",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x77359400",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x19354a082"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x3b2a352d",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x123302e3"
+    },
+    "id": "B-011",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x59682f00",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": true
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x298facd67"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x2d2b8107",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x5164ef87"
+    },
+    "id": "B-012",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x59682f00",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": true
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x298facd67"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x3b71695c",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0xe9f7be3"
+    },
+    "id": "B-013",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x59682f00",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": true
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x298facd67"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x3135e919",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x3f834c87"
+    },
+    "id": "B-014",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x59682f00",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": true
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x298facd67"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x3b8d56e3",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0xbf0d6a3"
+    },
+    "id": "B-015",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x59682f00",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x298facd67"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x347be6f2",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x321a1247"
+    },
+    "id": "B-016",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x59682f00",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x298facd67"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x3b987152",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x9423163"
+    },
+    "id": "B-017",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x59682f00",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": false
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x298facd67"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x37c5790e",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x24b0d807"
+    },
+    "id": "B-018",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x59682f00",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x298facd67"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x3b9ac503",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x5aeaa63"
+    },
+    "id": "B-019",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x59682f00",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": false
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x298facd67"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x3b1a0240",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x12cf3507"
+    },
+    "id": "B-020",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x59682f00",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x298facd67"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x39df629d",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0xd248b44"
+    },
+    "id": "B-021",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x3b9aca00",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": true
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x4485dbd5b"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x29debabb",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x39297022"
+    },
+    "id": "B-022",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x3b9aca00",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": true
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x4485dbd5b"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x3aa4c403",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0xac23144"
+    },
+    "id": "B-023",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x3b9aca00",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": true
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x4485dbd5b"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x2d68a8b6",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x2d3dae22"
+    },
+    "id": "B-024",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x3b9aca00",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": true
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x4485dbd5b"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x3b180991",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x8f86dc4"
+    },
+    "id": "B-025",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x3b9aca00",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x4485dbd5b"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x307e6670",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x244cdca2"
+    },
+    "id": "B-026",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x3b9aca00",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x4485dbd5b"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x3b6705a4",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x72eaa44"
+    },
+    "id": "B-027",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x3b9aca00",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": false
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x4485dbd5b"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x33fdf698",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x1b5c0b22"
+    },
+    "id": "B-028",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x3b9aca00",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x4485dbd5b"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x3b95501f",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x4cc5044"
+    },
+    "id": "B-029",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x3b9aca00",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": false
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x4485dbd5b"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x39019520",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0xf704922"
+    },
+    "id": "B-030",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x3b9aca00",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x4485dbd5b"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x3469021e",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x81b0bb3"
+    },
+    "id": "B-031",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x1dcd6500",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": true
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x70f9a2b7a"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x244e8228",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x227c062e"
+    },
+    "id": "B-032",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x1dcd6500",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": true
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x70f9a2b7a"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x35d009b7",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x6e9deb3"
+    },
+    "id": "B-033",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x1dcd6500",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": true
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x70f9a2b7a"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x268e7d0f",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x1c86252e"
+    },
+    "id": "B-034",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x1dcd6500",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": true
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x70f9a2b7a"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x36eb4602",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x604fcf3"
+    },
+    "id": "B-035",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x1dcd6500",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x70f9a2b7a"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x289189e5",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x180dbc6e"
+    },
+    "id": "B-036",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x1dcd6500",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x70f9a2b7a"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x380df2ae",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x5201b33"
+    },
+    "id": "B-037",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x1dcd6500",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": false
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x70f9a2b7a"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x2af9056a",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x139553ae"
+    },
+    "id": "B-038",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x1dcd6500",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x70f9a2b7a"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x398bcff1",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x3eeee33"
+    },
+    "id": "B-039",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x1dcd6500",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": false
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x70f9a2b7a"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x2f183d9b",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0xd9f72ae"
+    },
+    "id": "B-040",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x1dcd6500",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x70f9a2b7a"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x1ae5b4ba",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x3938700"
+    },
+    "id": "B-041",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": true
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0xba43b7400"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x175ee77f",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x11e1a300"
+    },
+    "id": "B-042",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": true
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0xba43b7400"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x1ae5b4ba",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x3938700"
+    },
+    "id": "B-043",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": true
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0xba43b7400"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x175ee77f",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x11e1a300"
+    },
+    "id": "B-044",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": true
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0xba43b7400"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x1ae5b4ba",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x3938700"
+    },
+    "id": "B-045",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0xba43b7400"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x175ee77f",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x11e1a300"
+    },
+    "id": "B-046",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0xba43b7400"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x1ae5b4ba",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x3938700"
+    },
+    "id": "B-047",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": false
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0xba43b7400"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x175ee77f",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x11e1a300"
+    },
+    "id": "B-048",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0xba43b7400"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x1ae5b4ba",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x3938700"
+    },
+    "id": "B-049",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": false
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0xba43b7400"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x175ee77f",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x11e1a300"
+    },
+    "id": "B-050",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0xba43b7400"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x121ee5f",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x3eeee33"
+    },
+    "id": "B-051",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x1dcd6500",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": true
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x133192812f"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x5ececab",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0xd9f72ae"
+    },
+    "id": "B-052",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x1dcd6500",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": true
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x133192812f"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x1e8cd9f",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x5201b33"
+    },
+    "id": "B-053",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x1dcd6500",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": true
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x133192812f"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x7589f31",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x139553ae"
+    },
+    "id": "B-054",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x1dcd6500",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": true
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x133192812f"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x27af835",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x604fcf3"
+    },
+    "id": "B-055",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x1dcd6500",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x133192812f"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x8067b74",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x180dbc6e"
+    },
+    "id": "B-056",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x1dcd6500",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x133192812f"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x30526a0",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x6e9deb3"
+    },
+    "id": "B-057",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x1dcd6500",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": false
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x133192812f"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x8800f14",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x1c86252e"
+    },
+    "id": "B-058",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x1dcd6500",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x133192812f"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x3ae3a89",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x81b0bb3"
+    },
+    "id": "B-059",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x1dcd6500",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": false
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x133192812f"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x8ec6fa6",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x227c062e"
+    },
+    "id": "B-060",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x1dcd6500",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x133192812f"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x1e066",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x4cc5044"
+    },
+    "id": "B-061",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x3b9aca00",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": true
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x1fa51c739f"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0xc9e5ae",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0xf704922"
+    },
+    "id": "B-062",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x3b9aca00",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": true
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x1fa51c739f"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x113576",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x72eaa44"
+    },
+    "id": "B-063",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x3b9aca00",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": true
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x1fa51c739f"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x212b781",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x1b5c0b22"
+    },
+    "id": "B-064",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x3b9aca00",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": true
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x1fa51c739f"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x2a8c3a",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x8f86dc4"
+    },
+    "id": "B-065",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x3b9aca00",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x1fa51c739f"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x2d1c427",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x244cdca2"
+    },
+    "id": "B-066",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x3b9aca00",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x1fa51c739f"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x4e728a",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0xac23144"
+    },
+    "id": "B-067",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x3b9aca00",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": false
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x1fa51c739f"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x3609754",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x2d3dae22"
+    },
+    "id": "B-068",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x3b9aca00",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x1fa51c739f"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x89c9e1",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0xd248b44"
+    },
+    "id": "B-069",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x3b9aca00",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": false
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x1fa51c739f"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x3e63e58",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x39297022"
+    },
+    "id": "B-070",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x3b9aca00",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x1fa51c739f"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x10c",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x5aeaa63"
+    },
+    "id": "B-071",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x59682f00",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": true
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x342c79688d"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x1828e7",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x12cf3507"
+    },
+    "id": "B-072",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x59682f00",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": true
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x342c79688d"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x7a2a",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x9423163"
+    },
+    "id": "B-073",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x59682f00",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": true
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x342c79688d"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0xa1db84",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x24b0d807"
+    },
+    "id": "B-074",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x59682f00",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": true
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x342c79688d"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x2abc2",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0xbf0d6a3"
+    },
+    "id": "B-075",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x59682f00",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x342c79688d"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x1144e9c",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x321a1247"
+    },
+    "id": "B-076",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x59682f00",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x342c79688d"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x80802",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0xe9f7be3"
+    },
+    "id": "B-077",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x59682f00",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": false
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x342c79688d"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x17543cc",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x3f834c87"
+    },
+    "id": "B-078",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x59682f00",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x342c79688d"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x15392d",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x123302e3"
+    },
+    "id": "B-079",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x59682f00",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": false
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x342c79688d"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x1d74fd0",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x5164ef87"
+    },
+    "id": "B-080",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x59682f00",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x342c79688d"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x0",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x6924773"
+    },
+    "id": "B-081",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x77359400",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": true
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x56051a6b53"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x2f164",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x16b22fd6"
+    },
+    "id": "B-082",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x77359400",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": true
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x56051a6b53"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x30b",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0xb56fb73"
+    },
+    "id": "B-083",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x77359400",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": true
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x56051a6b53"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x34133d",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x2e89b3d6"
+    },
+    "id": "B-084",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x77359400",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": true
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x56051a6b53"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x2a1a",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0xeea8273"
+    },
+    "id": "B-085",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x77359400",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x56051a6b53"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x6ef089",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x406b56d6"
+    },
+    "id": "B-086",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x77359400",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x56051a6b53"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0xd54d",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x127e0973"
+    },
+    "id": "B-087",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x77359400",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": false
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x56051a6b53"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0xa8337b",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x524cf9d6"
+    },
+    "id": "B-088",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x77359400",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x11e1a300",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x56051a6b53"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x35e7f",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x1742bd73"
+    },
+    "id": "B-089",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x77359400",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": false
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x56051a6b53"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0xe746ba",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x6a247dd6"
+    },
+    "id": "B-090",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0x1dcd6500",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x77359400",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x29b92700",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x56051a6b53"
+    },
+    "source": "synthetic-stress-grid",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x0",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x1",
+        "neg": true
+      },
+      "params_valid": false,
+      "w": "0x0"
+    },
+    "id": "B-arb-091",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x0",
+      "b": "0x0",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x2faf0800",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x3b023380",
+        "neg": true
+      },
+      "sigma": "0x2faf080",
+      "strike": "0x19e8a0fa99"
+    },
+    "source": "synthetic-arb-violating",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x0",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x1",
+        "neg": true
+      },
+      "params_valid": false,
+      "w": "0x0"
+    },
+    "id": "B-arb-092",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x0",
+      "b": "0x0",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x59682f00",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x3b023380",
+        "neg": true
+      },
+      "sigma": "0x2faf080",
+      "strike": "0x342c79688d"
+    },
+    "source": "synthetic-arb-violating",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x0",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x1",
+        "neg": true
+      },
+      "params_valid": false,
+      "w": "0x0"
+    },
+    "id": "B-arb-093",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x0",
+      "b": "0x0",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x59682f00",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x3b023380",
+        "neg": false
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x298facd67"
+    },
+    "source": "synthetic-arb-violating",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x0",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x1",
+        "neg": true
+      },
+      "params_valid": false,
+      "w": "0x0"
+    },
+    "id": "B-arb-094",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x0",
+      "b": "0x0",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x77359400",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x3b023380",
+        "neg": false
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0x19354a082"
+    },
+    "source": "synthetic-arb-violating",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x0",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x1",
+        "neg": true
+      },
+      "params_valid": false,
+      "w": "0x0"
+    },
+    "id": "B-arb-095",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x0",
+      "b": "0x0",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x3b9aca00",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x3b8b87c0",
+        "neg": true
+      },
+      "sigma": "0xf4240",
+      "strike": "0x1fa51c739f"
+    },
+    "source": "synthetic-arb-violating",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x0",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x1",
+        "neg": true
+      },
+      "params_valid": false,
+      "w": "0x0"
+    },
+    "id": "B-arb-096",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x0",
+      "b": "0x0",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x3b9aca00",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x3b8b87c0",
+        "neg": false
+      },
+      "sigma": "0xf4240",
+      "strike": "0x4485dbd5b"
+    },
+    "source": "synthetic-arb-violating",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x0",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x1",
+        "neg": true
+      },
+      "params_valid": false,
+      "w": "0x0"
+    },
+    "id": "B-arb-097",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x0",
+      "b": "0x0",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x1dcd6500",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x1dcd6500",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x2faf0800",
+        "neg": true
+      },
+      "sigma": "0x2faf080",
+      "strike": "0x70f9a2b7a"
+    },
+    "source": "synthetic-arb-violating",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x0",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x1",
+        "neg": true
+      },
+      "params_valid": false,
+      "w": "0x0"
+    },
+    "id": "B-arb-098",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x0",
+      "b": "0x0",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x1dcd6500",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x1dcd6500",
+        "neg": true
+      },
+      "rho": {
+        "mag": "0x2faf0800",
+        "neg": false
+      },
+      "sigma": "0x2faf080",
+      "strike": "0x133192812f"
+    },
+    "source": "synthetic-arb-violating",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x0",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x1",
+        "neg": true
+      },
+      "params_valid": false,
+      "w": "0x0"
+    },
+    "id": "B-arb-099",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x0",
+      "b": "0x0",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x59682f00",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x389fd980",
+        "neg": true
+      },
+      "sigma": "0x989680",
+      "strike": "0x342c79688d"
+    },
+    "source": "synthetic-arb-violating",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x0",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x1",
+        "neg": true
+      },
+      "params_valid": false,
+      "w": "0x0"
+    },
+    "id": "B-arb-100",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x0",
+      "b": "0x0",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x59682f00",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x389fd980",
+        "neg": false
+      },
+      "sigma": "0x989680",
+      "strike": "0x298facd67"
+    },
+    "source": "synthetic-arb-violating",
+    "tier": "B"
+  },
+  {
+    "expected": {
+      "binary_price": "0x196128c6",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x8583b00"
+    },
+    "id": "C-01",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2625a00",
+      "b": "0xbebc200",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0xba43b7400"
+    },
+    "source": "JackJacquier-SSVI-stub",
+    "tier": "C"
+  },
+  {
+    "expected": {
+      "binary_price": "0xe5d7ea5",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x958a146"
+    },
+    "id": "C-02",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0xee6b280",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0xbebc200",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x5f5e100",
+        "neg": true
+      },
+      "sigma": "0x17d78400",
+      "strike": "0xe38105a90"
+    },
+    "source": "JackJacquier-SSVI-stub",
+    "tier": "C"
+  },
+  {
+    "expected": {
+      "binary_price": "0x247ff40e",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x9f137c6"
+    },
+    "id": "C-03",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0xee6b280",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0xbebc200",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x5f5e100",
+        "neg": true
+      },
+      "sigma": "0x17d78400",
+      "strike": "0x98801ff90"
+    },
+    "source": "JackJacquier-SSVI-stub",
+    "tier": "C"
+  },
+  {
+    "expected": {
+      "binary_price": "0x62eaeed",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0xe7d62de"
+    },
+    "id": "C-04",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x1c9c380",
+      "b": "0x11e1a300",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x1dcd6500",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0xbebc200",
+        "neg": false
+      },
+      "sigma": "0x14dc9380",
+      "strike": "0x1331928300"
+    },
+    "source": "JackJacquier-SSVI-stub",
+    "tier": "C"
+  },
+  {
+    "expected": {
+      "binary_price": "0x317a456e",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0xae9dbde"
+    },
+    "id": "C-05",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x1c9c380",
+      "b": "0x11e1a300",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x1dcd6500",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0xbebc200",
+        "neg": false
+      },
+      "sigma": "0x14dc9380",
+      "strike": "0x70f9a27a0"
+    },
+    "source": "JackJacquier-SSVI-stub",
+    "tier": "C"
+  },
+  {
+    "expected": {
+      "binary_price": "0x471c2d",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0xa6d32ac"
+    },
+    "id": "C-06",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x3938700",
+      "b": "0x8f0d180",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x3b9aca00",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x17d78400",
+        "neg": true
+      },
+      "sigma": "0x23c34600",
+      "strike": "0x1fa51c71f8"
+    },
+    "source": "JackJacquier-SSVI-stub",
+    "tier": "C"
+  },
+  {
+    "expected": {
+      "binary_price": "0x38225207",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x119440ac"
+    },
+    "id": "C-07",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x3938700",
+      "b": "0x8f0d180",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x3b9aca00",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x17d78400",
+        "neg": true
+      },
+      "sigma": "0x23c34600",
+      "strike": "0x4485dbd20"
+    },
+    "source": "JackJacquier-SSVI-stub",
+    "tier": "C"
+  },
+  {
+    "expected": {
+      "binary_price": "0x196b51ba",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x8319fb2"
+    },
+    "id": "C-08",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2aea540",
+      "b": "0xd693a40",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x5f5e100",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x1dcd6500",
+        "neg": false
+      },
+      "sigma": "0x1ad27480",
+      "strike": "0xba43b7400"
+    },
+    "source": "JackJacquier-SSVI-stub",
+    "tier": "C"
+  },
+  {
+    "expected": {
+      "binary_price": "0x76b91a",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x1fca9e0a"
+    },
+    "id": "C-09",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2aea540",
+      "b": "0xd693a40",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x59682f00",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x5f5e100",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x1dcd6500",
+        "neg": false
+      },
+      "sigma": "0x1ad27480",
+      "strike": "0x342c796a70"
+    },
+    "source": "JackJacquier-SSVI-stub",
+    "tier": "C"
+  },
+  {
+    "expected": {
+      "binary_price": "0x3b769c14",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0xe3e5a1f"
+    },
+    "id": "C-10",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2aea540",
+      "b": "0xd693a40",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x59682f00",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x5f5e100",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x1dcd6500",
+        "neg": false
+      },
+      "sigma": "0x1ad27480",
+      "strike": "0x298fac978"
+    },
+    "source": "JackJacquier-SSVI-stub",
+    "tier": "C"
+  },
+  {
+    "expected": {
+      "binary_price": "0x163ad776",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x1908b100"
+    },
+    "id": "C2-01",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x5f5e100",
+      "b": "0x17d78400",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "sigma": "0x2faf0800",
+      "strike": "0xba43b7400"
+    },
+    "source": "PredictTests-stub-ATM-no-skew",
+    "tier": "C2"
+  },
+  {
+    "expected": {
+      "binary_price": "0x163ad776",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x1908b100"
+    },
+    "id": "C2-02",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x5f5e100",
+      "b": "0x17d78400",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0xee6b280",
+        "neg": true
+      },
+      "sigma": "0x2faf0800",
+      "strike": "0xba43b7400"
+    },
+    "source": "PredictTests-stub-ATM-neg-skew",
+    "tier": "C2"
+  },
+  {
+    "expected": {
+      "binary_price": "0x163ad776",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x1908b100"
+    },
+    "id": "C2-03",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x5f5e100",
+      "b": "0x17d78400",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0xee6b280",
+        "neg": false
+      },
+      "sigma": "0x2faf0800",
+      "strike": "0xba43b7400"
+    },
+    "source": "PredictTests-stub-ATM-pos-skew",
+    "tier": "C2"
+  },
+  {
+    "expected": {
+      "binary_price": "0xe306f2",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x104ee88d"
+    },
+    "id": "C2-04",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0xbebc200",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x3b9aca00",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x1fa51c71f8"
+    },
+    "source": "PredictTests-stub-OTM-call",
+    "tier": "C2"
+  },
+  {
+    "expected": {
+      "binary_price": "0x38a848ad",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x104ee88d"
+    },
+    "id": "C2-05",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0xbebc200",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x3b9aca00",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0x4485dbd20"
+    },
+    "source": "PredictTests-stub-OTM-put",
+    "tier": "C2"
+  },
+  {
+    "expected": {
+      "binary_price": "0xe4651f5",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x90f0966"
+    },
+    "id": "C2-06",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0xbebc200",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0xbebc200",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x5f5e100",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "sigma": "0x1dcd6500",
+      "strike": "0xe38105a90"
+    },
+    "source": "PredictTests-stub-skew-shifted",
+    "tier": "C2"
+  },
+  {
+    "expected": {
+      "binary_price": "0xe071850",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x1706137"
+    },
+    "id": "C2-07",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x989680",
+      "b": "0x5f5e100",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x5f5e100",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "sigma": "0x5f5e100",
+      "strike": "0xcddb51e10"
+    },
+    "source": "PredictTests-stub-low-variance",
+    "tier": "C2"
+  },
+  {
+    "expected": {
+      "binary_price": "0x96f2515",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x354fe036"
+    },
+    "id": "C2-08",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0xbebc200",
+      "b": "0x2faf0800",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x1dcd6500",
+        "neg": false
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x1dcd6500",
+        "neg": true
+      },
+      "sigma": "0x3b9aca00",
+      "strike": "0x1331928300"
+    },
+    "source": "PredictTests-stub-high-var-skew-call",
+    "tier": "C2"
+  },
+  {
+    "expected": {
+      "binary_price": "0x1abbed1d",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0x4d276436"
+    },
+    "id": "C2-09",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0xbebc200",
+      "b": "0x2faf0800",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x1dcd6500",
+        "neg": true
+      },
+      "m": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x1dcd6500",
+        "neg": true
+      },
+      "sigma": "0x3b9aca00",
+      "strike": "0x70f9a27a0"
+    },
+    "source": "PredictTests-stub-high-var-skew-put",
+    "tier": "C2"
+  },
+  {
+    "expected": {
+      "binary_price": "0x18af8ec9",
+      "calendar_pass": true,
+      "min_g_k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "params_valid": true,
+      "w": "0xb3663db"
+    },
+    "id": "C2-10",
+    "inputs": {
+      "T_seconds": 1209600,
+      "a": "0x2faf080",
+      "b": "0xee6b280",
+      "forward": "0xba43b7400",
+      "k": {
+        "mag": "0x0",
+        "neg": false
+      },
+      "m": {
+        "mag": "0xbebc200",
+        "neg": false
+      },
+      "rho": {
+        "mag": "0x17d78400",
+        "neg": false
+      },
+      "sigma": "0x23c34600",
+      "strike": "0xba43b7400"
+    },
+    "source": "PredictTests-stub-shifted-pos-skew",
+    "tier": "C2"
+  }
+]

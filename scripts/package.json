@@ -1,0 +1,36 @@
+{
+  "name": "scripts",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "create-pool": "pnpm tsx transactions/createPool.ts",
+    "dusdc-publish": "pnpm tsx transactions/predict/dusdcPublish.ts",
+    "dusdc-mint": "pnpm tsx transactions/predict/dusdcMint.ts",
+    "predict-publish": "pnpm tsx transactions/predict/publish.ts",
+    "predict-init": "pnpm tsx transactions/predict/init.ts",
+    "predict-deposit": "pnpm tsx transactions/predict/deposit.ts",
+    "predict-create-oracle-cap": "pnpm tsx transactions/predict/createOracleCap.ts",
+    "predict-create-oracle": "pnpm tsx transactions/predict/createOracle.ts",
+    "predict-deploy-oracles": "pnpm tsx transactions/predict/deployOracles.ts",
+    "predict-redeploy": "pnpm tsx transactions/predict/redeploy.ts",
+    "oracle-feed": "pnpm tsx services/oracle-feed/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@mysten/deepbook-v3": "^1.2.1",
+    "@mysten/sui": "^2.5.0",
+    "esbuild": "^0.27.2",
+    "pino": "^9.5.0",
+    "tsx": "^4.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "vitest": "^3.0.0"
+  }
+}

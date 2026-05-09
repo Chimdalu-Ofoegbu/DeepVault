@@ -1,7 +1,7 @@
 # Phase 1: Math Foundation (SVI Parity Gate) - Context
 
 **Gathered:** 2026-05-09
-**Status:** Ready for planning
+**Status:** Ready for planning (with re-routes — see "Re-routes from RESEARCH.md (2026-05-09)" section at bottom)
 
 <domain>
 ## Phase Boundary
@@ -175,5 +175,42 @@ Out of scope: SSVI calibration from market data (Phase 3 backtest), oracle autho
 
 ---
 
+## Re-routes from RESEARCH.md (2026-05-09)
+
+The day-1 oracle struct spike (RESEARCH.md §"Spike Findings") read the vendored `scripts/deepbookv3/packages/predict/sources/{oracle,predict}.move` + `helper/{math,i64,constants}.move` at HEAD `1159d79af33c70e09e406310e1d8f067832ede9d` and discovered six locked decisions that contradict on-chain reality. **All six re-routes ACCEPTED on 2026-05-09**, rationale: matching on-chain bit-for-bit is the only way Phase 2's D-08 "abstain on Predict mis-quote" gate can distinguish actual mispricing from model mismatch.
+
+**The on-chain Predict implementation IS our reference implementation.** Phase 1's triple-emit clones the existing `helper/math.move` + `oracle.move::compute_nd2` into Python and TypeScript. Auditability story: spec doc cites the on-chain source for every clone.
+
+| Decision | Original (CONTEXT.md) | Re-routed to | Source |
+|---|---|---|---|
+| **D-01** SSVI parameterization | Heston-like power-law (η, γ, ρ) + per-tenor θ_T | **Raw 5-param SVI** `(a, b, ρ, m, σ)` per oracle. SSVI sufficient conditions become an *additional* off-chain checker step, not the primary param interface. | `oracle.move:58-66` (`OracleSVIUpdated` event struct) |
+| **D-02** Evaluator signature | `f(k, T, θ_T, ρ, η, γ) → (w, binary_price)` | `f(svi: SVIParams, k) → (w, binary_price)` where `SVIParams = (a, b, rho, m, sigma)`. T is implicit per oracle (one oracle per expiry). | `oracle.move:96-114` (`OracleSVI` struct) |
+| **D-09** Φ approximation | Abramowitz-Stegun 7.1.26 (claimed 7 coeffs) | **Cody 1969 piecewise rational Chebyshev** (~30 coefficients across 3 ranges, ~1e-15 in float / ~5 units at 1e9). Coefficients emitted by codegen extension reading new `shared/cody_phi_coefficients.toml`. | `helper/math.move:31-65` (constants), `:191-239` (`normal_cdf_u128`), source comment cites Cody 1969 / GSL gauss.c |
+| **D-10** Fixed-point scales | Variance 1e27 / price 1e18 (vault-internal) | **SVI math layer at 1e9** (matches `predict::constants::float_scaling!()`). Vault NAV layer keeps 1e18, vault shares keep 1e9 — those are unchanged. New `[fixed_point.svi]` sub-section (or top-level `[svi].scale = 9` field) in `shared/strategy.toml`. | `helper/constants.move` (`FLOAT_SCALING = 1e9`) |
+| **D-11** Newton sqrt | Loop-until-converged (`x_{n+1} == x_n` or `+1`) | **Bit-length seed + 7 unrolled Newton iterations + final overshoot correction** `if (g*g > x) g = g - 1`. Deterministic constant gas; matches on-chain. | `helper/math.move:266-292` (`sqrt_u128`) |
+| **D-13** Intermediate width | u256 intermediates / u128 IO | **u128 intermediates / u64 IO** (matches on-chain). u256 unnecessary at 1e9 scaling for SVI domain. Move 2024 still has u256 available; we just don't need it. | `helper/math.move` arithmetic + `oracle.move::compute_nd2` |
+| **D-14** Parity tolerance | Exact `==` at 10⁻¹⁸ | **Exact `==` at 10⁻⁹** (auto-follows D-10). Still bit-equal; tolerance window is still zero. | Auto-follows D-10 |
+| **D-17** Tier C cross-check | JackJacquier/SSVI repo only | JackJacquier/SSVI **has no LICENSE, only a Jupyter notebook, no shipped fixtures** — degraded. Tier C remains JackJacquier (execute notebook against pinned inputs, capture outputs by hand into `tests/fixtures/jackjacquier_ssvi_outputs.json` with notebook git SHA cited in spec; treat as cross-check reference, not vendored code). **Add Tier C2:** cross-check against vendored Predict's own Move tests at `scripts/deepbookv3/packages/predict/tests/oracle_tests.move`. | RESEARCH.md §"Spike Findings" + `JackJacquier/SSVI` repo metadata (4 commits, no LICENSE) |
+
+**Decisions that auto-follow re-routes (no separate re-route needed):**
+
+- **D-04** (param-bound enforcement diverges by trust boundary): Raw SVI's closed-form butterfly bound is non-trivial (Roper-Rutkowski / Martini-Mingone 2020). Move-side hard-reject becomes a stricter sanity check on `(a, b, rho, m, sigma)` ranges from on-chain validation; off-chain g(k) grid scan still works as primary arbitrage detection. Spec doc records the exact condition.
+- **D-15..D-19** (golden vectors): unchanged structure; integer hex strings at 10⁻⁹ scale (auto-follows D-10/D-14). Tier A still Gatheral 2014 §4 worked vectors. Tier B still synthetic stress (now in raw-SVI param space). Tier C augmented per D-17 re-route above.
+
+**Decisions that stand as written (no spike conflict):**
+
+D-03 (output contract `(total_variance, binary_call_price)`), D-05 (off-chain checker scope), D-06 (r=0), D-07 (forward F passed explicitly), D-08 (theoretical fair value vs Phase 2 abstain), D-12 (truncate toward zero), D-16 (JSON schema of integer hex strings), D-18 (no time-stamped replay vectors), D-19 (whitepaper claim ladder — adjusts to "Bit-equal across 3 runtimes on 120 vectors at 10⁻⁹ including 20 from Gatheral & Jacquier 2014, all algorithms cloned line-for-line from the audited on-chain Predict implementation").
+
+**Open questions for the planner to resolve in Wave 0 spikes (1-hour each):**
+
+1. Is `oracle.compute_price` callable from `deepvault::svi_view` (different Move package)? `oracle.move:331` declares it `public(package)`. Wave 0 task: write a tiny Move test calling `predict::get_trade_amounts(predict, oracle, key, quantity=1, clock)` and inspect `(ask, bid)`. If `(ask + bid) / 2 ≈ oracle mid`, we can sanity-test directly; otherwise MATH-02's "matches on-chain output" assertion lives in a Phase 2 integration test.
+2. Exact bit-shift sequence in `sqrt_initial_guess_u128` — verify Python clone matches Move on 1000 random u128 inputs.
+3. `[svi]` schema fill-in: `[fixed_point.svi]` sub-section vs top-level `[svi].scale = 9`. Recommended: top-level `[svi].scale = 9`.
+4. `phi.move` and `isqrt.move` location: `contracts/sources/helpers/` (mirror Predict's `packages/predict/sources/helper/`) or flat in `contracts/sources/`. Recommended: `contracts/sources/helpers/`.
+5. `max safe input domain` for k: spec doc records `k ∈ [-2.5, 2.5]` (in 1e9 → ±2_500_000_000). Outside this range `(k - m)^2` may overflow at extreme strikes if `b` is also large.
+
+---
+
 *Phase: 1-Math Foundation (SVI Parity Gate)*
 *Context gathered: 2026-05-09*
+*Re-routes accepted: 2026-05-09 (post-spike)*

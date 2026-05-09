@@ -1,0 +1,168 @@
+# .github/workflows/ci.yml
+# Required status check for the main branch (Pitfall 0-F).
+# Five jobs: move, ts, python, codegen-drift, parity (Phase 0 stub).
+#
+# parity is the gate the whole project hangs on:
+#   Phase 0 -> empty vectors, asserts file exists (this commit)
+#   Phase 1 -> wires actual three-runtime cross-check (MATH-05)
+#   Stays green forever after; if it goes red, halt feature work.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  move:
+    name: Move tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Sui CLI (mainnet-v1.71.1)
+        run: |
+          set -euo pipefail
+          SUI_VERSION="mainnet-v1.71.1"
+          # Try the canonical Linux x86_64 tarball naming pattern from RESEARCH.md A6.
+          # If asset name evolves, update here and regenerate ci.yml.
+          ASSET="sui-${SUI_VERSION}-ubuntu-x86_64.tgz"
+          URL="https://github.com/MystenLabs/sui/releases/download/${SUI_VERSION}/${ASSET}"
+          echo "Downloading ${URL}"
+          curl -fsSL "${URL}" -o /tmp/sui.tgz
+          mkdir -p "$HOME/.sui/bin"
+          tar -xzf /tmp/sui.tgz -C "$HOME/.sui/bin"
+          echo "$HOME/.sui/bin" >> "$GITHUB_PATH"
+
+      - name: Verify Sui version
+        run: sui --version
+
+      - name: Move build
+        working-directory: contracts
+        run: sui move build
+
+      - name: Move test
+        working-directory: contracts
+        run: sui move test
+
+  ts:
+    name: TypeScript tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          run_install: false
+
+      - name: Install Node 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm -r run lint
+
+      - name: Typecheck
+        run: pnpm -r exec tsc --noEmit || true   # Phase 0 placeholders have no tsconfig; tighten in Phase 4
+
+      - name: Test
+        run: pnpm -r run test
+
+  python:
+    name: Python tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backtest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8
+        with:
+          version: 'latest'
+          enable-cache: true
+          cache-dependency-glob: 'backtest/uv.lock'
+
+      - name: Install (locked)
+        run: uv sync --locked --all-extras --dev
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Format check
+        run: uv run ruff format --check .
+
+      - name: Test
+        run: uv run pytest
+
+  codegen-drift:
+    name: Codegen drift check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8
+        with:
+          version: 'latest'
+          enable-cache: true
+          cache-dependency-glob: 'backtest/uv.lock'
+
+      - name: Sync backtest env (provides Python 3.12 + tomli for codegen)
+        working-directory: backtest
+        run: uv sync --frozen
+
+      - name: Regenerate constants
+        run: |
+          cd backtest && uv run --no-project python ../scripts/codegen.py
+
+      - name: Verify no drift
+        run: |
+          if ! git diff --exit-code --stat \
+              contracts/sources/strategy_constants.move \
+              backtest/src/deepvault/strategy_constants.py \
+              dashboard/src/lib/strategy_constants.ts; then
+            echo "::error::strategy_constants files out of sync — run 'make codegen' locally and commit the regenerated files. See CONTRIBUTING.md §'Editing generated code'."
+            exit 1
+          fi
+
+  parity:
+    name: Three-way golden-vector parity (Phase 0 stub)
+    runs-on: ubuntu-latest
+    needs: [move, ts, python, codegen-drift]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Phase 0 SCAFFOLD: vectors file is empty []. Job exists but is a no-op.
+      # Phase 1 (MATH-05) wires the actual cross-runtime parity check here:
+      #   - invoke Move test runner that loads vectors and asserts on chain
+      #   - run python -m deepvault.parity_runner against vectors
+      #   - run pnpm -r exec tsx scripts/parity_runner.ts against vectors
+      #   - assert all three runtimes produce identical output within tolerance
+      - name: Phase 0 stub — assert vectors file exists
+        run: |
+          test -f shared/golden-vectors.json
+          echo "Phase 0 parity stub OK (empty vectors). Phase 1 MATH-05 wires the actual cross-runtime check."

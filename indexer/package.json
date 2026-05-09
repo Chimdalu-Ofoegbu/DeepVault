@@ -1,0 +1,11 @@
+{
+  "name": "@deepvault/indexer",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Sui RPC event relay (Phase 4 placeholder)",
+  "scripts": {
+    "build": "echo 'Phase 4 fills this in' && exit 0",
+    "test": "echo 'Phase 4 fills this in' && exit 0",
+    "lint": "echo 'Phase 4 fills this in' && exit 0"
+  }
+}

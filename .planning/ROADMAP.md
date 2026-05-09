@@ -88,7 +88,7 @@ Drop in this order, never reverse:
 - [x] 01-03-PLAN.md (Wave 2, TDD) — Python canonical evaluator: isqrt + phi + ln + svi + tests
 - [x] 01-04-PLAN.md (Wave 3) — Golden-vector emitter: 120+ vectors (Tier A/B/C/C2) + Move companion
 - [x] 01-05-PLAN.md (Wave 4) — Move evaluator: helpers/{i64,math,isqrt,phi,ln} + svi_view + tests
-- [ ] 01-06-PLAN.md (Wave 4) — TypeScript evaluator: math/isqrt/phi/ln/svi.ts + Vitest setup + tests
+- [x] 01-06-PLAN.md (Wave 4) — TypeScript evaluator: math/isqrt/phi/ln/svi.ts + Vitest setup + tests
 - [ ] 01-07-PLAN.md (Wave 5) — CI parity job wiring: 3-runtime cross-check + forbidden-token grep
 - [ ] 01-08-PLAN.md (Wave 6) — Arb-checker (Python + TS) + g(k) array + Tier C JackJacquier fixture
 
@@ -162,7 +162,7 @@ Decimal phases (e.g., 2.1) reserved for urgent insertions and execute between th
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 0. Setup & Ground Rules | 8/8 | Complete-with-checkpoints | 2026-05-09 |
-| 1. Math Foundation (SVI Parity Gate) | 0/8 | Not started | - |
+| 1. Math Foundation (SVI Parity Gate) | 6/8 | In progress | - |
 | 2. Vault Move Package + Testnet Deploy | 0/TBD | Not started | - |
 | 3. Backtest Harness + Two-Protocol PTB | 0/TBD | Not started | - |
 | 4. PLP Risk Studio Dashboard + Relay | 0/TBD | Not started | - |

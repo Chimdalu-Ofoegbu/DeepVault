@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
 status: executing
-stopped_at: Phase 01-04 complete (2/2 tasks, 141 golden vectors emitted, CI codegen-drift extended, Plans 01-05/06/07/08 unblocked)
-last_updated: "2026-05-09T15:47:08.498Z"
+stopped_at: Phase 01-06 complete (3/3 tasks, 303 Vitest tests pass incl. 131-vector golden parity loop bit-equal with Python at 1 unit/1e9, MATH-03 satisfied, Plan 01-07 CI parity job unblocked)
+last_updated: "2026-05-09T17:00:00.000Z"
 last_activity: 2026-05-09
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 16
-  completed_plans: 13
-  percent: 81
+  completed_plans: 14
+  percent: 88
 ---
 
 # Project State
@@ -26,12 +26,12 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 01 (math-foundation-svi-parity-gate) — EXECUTING
-Plan: 6 of 8
+Plan: 7 of 8
 Status: Ready to execute
 Next phase: Phase 1 — Math Foundation (SVI Parity Gate); requirements MATH-01..06; depends on Phase 0
 Last activity: 2026-05-09
 
-Progress: [██████████] 100% Phase 0 / 14% milestone
+Progress: [████████████░░░░░] 75% Phase 1 / 88% milestone
 
 ## Performance Metrics
 
@@ -66,6 +66,7 @@ Progress: [██████████] 100% Phase 0 / 14% milestone
 | Phase 01 P01-03 | 10min | 3 tasks | 9 files |
 | Phase 01 P01-04 | 8min | 2 tasks | 5 files |
 | Phase 01 P01-05 | 12 | 3 tasks | 11 files |
+| Phase 01 P01-06 | 8min | 3 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -127,6 +128,9 @@ Recent decisions affecting current work:
 - [Phase ?]: Phase 01-05: 4 Move test modules (i64+isqrt+phi+svi_view) authored; svi_view_test.move loops all 141 golden vectors and asserts bit-equal output within 1 unit at 1e9 — MATH-02 parity gate covers Tier A (21) + B-valid (90) + C (10) + C2 (10) = 131 vectors; 10 arb-violating skipped via params_valid guard with EZeroVariance assertion test for rejection coverage
 - [Phase ?]: Phase 01-05: Sui CLI unavailable in execution environment (verified via which/command-v/PowerShell); sui move build && sui move test deferred to CI / Plan 01-07 parity job; static review against vendored source confirms algorithmic correctness
 - [Phase ?]: Phase 01-05: Cross-runtime sqrt parity test inlines first 20 cases from backtest/tests/test_isqrt_random_snapshot.txt as Move u128 hex literals (Move tests can't read text files at compile time); same random.Random(seed=42) inputs as Plan 01-03 Python pytest
+- [Phase ?]: Phase 01-06: TS evaluator triple+ (math/isqrt/phi/ln/svi.ts) cloned bigint-only from vendored Predict SHA 1159d79a; Vitest 4.1.5 wired in dashboard/ workspace; 303 tests pass in 1.3s incl. 100-input cross-runtime sqrt parity vs Python snapshot AND 131-valid-vector total_variance + binary_price parity loops within 1 unit at 1e9
+- [Phase ?]: Phase 01-06: MATH-03 satisfied — TS evaluator bit-equal with Python on every valid golden vector. Combined with Plan 01-03 (MATH-01) + Plan 01-05 (MATH-02), three-way parity gate is provably real on 131 vectors; Plan 01-07 can wire all three runtime test commands as required-status-checks
+- [Phase ?]: Phase 01-06: BigInt `/` truncates toward zero natively (matches Move u128 + Python _signed_div_trunc); plain BigInt arithmetic is bit-equal with Python by construction — no _signedDivTrunc helper needed. Documented in svi.ts. NO Number/parseFloat/Math.X in any of the 5 evaluator files; all numeric literals carry the `n` suffix
 
 ### Pending Todos
 
@@ -166,6 +170,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-09T15:45:55.151Z
-Stopped at: Phase 01-04 complete (2/2 tasks, 141 golden vectors emitted, CI codegen-drift extended, Plans 01-05/06/07/08 unblocked)
+Last session: 2026-05-09T17:00:00.000Z
+Stopped at: Phase 01-06 complete (3/3 tasks, 303 Vitest tests pass incl. 131-vector golden parity loop bit-equal with Python at 1 unit/1e9, MATH-03 satisfied, Plan 01-07 CI parity job unblocked)
 Resume file: None

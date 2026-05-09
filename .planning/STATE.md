@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
 status: executing
-stopped_at: "Phase 01-01 complete (4/4 tasks, MATH: prefix policy locked, [svi] schema rewritten, 5 spikes resolved). Plans 01-02..01-08 unblocked simultaneously."
-last_updated: "2026-05-09T15:06:52.504Z"
+stopped_at: Phase 01-04 complete (2/2 tasks, 141 golden vectors emitted, CI codegen-drift extended, Plans 01-05/06/07/08 unblocked)
+last_updated: "2026-05-09T15:24:59.429Z"
 last_activity: 2026-05-09
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 16
-  completed_plans: 11
-  percent: 69
+  completed_plans: 12
+  percent: 75
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 01 (math-foundation-svi-parity-gate) — EXECUTING
-Plan: 4 of 8
+Plan: 5 of 8
 Status: Ready to execute
 Next phase: Phase 1 — Math Foundation (SVI Parity Gate); requirements MATH-01..06; depends on Phase 0
 Last activity: 2026-05-09
@@ -64,6 +64,7 @@ Progress: [██████████] 100% Phase 0 / 14% milestone
 | Phase 01 P01 | 12min | 4 tasks | 7 files |
 | Phase 01 P02 | 14min | 3 tasks | 6 files |
 | Phase 01 P01-03 | 10min | 3 tasks | 9 files |
+| Phase 01 P01-04 | 8min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -117,6 +118,10 @@ Recent decisions affecting current work:
 - [Phase ?]: Phase 01-03: Python canonical SVI evaluator complete (isqrt + phi + ln + svi cloned from vendored math.move + oracle.move at SHA 1159d79a; 50 tests pass; Cody Phi within 1e-7 of scipy; 100-input snapshot pinned for Plan 01-05 Move cross-check)
 - [Phase ?]: Phase 01-03: ECannotBeNegative on-chain assert is provably unreachable in pure SVI math when sigma > 0; kept as defensive parity, tests exercise EZeroVariance path instead
 - [Phase ?]: Phase 01-03: Tier A vectors hand-computed from raw-SVI closed-form (5 cases); Plan 01-04 supersedes via golden-vectors.json from this same evaluator
+- [Phase ?]: Phase 01-04: 141 golden vectors emitted (A=21, B=100, C=10, C2=10) via scripts/golden_emit.py; deepvault.svi canonical; D-16 hex schema with {mag,neg} signed pairs
+- [Phase ?]: Phase 01-04: Tier B arb-violating sub-tier uses a=0,b=0 to trigger reachable EZeroVariance (ECannotBeNegative is unreachable for sigma>0 per 01-03 analysis); 10 IDs B-arb-091..B-arb-100 have params_valid=false
+- [Phase ?]: Phase 01-04: CI codegen-drift extended from 6 to 8 file paths (+ shared/golden-vectors.json + contracts/tests/golden_vectors_data.move); new Regenerate-golden-vectors step inserted; job keys codegen-drift + parity unchanged for branch protection
+- [Phase ?]: Phase 01-04: Tier C/C2 ship as stubs with deepvault.svi-derived expected values; vendored oracle_tests.move does NOT exist per 01-01-SPIKE-NOTES.md; Plan 01-08 may overwrite C2 with empirical sui-move-test outputs of oracle::compute_nd2
 
 ### Pending Todos
 
@@ -156,6 +161,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-09T15:06:17.139Z
-Stopped at: Phase 01-01 complete (4/4 tasks, MATH: prefix policy locked, [svi] schema rewritten, 5 spikes resolved). Plans 01-02..01-08 unblocked simultaneously.
+Last session: 2026-05-09T15:24:59.400Z
+Stopped at: Phase 01-04 complete (2/2 tasks, 141 golden vectors emitted, CI codegen-drift extended, Plans 01-05/06/07/08 unblocked)
 Resume file: None

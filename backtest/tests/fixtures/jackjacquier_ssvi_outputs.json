@@ -1,0 +1,52 @@
+{
+  "_metadata": {
+    "source_repo": "https://github.com/JackJacquier/SSVI",
+    "source_notebook_sha": "(unverified - upstream repo has no LICENSE; outputs derived per CONTEXT.md re-route D-17 + 01-01-SPIKE-NOTES.md)",
+    "rationale": "JackJacquier/SSVI ships only a Jupyter notebook with no LICENSE. Per CONTEXT.md re-route D-17, executing the notebook against pinned inputs and capturing outputs into this fixture is the documented path. For Plan 01-08 the expected_w values are derived from deepvault.svi.total_variance(svi, k) on these inputs - this is a Tier C 'stub' cross-check that asserts the SHAPE of the cross-check pipeline (loader + per-row tolerance + notebook-style assertion) without externally-verified ground truth. A future plan can overwrite the expected_w values with notebook-captured outputs (recompute via Jupyter against pinned commit SHA) without changing the loader/test harness.",
+    "tolerance": "5 units at FLOAT_SCALING=1e9 (notebook would use float arithmetic; bit-equality is not expected even after notebook capture).",
+    "schema": "Each row: {id: string, svi: {a, b, rho, m, sigma at FLOAT_SCALING=1e9}, k: int at FLOAT_SCALING, expected_w: int at FLOAT_SCALING, tolerance: int, comment: string}",
+    "future_work": "Phase 6 whitepaper closeout: (a) execute upstream notebook against the 5 svi/k tuples below, (b) capture outputs to this file with notebook git SHA pinned, (c) confirm tolerance window holds against deepvault.svi outputs."
+  },
+  "vectors": [
+    {
+      "id": "JJ-01",
+      "svi": {"a": 40000000, "b": 200000000, "rho": 0, "m": 0, "sigma": 500000000},
+      "k": 0,
+      "expected_w": 140000000,
+      "tolerance": 5,
+      "comment": "ATM no-skew baseline; SSVI Heston-power-law boundary case shape"
+    },
+    {
+      "id": "JJ-02",
+      "svi": {"a": 50000000, "b": 250000000, "rho": -100000000, "m": 0, "sigma": 400000000},
+      "k": 200000000,
+      "expected_w": 156803398,
+      "tolerance": 5,
+      "comment": "Mild negative skew + slight OTM call"
+    },
+    {
+      "id": "JJ-03",
+      "svi": {"a": 50000000, "b": 250000000, "rho": -100000000, "m": 0, "sigma": 400000000},
+      "k": -200000000,
+      "expected_w": 166803398,
+      "tolerance": 5,
+      "comment": "Same SVI but OTM put; w should be higher than the call due to negative skew"
+    },
+    {
+      "id": "JJ-04",
+      "svi": {"a": 30000000, "b": 300000000, "rho": 200000000, "m": 0, "sigma": 350000000},
+      "k": 500000000,
+      "expected_w": 243098334,
+      "tolerance": 5,
+      "comment": "Positive skew, moderate OTM call; tests the +rho path"
+    },
+    {
+      "id": "JJ-05",
+      "svi": {"a": 60000000, "b": 150000000, "rho": -400000000, "m": 0, "sigma": 600000000},
+      "k": 1000000000,
+      "expected_w": 174928556,
+      "tolerance": 5,
+      "comment": "Strong negative skew, far OTM call; tests asymptotic behavior"
+    }
+  ]
+}

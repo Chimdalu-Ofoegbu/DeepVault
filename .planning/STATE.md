@@ -4,14 +4,14 @@ milestone: v1.1
 milestone_name: milestone
 status: executing
 stopped_at: Phase 01-04 complete (2/2 tasks, 141 golden vectors emitted, CI codegen-drift extended, Plans 01-05/06/07/08 unblocked)
-last_updated: "2026-05-09T15:24:59.429Z"
+last_updated: "2026-05-09T15:47:08.498Z"
 last_activity: 2026-05-09
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 16
-  completed_plans: 12
-  percent: 75
+  completed_plans: 13
+  percent: 81
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 01 (math-foundation-svi-parity-gate) — EXECUTING
-Plan: 5 of 8
+Plan: 6 of 8
 Status: Ready to execute
 Next phase: Phase 1 — Math Foundation (SVI Parity Gate); requirements MATH-01..06; depends on Phase 0
 Last activity: 2026-05-09
@@ -65,6 +65,7 @@ Progress: [██████████] 100% Phase 0 / 14% milestone
 | Phase 01 P02 | 14min | 3 tasks | 6 files |
 | Phase 01 P01-03 | 10min | 3 tasks | 9 files |
 | Phase 01 P01-04 | 8min | 2 tasks | 5 files |
+| Phase 01 P01-05 | 12 | 3 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -122,6 +123,10 @@ Recent decisions affecting current work:
 - [Phase ?]: Phase 01-04: Tier B arb-violating sub-tier uses a=0,b=0 to trigger reachable EZeroVariance (ECannotBeNegative is unreachable for sigma>0 per 01-03 analysis); 10 IDs B-arb-091..B-arb-100 have params_valid=false
 - [Phase ?]: Phase 01-04: CI codegen-drift extended from 6 to 8 file paths (+ shared/golden-vectors.json + contracts/tests/golden_vectors_data.move); new Regenerate-golden-vectors step inserted; job keys codegen-drift + parity unchanged for branch protection
 - [Phase ?]: Phase 01-04: Tier C/C2 ship as stubs with deepvault.svi-derived expected values; vendored oracle_tests.move does NOT exist per 01-01-SPIKE-NOTES.md; Plan 01-08 may overwrite C2 with empirical sui-move-test outputs of oracle::compute_nd2
+- [Phase ?]: Phase 01-05: Move evaluator + helpers cloned line-for-line from vendored Predict at SHA 1159d79a; production binary_price() FULLY FUNCTIONAL after Spike 1 reassessment (oracle::svi + SVIParams accessors are public)
+- [Phase ?]: Phase 01-05: 4 Move test modules (i64+isqrt+phi+svi_view) authored; svi_view_test.move loops all 141 golden vectors and asserts bit-equal output within 1 unit at 1e9 — MATH-02 parity gate covers Tier A (21) + B-valid (90) + C (10) + C2 (10) = 131 vectors; 10 arb-violating skipped via params_valid guard with EZeroVariance assertion test for rejection coverage
+- [Phase ?]: Phase 01-05: Sui CLI unavailable in execution environment (verified via which/command-v/PowerShell); sui move build && sui move test deferred to CI / Plan 01-07 parity job; static review against vendored source confirms algorithmic correctness
+- [Phase ?]: Phase 01-05: Cross-runtime sqrt parity test inlines first 20 cases from backtest/tests/test_isqrt_random_snapshot.txt as Move u128 hex literals (Move tests can't read text files at compile time); same random.Random(seed=42) inputs as Plan 01-03 Python pytest
 
 ### Pending Todos
 
@@ -161,6 +166,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-09T15:24:59.400Z
+Last session: 2026-05-09T15:45:55.151Z
 Stopped at: Phase 01-04 complete (2/2 tasks, 141 golden vectors emitted, CI codegen-drift extended, Plans 01-05/06/07/08 unblocked)
 Resume file: None

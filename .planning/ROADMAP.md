@@ -82,7 +82,15 @@ Drop in this order, never reverse:
   3. The TypeScript `dashboard/lib/svi.ts` evaluator produces output identical to Python on the same vectors, executable via `pnpm test`.
   4. The arbitrage-free checker visualizes a violating g(k) curve (not just a boolean) when fed an arbitrage-violating SVI slice, and passes when fed Gatheral-paper-valid slices.
   5. The CI three-way parity gate is green; any change in any runtime that breaks parity blocks the phase from advancing.
-**Plans**: TBD
+**Plans**: 8 plans
+- [ ] 01-01-PLAN.md (Wave 0) — Spec doc + strategy.toml [svi] extension + MATH: prefix + Wave-0 spike resolutions
+- [ ] 01-02-PLAN.md (Wave 1) — Codegen extension for Cody Phi coefficients (3 generated files)
+- [ ] 01-03-PLAN.md (Wave 2, TDD) — Python canonical evaluator: isqrt + phi + ln + svi + tests
+- [ ] 01-04-PLAN.md (Wave 3) — Golden-vector emitter: 120+ vectors (Tier A/B/C/C2) + Move companion
+- [ ] 01-05-PLAN.md (Wave 4) — Move evaluator: helpers/{i64,math,isqrt,phi,ln} + svi_view + tests
+- [ ] 01-06-PLAN.md (Wave 4) — TypeScript evaluator: math/isqrt/phi/ln/svi.ts + Vitest setup + tests
+- [ ] 01-07-PLAN.md (Wave 5) — CI parity job wiring: 3-runtime cross-check + forbidden-token grep
+- [ ] 01-08-PLAN.md (Wave 6) — Arb-checker (Python + TS) + g(k) array + Tier C JackJacquier fixture
 
 ### Phase 2: Vault Move Package + Testnet Deploy
 **Goal**: A deployed `deepvault::` Move package on Sui testnet supporting end-to-end supply→hedge→redeem with vault share tokens, withdrawal queue, and pause authority — auditable, tested, and integration-verified against current Predict contracts.
@@ -154,7 +162,7 @@ Decimal phases (e.g., 2.1) reserved for urgent insertions and execute between th
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 0. Setup & Ground Rules | 8/8 | Complete-with-checkpoints | 2026-05-09 |
-| 1. Math Foundation (SVI Parity Gate) | 0/TBD | Not started | - |
+| 1. Math Foundation (SVI Parity Gate) | 0/8 | Not started | - |
 | 2. Vault Move Package + Testnet Deploy | 0/TBD | Not started | - |
 | 3. Backtest Harness + Two-Protocol PTB | 0/TBD | Not started | - |
 | 4. PLP Risk Studio Dashboard + Relay | 0/TBD | Not started | - |

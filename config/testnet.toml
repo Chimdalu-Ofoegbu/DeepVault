@@ -1,0 +1,62 @@
+# config/testnet.toml
+# Testnet runtime configuration for DeepVault.
+#
+# Schema is intentionally identical to config/mainnet.toml so the Phase 5
+# preflight script can diff structure (Pitfall 14 mitigation).
+#
+# Consumed by:
+#   - indexer (Phase 4)        -> SUI_RPC_URL, PREDICT_PACKAGE, oracle event filter
+#   - dashboard (Phase 4)      -> PREDICT_SERVER_URL, RELAY_URL
+#   - scripts/preflight.sh     -> schema parity vs mainnet.toml
+#   - vault::predict_adapter   -> reads addresses indirectly via Move.toml [addresses]
+
+schema_version = 1
+
+[network]
+name = "testnet"
+sui_rpc_url = "https://fullnode.testnet.sui.io:443"
+sui_ws_url = ""                                     # Sui JSON-RPC WS deprecated; queryEvents polling only
+predict_server_url = "https://predict-server.testnet.mystenlabs.com"
+
+[predict]
+# DeepBook Predict, testnet, verified 2026-05-08 per CLAUDE.md Stack Pins
+package_id = "0xf5ea2b3749c65d6e56507cc35388719aadb28f9cab873696a2f8687f5c785138"
+registry_id = "0x43af14fed5480c20ff77e2263d5f794c35b9fab7e2212903127062f4fe2a6e64"
+top_level_shared_object_id = "0xc8736204d12f0a7277c86388a68bf8a194b0a14c5538ad13f22cbd8e2a38028a"
+plp_type_tag = "0xf5ea2b3749c65d6e56507cc35388719aadb28f9cab873696a2f8687f5c785138::plp::PLP"
+
+[deepbook_margin]
+# DeepBook Margin, testnet (TBD: pull from @mysten/deepbook-v3 0.17.0 Margin Manager docs in Phase 1+ spike)
+package_id = "TBD"
+margin_pool_id = "TBD"
+
+[oracle_svi]
+# OracleSVIUpdated event filter (Phase 1 captures exact event struct schema)
+event_module_full = "TBD::oracle_svi::OracleSVIUpdated"
+poll_interval_ms = 2000                                         # 2s cadence per STACK.md
+
+[assets]
+# Quote asset on testnet, DUSDC, 6 decimals (CLAUDE.md Stack Pins)
+quote_type_tag = "0xe95040085976bfd54a1a07225cd46c8a2b4e8e2b6732f140a0fc49850ba73e1a::dusdc::DUSDC"
+quote_decimals = 6
+btc_oracle_type_tag = "TBD"
+
+[deepvault]
+# Filled at testnet deploy time (Phase 2)
+package_id = "TBD"
+vault_shared_object_id = "TBD"
+admin_cap_id = "TBD"
+treasury_cap_holder = "TBD"
+deploy_tx_digest = "TBD"
+
+[hosting]
+# Per CONTEXT.md D-13 (Vercel default subdomain), D-15 (Render free tier), D-16 (no custom domain)
+dashboard_url = "TBD"                # filled in Phase 4 deploy: https://<slug>.vercel.app
+relay_url = "TBD"                    # filled in Phase 4 deploy: wss://<slug>.onrender.com
+relay_keepalive_path = "/healthz"
+
+[contingency]
+# Mainnet-redeploy contingency tracking (DEPLOY-09); not directly applicable to testnet
+# but field present for schema parity with mainnet.toml.
+predict_mainnet_shipped = false      # Phase 5 sets to true on day-of if mainnet shipped
+fallback_documented_in = "docs/MAINNET-FUNDING.md"

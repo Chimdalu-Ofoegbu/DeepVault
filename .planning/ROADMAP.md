@@ -69,7 +69,7 @@ Drop in this order, never reverse:
 - [x] 00-04-PLAN.md — config/{testnet,mainnet}.toml scaffolds (schema parity, Pitfall 14 mitigation)
 - [x] 00-05-PLAN.md — DeepBookV3 fork via subtree + scripts/predict-diff.sh + Monday cron workflow
 - [x] 00-06-PLAN.md — CONTRIBUTING.md + docs/HEDGE-POLICY.md + docs/MAINNET-FUNDING.md (policy locks)
-- [ ] 00-07-PLAN.md — .github/workflows/ci.yml 5-job matrix + golden-vectors.json placeholder + branch-protection guide
+- [x] 00-07-PLAN.md — .github/workflows/ci.yml 5-job matrix + golden-vectors.json placeholder + branch-protection guide (Tasks 1-3 complete; Task 4 awaiting human action — see 00-07-SUMMARY.md Resume Signal)
 - [ ] 00-08-PLAN.md — README polish + end-to-end Phase 0 verification + Phase 0 closure SUMMARY
 
 ### Phase 1: Math Foundation (SVI Parity Gate)

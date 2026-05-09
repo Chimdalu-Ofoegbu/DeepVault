@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
 status: executing
-stopped_at: Plan 00-06 complete (CONTRIBUTING.md + HEDGE-POLICY.md + MAINNET-FUNDING.md policy locks)
-last_updated: "2026-05-09T05:16:54Z"
+stopped_at: Plan 00-07 complete-with-checkpoint (CI 5-job matrix + golden-vectors stub + branch-protection doc; Task 4 awaiting human action)
+last_updated: "2026-05-09T06:25:00Z"
 last_activity: 2026-05-09
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 8
-  completed_plans: 6
-  percent: 75
+  completed_plans: 7
+  percent: 87
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 0 (Setup & Ground Rules) — EXECUTING
-Plan: 7 of 8
-Status: Ready to execute
+Plan: 8 of 8
+Status: Ready to execute (Plan 00-07 complete-with-checkpoint; Task 4 human action awaited)
 Last activity: 2026-05-09
 
-Progress: [████████░░] 75%
+Progress: [█████████░] 87%
 
 ## Performance Metrics
 
@@ -58,6 +58,7 @@ Progress: [████████░░] 75%
 | Phase Phase 0 PP00-04 | 5min | 2 tasks tasks | 2 files files |
 | Phase 0 P00-05 | 8min | 4 tasks | 4 files |
 | Phase 0 P00-06 | 4min | 3 tasks | 3 files |
+| Phase 0 P00-07 | 6min | 3 tasks (auto) + 1 checkpoint | 3 files |
 
 ## Accumulated Context
 
@@ -90,6 +91,13 @@ Recent decisions affecting current work:
 - [Phase ?]: Plan 00-06: docs/MAINNET-FUNDING.md mechanical Phase 5 playbook committed ($80 budget = $50 USDsui + $15 gas + $15 buffer; Cetus DEX swap path; SUI_CONFIG_DIR=~/.sui/sui_config_mainnet isolation; 4-step deploy flow; $30-buffer-tight risk flag with $150 top-up trigger; DEPLOY-09 contingency for un-shipped Predict mainnet; AdminCap discipline per Pitfall 14).
 - [Phase ?]: Plan 00-06: Three-way number parity verified — allocation_bps=1000, strike_otm_bps=1500, tenor_seconds=1209600, roll_trigger_seconds=172800, sizing_function="fixed" all appear verbatim in CONTRIBUTING.md AND docs/HEDGE-POLICY.md AND shared/strategy.toml. T-00-23 mitigation in place; Plan 07 CI codegen-drift catches strategy.toml/generated drift independently.
 - [Phase ?]: Plan 00-06: POLICY: commit-prefix discipline introduced — changes to [hedge_policy] fields require shared/strategy.toml + codegen + paired docs/HEDGE-POLICY.md ADR Decision-section update + POLICY: commit-message prefix. Second human gate beyond CI codegen-drift.
+- [Phase ?]: Plan 00-07: 5-job CI matrix wired in .github/workflows/ci.yml (move + ts + python + codegen-drift + parity); parity job needs all four prior; Phase 0 stub asserts shared/golden-vectors.json exists, Phase 1 MATH-05 wires real cross-runtime check while keeping job NAME stable so branch protection survives.
+- [Phase ?]: Plan 00-07: Sui CLI installed via direct release-tarball download (sui-mainnet-v1.71.1-ubuntu-x86_64.tgz per RESEARCH A6) rather than suiup — single edit point if Mysten changes asset naming. Resolves RESEARCH Open Q6 inline-as-comment.
+- [Phase ?]: Plan 00-07: codegen-drift CI job uses cd backtest && uv sync --frozen + cd backtest && uv run --no-project python ../scripts/codegen.py (matches Makefile pattern from Plan 03; this is the plan-checker fix for the tomli-not-found failure mode), followed by git diff --exit-code on three generated files with ::error:: pointing at make codegen.
+- [Phase ?]: Plan 00-07: Pinned action versions (verified RESEARCH A7/A8): actions/checkout@v4, pnpm/action-setup@v4, actions/setup-node@v6, astral-sh/setup-uv@v8.
+- [Phase ?]: Plan 00-07: shared/golden-vectors.json shipped as strict empty array `[]` (not wrapping object); Phase 1 MATH-05 fills with Gatheral-paper test cases for SVI parity gate.
+- [Phase ?]: Plan 00-07: docs/CI-BRANCH-PROTECTION.md ships both UI click-path (Settings → Branches) and gh CLI scripted path (gh api PUT branches/main/protection) for one-time setup; Task 4 awaits human action because gh repo create requires explicit owner/visibility/auth confirmation and required-status-checks only become selectable after each named job has run on default branch.
+- [Phase ?]: Plan 00-07: Local default branch is currently 'master' (git init default); Resume Signal in 00-07-SUMMARY.md flags that user must `git branch -M main` before first push so workflow triggers fire (Pitfall 0-D guard).
 
 ### Pending Todos
 
@@ -105,6 +113,7 @@ Open verification gaps to resolve in Phase 0/1:
 - `react-plotly.js` last published 2022 — Phase 4 contingency: 30-line `Plotly.newPlot()` fallback hook ready
 - Predict mainnet contract addresses + USDsui type tag + mainnet `predict-server` URL — Phase 5 precondition
 - Task 4 of Plan 00-02 BLOCKED-on-human: testnet + mainnet Sui wallet provisioning per D-06; resume-signal in 00-02-SUMMARY.md
+- Task 4 of Plan 00-07 BLOCKED-on-human: gh repo create deepvault --public, git branch -M main, git push -u origin main, configure branch protection (5 required status checks); resume-signal in 00-07-SUMMARY.md "Resume Signal" section
 
 ## Hard Policy Locks (from ROADMAP.md)
 
@@ -127,6 +136,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-09T05:16:54Z
-Stopped at: Plan 00-06 complete (CONTRIBUTING.md + HEDGE-POLICY.md + MAINNET-FUNDING.md policy locks)
-Resume file: None
+Last session: 2026-05-09T06:25:00Z
+Stopped at: Plan 00-07 complete-with-checkpoint (CI 5-job matrix + golden-vectors.json + branch-protection doc; Task 4 awaiting human action — gh repo create + push to main + configure branch protection)
+Resume file: .planning/phases/00-setup-ground-rules/00-07-SUMMARY.md (see "Resume Signal" section for Task 4 instructions)

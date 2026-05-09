@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
 status: executing
-stopped_at: Plan 00-03 complete (cross-runtime codegen wired)
-last_updated: "2026-05-09T04:58:56.201Z"
+stopped_at: Plan 00-05 complete (DeepBookV3 subtree + predict-diff sweep ritual wired)
+last_updated: "2026-05-09T05:06:04Z"
 last_activity: 2026-05-09
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 8
-  completed_plans: 4
-  percent: 50
+  completed_plans: 5
+  percent: 63
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 0 (Setup & Ground Rules) — EXECUTING
-Plan: 5 of 8
+Plan: 6 of 8
 Status: Ready to execute
 Last activity: 2026-05-09
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██████░░░░] 63%
 
 ## Performance Metrics
 
@@ -56,6 +56,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 0 P02 | 5min | 4 tasks | 9 files |
 | Phase Phase 0 P03 P00-03 | 5min | 3 tasks | 6 files |
 | Phase Phase 0 PP00-04 | 5min | 2 tasks tasks | 2 files files |
+| Phase 0 P00-05 | 8min | 4 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -80,6 +81,9 @@ Recent decisions affecting current work:
 - [Phase ?]: Plan 00-04: config/testnet.toml + config/mainnet.toml schema parity wired (Pitfall 14 mitigation). 8 sections + schema_version=1; 17 TBD slots in mainnet for Phase 5 preflight.
 - [Phase ?]: Plan 00-04: testnet [deepbook_margin], [oracle_svi].event_module_full, [assets].btc_oracle_type_tag retained as TBD on testnet — not yet documented in Mysten public surface; Phase 1 spike fills (intentional non-pre-fill to keep TBD literal greppable for Phase 5 preflight assertions).
 - [Phase ?]: Plan 00-04: [hosting].relay_url uses wss:// scheme (mixed-content guard — Vercel https page cannot connect to ws:// from Render free tier). Documented inline in both configs; Phase 4 must use wss when filling.
+- [Phase ?]: Plan 00-05: DeepBookV3 fork vendored at scripts/deepbookv3/ via git subtree --squash (HEAD 1159d79af33c70e09e406310e1d8f067832ede9d, matches Plan 02 Move.toml rev pin). RESEARCH Open Question #2 RESOLVED: predict_manager and oracle_svi are NOT separate top-level packages — predict_manager.move and oracle.move (with OracleSVIUpdated event) live INSIDE packages/predict/sources/. Watching packages/predict covers both.
+- [Phase ?]: Plan 00-05: Cron schedule 0 14 * * 1 (Monday 14:00 UTC = 09:00 ET / 06:00 PT) chosen over 09:00 UTC for GHA delay headroom. workflow_dispatch wired for manual catchup. Title uses github.run_id for monotonic uniqueness.
+- [Phase ?]: Plan 00-05: Subtree topology means scripts/predict-diff.sh runs git operations against parent repo with subtree-prefixed pathspec (NOT cd into vendored dir as RESEARCH Pattern 7 paste-ready code suggested) — corrected; documented in script comments.
 
 ### Pending Todos
 
@@ -117,6 +121,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-09T04:58:22.057Z
-Stopped at: Plan 00-03 complete (cross-runtime codegen wired)
+Last session: 2026-05-09T05:06:04Z
+Stopped at: Plan 00-05 complete (DeepBookV3 subtree + predict-diff sweep ritual wired)
 Resume file: None

@@ -143,26 +143,96 @@ Explicitly excluded from v1 to prevent scope creep under deadline pressure.
 
 ## Traceability
 
-Phase mapping populated by gsd-roadmapper. Initial estimate based on research SUMMARY.md phase ordering:
+Phase mapping finalized by gsd-roadmapper on 2026-05-09 against ROADMAP.md. Every v1 REQ-ID maps to exactly one phase. No orphans, no duplicates.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SETUP-01 through SETUP-08 | Phase 0 | Pending |
-| MATH-01 through MATH-06 | Phase 1 | Pending |
-| VAULT-01 through VAULT-11 | Phase 2 | Pending |
-| BACK-01 through BACK-10 | Phase 3 | Pending |
-| PTB-01 through PTB-06 | Phase 3 | Pending |
-| DASH-01 through DASH-13 | Phase 4 | Pending |
-| DEPLOY-01 through DEPLOY-04 | Phase 5 | Pending |
-| DEPLOY-05 through DEPLOY-10 | Phase 6 | Pending |
+| SETUP-01 | Phase 0 | Pending |
+| SETUP-02 | Phase 0 | Pending |
+| SETUP-03 | Phase 0 | Pending |
+| SETUP-04 | Phase 0 | Pending |
+| SETUP-05 | Phase 0 | Pending |
+| SETUP-06 | Phase 0 | Pending |
+| SETUP-07 | Phase 0 | Pending |
+| SETUP-08 | Phase 0 | Pending |
+| MATH-01 | Phase 1 | Pending |
+| MATH-02 | Phase 1 | Pending |
+| MATH-03 | Phase 1 | Pending |
+| MATH-04 | Phase 1 | Pending |
+| MATH-05 | Phase 1 | Pending |
+| MATH-06 | Phase 1 | Pending |
+| VAULT-01 | Phase 2 | Pending |
+| VAULT-02 | Phase 2 | Pending |
+| VAULT-03 | Phase 2 | Pending |
+| VAULT-04 | Phase 2 | Pending |
+| VAULT-05 | Phase 2 | Pending |
+| VAULT-06 | Phase 2 | Pending |
+| VAULT-07 | Phase 2 | Pending |
+| VAULT-08 | Phase 2 | Pending |
+| VAULT-09 | Phase 2 | Pending |
+| VAULT-10 | Phase 2 | Pending |
+| VAULT-11 | Phase 2 | Pending |
+| BACK-01 | Phase 3 | Pending |
+| BACK-02 | Phase 3 | Pending |
+| BACK-03 | Phase 3 | Pending |
+| BACK-04 | Phase 3 | Pending |
+| BACK-05 | Phase 3 | Pending |
+| BACK-06 | Phase 3 | Pending |
+| BACK-07 | Phase 3 | Pending |
+| BACK-08 | Phase 3 | Pending |
+| BACK-09 | Phase 3 | Pending |
+| BACK-10 | Phase 3 | Pending |
+| PTB-01 | Phase 3 | Pending |
+| PTB-02 | Phase 3 | Pending |
+| PTB-03 | Phase 3 | Pending |
+| PTB-04 | Phase 3 | Pending |
+| PTB-05 | Phase 3 | Pending |
+| PTB-06 | Phase 3 | Pending |
+| DASH-01 | Phase 4 | Pending |
+| DASH-02 | Phase 4 | Pending |
+| DASH-03 | Phase 4 | Pending |
+| DASH-04 | Phase 4 | Pending |
+| DASH-05 | Phase 4 | Pending |
+| DASH-06 | Phase 4 | Pending |
+| DASH-07 | Phase 4 | Pending |
+| DASH-08 | Phase 4 | Pending |
+| DASH-09 | Phase 4 | Pending |
+| DASH-10 | Phase 4 | Pending |
+| DASH-11 | Phase 4 | Pending |
+| DASH-12 | Phase 4 | Pending |
+| DASH-13 | Phase 4 | Pending |
+| DEPLOY-01 | Phase 5 | Pending |
+| DEPLOY-02 | Phase 5 | Pending |
+| DEPLOY-03 | Phase 5 | Pending |
+| DEPLOY-04 | Phase 5 | Pending |
+| DEPLOY-05 | Phase 6 | Pending |
+| DEPLOY-06 | Phase 6 | Pending |
+| DEPLOY-07 | Phase 6 | Pending |
+| DEPLOY-08 | Phase 6 | Pending |
+| DEPLOY-09 | Phase 5 | Pending |
+| DEPLOY-10 | Phase 6 | Pending |
 
 **Coverage:**
-- v1 requirements: 67 total
-- Mapped to phases: 67 (preliminary)
+- v1 requirements (distinct REQ-IDs counted from category checkboxes): 64 total (SETUP=8, MATH=6, VAULT=11, BACK=10, PTB=6, DASH=13, DEPLOY=10)
+- Mapped to phases: 64
 - Unmapped: 0
+- Duplicates: 0
 
-(Roadmapper will finalize this mapping with phase IDs and update STATE.md.)
+> Note: The previous draft cited "67 v1 requirements." Recount of distinct REQ-IDs in this file totals **64**. The discrepancy was an early-draft tally error; the 64 count above is authoritative and matches every checkbox in this file.
+
+**Phase distribution:**
+
+| Phase | Count | REQ-IDs |
+|-------|-------|---------|
+| Phase 0 | 8 | SETUP-01..08 |
+| Phase 1 | 6 | MATH-01..06 |
+| Phase 2 | 11 | VAULT-01..11 |
+| Phase 3 | 16 | BACK-01..10, PTB-01..06 |
+| Phase 4 | 13 | DASH-01..13 |
+| Phase 5 | 5 | DEPLOY-01..04, DEPLOY-09 |
+| Phase 6 | 5 | DEPLOY-05..08, DEPLOY-10 |
+| **Total** | **64** | — |
 
 ---
 *Requirements defined: 2026-05-09*
-*Last updated: 2026-05-09 after initial definition*
+*Last updated: 2026-05-09 — traceability finalized by gsd-roadmapper; 64 v1 REQ-IDs mapped across Phases 0-6*

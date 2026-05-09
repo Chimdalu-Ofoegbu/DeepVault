@@ -67,6 +67,20 @@ Every Monday at 14:00 UTC (09:00 ET / 06:00 PT), GitHub Actions runs `scripts/pr
 
 Pitfall 6 (`.planning/research/PITFALLS.md`) documents the cost of skipping this ritual. The state file `.predict-diff-state` advances **only after a human triages** — never auto-advanced.
 
+### 6. SVI math layer is locked to the on-chain reference
+
+The SVI math primitives (Φ, sqrt, raw-SVI evaluator, op order, fixed-point scale, sign convention) are cloned line-for-line from the vendored DeepBookV3 fork at SHA `1159d79af33c70e09e406310e1d8f067832ede9d`. Bit-equality with the on-chain Predict implementation is **the** Phase 1 deliverable — see `shared/svi-spec.md` §"Whitepaper claim ladder".
+
+Numbers come from `shared/cody_phi_coefficients.toml` (Cody 1969 coefficients, populated in Phase 1 Plan 02) and `shared/strategy.toml [svi]`. Both files are **MATH:** policy. Once Phase 1 closes (CI parity job green on 120 vectors), the spec doc, op order, coefficient tables, and fixed-point scale are frozen until submission.
+
+**MATH:** changes (analogous to `POLICY:` prefix for hedge policy) require:
+1. A `MATH:` commit-message prefix on every commit touching `shared/svi-spec.md`, `shared/cody_phi_coefficients.toml`, `shared/strategy.toml [svi]`, or any file under `contracts/sources/helpers/{i64,isqrt,phi}.move`, `contracts/sources/svi_view.move`, `backtest/src/deepvault/{isqrt,phi,svi}.py`, `dashboard/src/lib/{isqrt,phi,svi,math}.ts`.
+2. A paired update to `shared/svi-spec.md` justifying the change (cite the upstream `scripts/deepbookv3/packages/predict/sources/...` line range that drives it).
+3. Re-running `python scripts/golden_emit.py` and committing the regenerated vectors (Plan 04 wires this).
+4. CI's `parity` job staying green.
+
+If the vendored DeepBookV3 SHA bumps on the upstream `predict-testnet-4-16` branch (Monday Predict sweep), and the bump touches `helper/math.move`, `oracle.move`, `oracle_config.move`, or `helper/i64.move`, this section's invariants must be re-verified before merging the bump.
+
 ## Branch strategy
 
 `main` only. Push directly. CI is the gate (required status checks: `move`, `ts`, `python`, `codegen-drift`, `parity`). No feature branches, no PR reviews — solo build, no second reviewer adds value.
@@ -89,6 +103,7 @@ To change a constant:
 - Subject: imperative mood, ≤72 chars (e.g., "feat(vault): add token-bucket refill cap")
 - Reference REQ-IDs where relevant (e.g., "closes SETUP-08")
 - For policy changes: include "POLICY: ..." prefix and link the relevant ADR
+- For SVI math changes: include "MATH: ..." prefix and link the relevant section of shared/svi-spec.md
 
 ## Build log discipline
 

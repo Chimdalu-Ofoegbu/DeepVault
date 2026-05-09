@@ -1,0 +1,45 @@
+# backtest/pyproject.toml
+# Python project for DeepVault backtest harness (Phase 1+ math, Phase 3 harness).
+# Pinned per .planning/phases/00-setup-ground-rules/00-RESEARCH.md Pattern 2 + Standard Stack.
+
+[project]
+name = "deepvault-backtest"
+version = "0.1.0"
+description = "DeepVault Python backtest harness (SVI eval, vault state replay, lookahead audit)"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "DeepVault solo builder" }]
+dependencies = [
+  "numpy>=2.4",
+  "pandas>=2.2",
+  "scipy>=1.14",
+  "pyarrow>=18",
+  "matplotlib>=3.9",
+  "requests>=2.32",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.3",
+  "pytest-cov",
+  "ruff",
+  "tomli-w>=1.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/deepvault"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "N"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"

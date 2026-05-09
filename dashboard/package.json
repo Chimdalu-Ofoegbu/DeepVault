@@ -5,7 +5,13 @@
   "description": "PLP Risk Studio dashboard (Phase 4 placeholder)",
   "scripts": {
     "build": "echo 'Phase 4 fills this in' && exit 0",
-    "test": "echo 'Phase 4 fills this in' && exit 0",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "echo 'Phase 4 fills this in' && exit 0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.18",
+    "tsx": "^4.21.0",
+    "vitest": "^4.1.5"
   }
 }

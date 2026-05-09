@@ -12,7 +12,7 @@ Requirements for the Sui Overflow 2026 submission (target 2026-06-16). Each maps
 - [x] **SETUP-01**: Repository scaffolded as TypeScript monorepo (`contracts/`, `indexer/`, `dashboard/`, `backtest/`, `shared/`) with `uv` for Python and `pnpm` for TS workspaces
 - [x] **SETUP-02**: `Move.toml` pins DeepBookV3 `predict-testnet-4-16` branch by exact rev; Sui CLI pinned to `mainnet-v1.71.1` via `suiup`
 - [x] **SETUP-03**: `shared/strategy.toml` (single source of truth for SVI parameters, hedge ratio policy, token-bucket capacity, decimals offset) with codegen to Move + Python + TypeScript constants
-- [ ] **SETUP-04**: `config/{testnet,mainnet}.toml` scaffold with all contract addresses, RPC URLs, type tags
+- [x] **SETUP-04**: `config/{testnet,mainnet}.toml` scaffold with all contract addresses, RPC URLs, type tags
 - [ ] **SETUP-05**: Weekly Monday Predict contract-version diff script (`scripts/predict-diff.sh`) plus calendar reminder; halts feature work on breaking change
 - [ ] **SETUP-06**: Hedge-ratio policy committed in writing (default: fixed-ratio v1, parameterized for future dynamic) before backtest opens — locks against hindsight tuning
 - [ ] **SETUP-07**: Code-freeze date (2026-05-30) and no-refactor-after-vault-ships rule documented in `CONTRIBUTING.md`
@@ -150,7 +150,7 @@ Phase mapping finalized by gsd-roadmapper on 2026-05-09 against ROADMAP.md. Ever
 | SETUP-01 | Phase 0 | Complete |
 | SETUP-02 | Phase 0 | Complete |
 | SETUP-03 | Phase 0 | Complete |
-| SETUP-04 | Phase 0 | Pending |
+| SETUP-04 | Phase 0 | Complete |
 | SETUP-05 | Phase 0 | Pending |
 | SETUP-06 | Phase 0 | Pending |
 | SETUP-07 | Phase 0 | Pending |

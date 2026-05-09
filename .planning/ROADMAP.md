@@ -66,7 +66,7 @@ Drop in this order, never reverse:
 - [x] 00-01-PLAN.md — Repo bootstrap (.gitignore, LICENSE, root package.json, pnpm-workspace.yaml, placeholder workspaces, README skeleton)
 - [x] 00-02-PLAN.md — Toolchain pins (Move.toml SHA-pin, backtest pyproject + uv sync, Makefile, two-wallet provisioning, DEV-BOOTSTRAP.md)
 - [x] 00-03-PLAN.md — shared/strategy.toml + scripts/codegen.py + Makefile codegen target (locked hedge values)
-- [ ] 00-04-PLAN.md — config/{testnet,mainnet}.toml scaffolds (schema parity, Pitfall 14 mitigation)
+- [x] 00-04-PLAN.md — config/{testnet,mainnet}.toml scaffolds (schema parity, Pitfall 14 mitigation)
 - [ ] 00-05-PLAN.md — DeepBookV3 fork via subtree + scripts/predict-diff.sh + Monday cron workflow
 - [ ] 00-06-PLAN.md — CONTRIBUTING.md + docs/HEDGE-POLICY.md + docs/MAINNET-FUNDING.md (policy locks)
 - [ ] 00-07-PLAN.md — .github/workflows/ci.yml 5-job matrix + golden-vectors.json placeholder + branch-protection guide
@@ -153,7 +153,7 @@ Decimal phases (e.g., 2.1) reserved for urgent insertions and execute between th
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 0. Setup & Ground Rules | 3/8 | In Progress|  |
+| 0. Setup & Ground Rules | 4/8 | In Progress|  |
 | 1. Math Foundation (SVI Parity Gate) | 0/TBD | Not started | - |
 | 2. Vault Move Package + Testnet Deploy | 0/TBD | Not started | - |
 | 3. Backtest Harness + Two-Protocol PTB | 0/TBD | Not started | - |

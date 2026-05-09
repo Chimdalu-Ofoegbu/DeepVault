@@ -4,14 +4,14 @@ milestone: v1.1
 milestone_name: milestone
 status: executing
 stopped_at: Plan 00-03 complete (cross-runtime codegen wired)
-last_updated: "2026-05-09T04:50:55.427Z"
+last_updated: "2026-05-09T04:58:56.201Z"
 last_activity: 2026-05-09
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 8
-  completed_plans: 3
-  percent: 38
+  completed_plans: 4
+  percent: 50
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 0 (Setup & Ground Rules) — EXECUTING
-Plan: 4 of 8
+Plan: 5 of 8
 Status: Ready to execute
 Last activity: 2026-05-09
 
@@ -55,6 +55,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 0 P1 | 3min | 3 tasks | 10 files |
 | Phase 0 P02 | 5min | 4 tasks | 9 files |
 | Phase Phase 0 P03 P00-03 | 5min | 3 tasks | 6 files |
+| Phase Phase 0 PP00-04 | 5min | 2 tasks tasks | 2 files files |
 
 ## Accumulated Context
 
@@ -76,6 +77,9 @@ Recent decisions affecting current work:
 - [Phase ?]: Plan 00-03: Cross-runtime codegen wired — shared/strategy.toml + scripts/codegen.py emit Move/Python/TS constants with AUTO-GENERATED headers and --check drift mode (Plan 07 CI consumes). D-01..D-04 locked numbers verified bit-for-bit across all three runtimes.
 - [Phase ?]: Plan 00-03: TS bigint literals (1209600n) used for u64-equivalent fields in dashboard/src/lib/strategy_constants.ts to maintain Move parity above 2^53.
 - [Phase ?]: Plan 00-03: ASCII-only headers in generated files (AUTO-GENERATED - DO NOT EDIT, hyphen not em-dash) for Move tokenizer / cross-OS portability.
+- [Phase ?]: Plan 00-04: config/testnet.toml + config/mainnet.toml schema parity wired (Pitfall 14 mitigation). 8 sections + schema_version=1; 17 TBD slots in mainnet for Phase 5 preflight.
+- [Phase ?]: Plan 00-04: testnet [deepbook_margin], [oracle_svi].event_module_full, [assets].btc_oracle_type_tag retained as TBD on testnet — not yet documented in Mysten public surface; Phase 1 spike fills (intentional non-pre-fill to keep TBD literal greppable for Phase 5 preflight assertions).
+- [Phase ?]: Plan 00-04: [hosting].relay_url uses wss:// scheme (mixed-content guard — Vercel https page cannot connect to ws:// from Render free tier). Documented inline in both configs; Phase 4 must use wss when filling.
 
 ### Pending Todos
 
@@ -113,6 +117,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-09T04:50:55.412Z
+Last session: 2026-05-09T04:58:22.057Z
 Stopped at: Plan 00-03 complete (cross-runtime codegen wired)
 Resume file: None

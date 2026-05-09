@@ -40,6 +40,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT / "backtest" / "src"))
 
+from deepvault.arb_checker import check_arb  # noqa: E402
 from deepvault.svi import SVIParams, binary_price, total_variance  # noqa: E402
 
 JSON_PATH = REPO_ROOT / "shared" / "golden-vectors.json"
@@ -137,20 +138,22 @@ def tier_b_vectors() -> list[dict]:
         # by construction).
         forward = 50 * F
         strike = round(forward * math.exp(k / F))
+        svi_params = SVIParams(a, b, rho, m, sigma)
         try:
-            w = total_variance(SVIParams(a, b, rho, m, sigma), k)
-            bp = binary_price(SVIParams(a, b, rho, m, sigma), forward=forward, strike=strike)
+            w = total_variance(svi_params, k)
+            bp = binary_price(svi_params, forward=forward, strike=strike)
             params_valid = True
         except ValueError:
             w = 0
             bp = 0
             params_valid = False
+        min_g_k = _compute_min_g_k(svi_params)
         vectors.append(_make_vector_explicit(
             id_=f"B-{counter:03d}", tier="B", source="synthetic-stress-grid",
             inputs={"a": a, "b": b, "rho": rho, "m": m, "sigma": sigma, "k": k,
                     "T_seconds": T_DEFAULT_SECONDS, "forward": forward, "strike": strike},
             expected={"w": w, "binary_price": bp, "params_valid": params_valid,
-                      "min_g_k": 0, "calendar_pass": True},  # min_g_k filled by Plan 01-08
+                      "min_g_k": min_g_k, "calendar_pass": True},
         ))
         counter += 1
 
@@ -176,21 +179,26 @@ def tier_b_vectors() -> list[dict]:
     for (a, b, rho, m, sigma, k) in arb_violating:
         forward = 50 * F
         strike = round(forward * math.exp(k / F))
+        svi_params = SVIParams(a, b, rho, m, sigma)
         try:
-            w = total_variance(SVIParams(a, b, rho, m, sigma), k)
+            w = total_variance(svi_params, k)
             # If we got here, the params actually didn't reject -- still compute bp.
-            bp = binary_price(SVIParams(a, b, rho, m, sigma), forward=forward, strike=strike)
+            bp = binary_price(svi_params, forward=forward, strike=strike)
             params_valid = True
         except ValueError:
             w = 0
             bp = 0
             params_valid = False
+        # arb_checker.check_arb returns min_g_k = -F (sentinel) when the slice is
+        # degenerate (a=0, b=0 -> theta_T_atm = 0). Plan 01-08 truth: arb-violating
+        # vectors must have min_g_k < 0. Sentinel -F satisfies this.
+        min_g_k = _compute_min_g_k(svi_params)
         vectors.append(_make_vector_explicit(
             id_=f"B-arb-{counter:03d}", tier="B", source="synthetic-arb-violating",
             inputs={"a": a, "b": b, "rho": rho, "m": m, "sigma": sigma, "k": k,
                     "T_seconds": T_DEFAULT_SECONDS, "forward": forward, "strike": strike},
             expected={"w": w, "binary_price": bp, "params_valid": params_valid,
-                      "min_g_k": -1, "calendar_pass": True},  # min_g_k stubbed; Plan 01-08 fills
+                      "min_g_k": min_g_k, "calendar_pass": True},
         ))
         counter += 1
 
@@ -278,6 +286,17 @@ def tier_c2_vectors() -> list[dict]:
 # Helpers
 # -------------------------------------------------------------------------
 
+def _compute_min_g_k(svi: SVIParams) -> int:
+    """Run arb_checker.check_arb to populate min_g_k for a vector.
+
+    Plan 01-08: Tier B arb-violating vectors should yield min_g_k < 0; Gatheral-
+    paper-valid slices should yield min_g_k >= 0. The grid sampler is the
+    visualization data; min_g_k is the scalar summary downstream consumers
+    (Move tests, dashboards) read.
+    """
+    return int(check_arb(svi).min_g_k)
+
+
 def _make_vector(*, id_: str, tier: str, source: str, a: int, b: int, rho: int, m: int,
                  sigma: int, k: int, forward: int, strike: int) -> dict:
     """Build a vector dict by running deepvault.svi on the inputs."""
@@ -290,12 +309,13 @@ def _make_vector(*, id_: str, tier: str, source: str, a: int, b: int, rho: int, 
         w = 0
         bp = 0
         params_valid = False
+    min_g_k = _compute_min_g_k(svi)
     return _make_vector_explicit(
         id_=id_, tier=tier, source=source,
         inputs={"a": a, "b": b, "rho": rho, "m": m, "sigma": sigma, "k": k,
                 "T_seconds": T_DEFAULT_SECONDS, "forward": forward, "strike": strike},
         expected={"w": w, "binary_price": bp, "params_valid": params_valid,
-                  "min_g_k": 0, "calendar_pass": True},
+                  "min_g_k": min_g_k, "calendar_pass": True},
     )
 
 

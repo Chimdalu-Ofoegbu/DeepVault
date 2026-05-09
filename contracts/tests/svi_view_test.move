@@ -94,31 +94,179 @@ fun golden_vectors_binary_price_all_pass() {
     };
 }
 
-/// Per Plan 01-03 / 01-04 mathematical analysis: for sigma > 0,
-/// `inner = rho * (k - m) + sqrt((k - m)^2 + sigma^2)` is provably non-negative
-/// (since sqrt((k-m)^2 + sigma^2) >= |k-m| and |rho| < F). The reachable
-/// rejection path with (a=0, b=0) is EZeroVariance — that is what the
-/// 10 arb-violating golden vectors trigger.
-#[test]
-fun golden_vectors_arb_violating_all_reject() {
-    // Exercises the rejection path: every params_valid=false vector should
-    // abort when fed to total_variance_from_params (or binary_price_from_params).
-    // We verify by counting how many params_valid=false rows exist so the test
-    // is wired to the data, but the actual rejection assertion is per-vector
-    // expected_failure tests (would be 10 separate tests). For data-coverage
-    // documentation, just confirm count > 0.
-    let params_valid = golden_vectors_data::all_params_valid();
-    let n = params_valid.length();
-    let mut i = 0;
-    let mut invalid_count = 0;
-    while (i < n) {
-        if (!params_valid[i]) {
-            invalid_count = invalid_count + 1;
-        };
-        i = i + 1;
-    };
-    // Plan 01-04 ships exactly 10 arb-violating vectors (B-arb-091..B-arb-100).
-    assert!(invalid_count == 10);
+/// Per-row rejection coverage for B-arb-091..B-arb-100 (closes CR-01 from
+/// 01-REVIEW.md). Per scripts/deepbookv3/.claude/rules/code-review.md:
+/// "Every generated test vector must be exercised against the contract.
+/// If generated data isn't passed to the function under test, delete it."
+///
+/// The 10 arb-violating Tier-B golden vectors live at zero-indexed array
+/// offsets 111..120 in `golden_vectors_data::all_inputs()` (B-arb-091 → 111,
+/// B-arb-100 → 120; layout: A 0..20, B-001..B-090 at 21..110, B-arb-* at
+/// 111..120, C 121..130, C2 131..140). Each row has `a=0, b=0` per the
+/// emitter's deliberate construction in `scripts/golden_emit.py:167-178`:
+/// this lands on the only reachable rejection path documented in Plan
+/// 01-03/01-04 mathematical analysis. ECannotBeNegative is unreachable for
+/// sigma > 0; EZeroVariance via (a=0, b=0) is the reachable path.
+///
+/// With a=0 and b=0:
+///   total_variance_from_params = a + math::mul_div_round_down(b, |inner|, F)
+///                              = 0 + 0 = 0
+///   binary_price_from_k        → assert!(total_var > 0, EZeroVariance) fires
+/// (svi_view.move:104). Therefore the expected abort code for ALL 10 rows is
+/// `svi_view::EZeroVariance`.
+///
+/// The previous test `golden_vectors_arb_violating_all_reject` (which only
+/// counted params_valid=false rows without ever calling svi_view::*) violated
+/// the vendored DeepBook code-review rule and is DELETED. The 10 per-row
+/// tests below replace it.
+#[test, expected_failure(abort_code = svi_view::EZeroVariance)]
+fun arb_violating_091_aborts_when_passed_to_svi_view() {
+    let inputs = golden_vectors_data::all_inputs();
+    let row = inputs[111];
+    let a = row[0];
+    let b = row[1];
+    let rho = i64::from_parts(row[2], row[3] == 1);
+    let m = i64::from_parts(row[4], row[5] == 1);
+    let sigma = row[6];
+    let forward = row[9];
+    let strike = row[10];
+    let _ = svi_view::binary_price_from_params(a, b, rho, m, sigma, forward, strike);
+    abort 999
+}
+
+#[test, expected_failure(abort_code = svi_view::EZeroVariance)]
+fun arb_violating_092_aborts_when_passed_to_svi_view() {
+    let inputs = golden_vectors_data::all_inputs();
+    let row = inputs[112];
+    let a = row[0];
+    let b = row[1];
+    let rho = i64::from_parts(row[2], row[3] == 1);
+    let m = i64::from_parts(row[4], row[5] == 1);
+    let sigma = row[6];
+    let forward = row[9];
+    let strike = row[10];
+    let _ = svi_view::binary_price_from_params(a, b, rho, m, sigma, forward, strike);
+    abort 999
+}
+
+#[test, expected_failure(abort_code = svi_view::EZeroVariance)]
+fun arb_violating_093_aborts_when_passed_to_svi_view() {
+    let inputs = golden_vectors_data::all_inputs();
+    let row = inputs[113];
+    let a = row[0];
+    let b = row[1];
+    let rho = i64::from_parts(row[2], row[3] == 1);
+    let m = i64::from_parts(row[4], row[5] == 1);
+    let sigma = row[6];
+    let forward = row[9];
+    let strike = row[10];
+    let _ = svi_view::binary_price_from_params(a, b, rho, m, sigma, forward, strike);
+    abort 999
+}
+
+#[test, expected_failure(abort_code = svi_view::EZeroVariance)]
+fun arb_violating_094_aborts_when_passed_to_svi_view() {
+    let inputs = golden_vectors_data::all_inputs();
+    let row = inputs[114];
+    let a = row[0];
+    let b = row[1];
+    let rho = i64::from_parts(row[2], row[3] == 1);
+    let m = i64::from_parts(row[4], row[5] == 1);
+    let sigma = row[6];
+    let forward = row[9];
+    let strike = row[10];
+    let _ = svi_view::binary_price_from_params(a, b, rho, m, sigma, forward, strike);
+    abort 999
+}
+
+#[test, expected_failure(abort_code = svi_view::EZeroVariance)]
+fun arb_violating_095_aborts_when_passed_to_svi_view() {
+    let inputs = golden_vectors_data::all_inputs();
+    let row = inputs[115];
+    let a = row[0];
+    let b = row[1];
+    let rho = i64::from_parts(row[2], row[3] == 1);
+    let m = i64::from_parts(row[4], row[5] == 1);
+    let sigma = row[6];
+    let forward = row[9];
+    let strike = row[10];
+    let _ = svi_view::binary_price_from_params(a, b, rho, m, sigma, forward, strike);
+    abort 999
+}
+
+#[test, expected_failure(abort_code = svi_view::EZeroVariance)]
+fun arb_violating_096_aborts_when_passed_to_svi_view() {
+    let inputs = golden_vectors_data::all_inputs();
+    let row = inputs[116];
+    let a = row[0];
+    let b = row[1];
+    let rho = i64::from_parts(row[2], row[3] == 1);
+    let m = i64::from_parts(row[4], row[5] == 1);
+    let sigma = row[6];
+    let forward = row[9];
+    let strike = row[10];
+    let _ = svi_view::binary_price_from_params(a, b, rho, m, sigma, forward, strike);
+    abort 999
+}
+
+#[test, expected_failure(abort_code = svi_view::EZeroVariance)]
+fun arb_violating_097_aborts_when_passed_to_svi_view() {
+    let inputs = golden_vectors_data::all_inputs();
+    let row = inputs[117];
+    let a = row[0];
+    let b = row[1];
+    let rho = i64::from_parts(row[2], row[3] == 1);
+    let m = i64::from_parts(row[4], row[5] == 1);
+    let sigma = row[6];
+    let forward = row[9];
+    let strike = row[10];
+    let _ = svi_view::binary_price_from_params(a, b, rho, m, sigma, forward, strike);
+    abort 999
+}
+
+#[test, expected_failure(abort_code = svi_view::EZeroVariance)]
+fun arb_violating_098_aborts_when_passed_to_svi_view() {
+    let inputs = golden_vectors_data::all_inputs();
+    let row = inputs[118];
+    let a = row[0];
+    let b = row[1];
+    let rho = i64::from_parts(row[2], row[3] == 1);
+    let m = i64::from_parts(row[4], row[5] == 1);
+    let sigma = row[6];
+    let forward = row[9];
+    let strike = row[10];
+    let _ = svi_view::binary_price_from_params(a, b, rho, m, sigma, forward, strike);
+    abort 999
+}
+
+#[test, expected_failure(abort_code = svi_view::EZeroVariance)]
+fun arb_violating_099_aborts_when_passed_to_svi_view() {
+    let inputs = golden_vectors_data::all_inputs();
+    let row = inputs[119];
+    let a = row[0];
+    let b = row[1];
+    let rho = i64::from_parts(row[2], row[3] == 1);
+    let m = i64::from_parts(row[4], row[5] == 1);
+    let sigma = row[6];
+    let forward = row[9];
+    let strike = row[10];
+    let _ = svi_view::binary_price_from_params(a, b, rho, m, sigma, forward, strike);
+    abort 999
+}
+
+#[test, expected_failure(abort_code = svi_view::EZeroVariance)]
+fun arb_violating_100_aborts_when_passed_to_svi_view() {
+    let inputs = golden_vectors_data::all_inputs();
+    let row = inputs[120];
+    let a = row[0];
+    let b = row[1];
+    let rho = i64::from_parts(row[2], row[3] == 1);
+    let m = i64::from_parts(row[4], row[5] == 1);
+    let sigma = row[6];
+    let forward = row[9];
+    let strike = row[10];
+    let _ = svi_view::binary_price_from_params(a, b, rho, m, sigma, forward, strike);
+    abort 999
 }
 
 /// Direct rejection-path coverage: a=0, b=0 forces total_var = 0 → EZeroVariance.

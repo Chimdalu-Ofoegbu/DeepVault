@@ -202,6 +202,24 @@ def tier_b_vectors() -> list[dict]:
         ))
         counter += 1
 
+    # WR-02 / Plan 01-09 defensive assertion: every entry pushed by the
+    # arb_violating loop above MUST have params_valid=False. If a future
+    # evaluator change silently flips a row to True (e.g. by altering the
+    # a=0, b=0 -> EZeroVariance contract), this assertion fires at emit time
+    # and prevents the regression from reaching CI's parity job. Mirrors the
+    # Move-side per-row #[expected_failure] tests in svi_view_test.move that
+    # close CR-01 from 01-REVIEW.md.
+    arb_violating_emitted = sum(
+        1 for v in vectors
+        if v['source'].endswith('arb-violating')
+        and not v['expected']['params_valid']
+    )
+    assert arb_violating_emitted == len(arb_violating), (
+        f"WR-02 / Plan 01-09: arb-violating count mismatch. "
+        f"Expected {len(arb_violating)} entries with params_valid=False; "
+        f"found {arb_violating_emitted}. A row may have silently passed validation."
+    )
+
     return vectors
 
 

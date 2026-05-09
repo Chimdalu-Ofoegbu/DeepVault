@@ -4,14 +4,14 @@ milestone: v1.1
 milestone_name: milestone
 status: executing
 stopped_at: "Phase 01-01 complete (4/4 tasks, MATH: prefix policy locked, [svi] schema rewritten, 5 spikes resolved). Plans 01-02..01-08 unblocked simultaneously."
-last_updated: "2026-05-09T14:49:51.196Z"
+last_updated: "2026-05-09T15:06:52.504Z"
 last_activity: 2026-05-09
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 16
-  completed_plans: 10
-  percent: 63
+  completed_plans: 11
+  percent: 69
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 01 (math-foundation-svi-parity-gate) — EXECUTING
-Plan: 3 of 8
+Plan: 4 of 8
 Status: Ready to execute
 Next phase: Phase 1 — Math Foundation (SVI Parity Gate); requirements MATH-01..06; depends on Phase 0
 Last activity: 2026-05-09
@@ -63,6 +63,7 @@ Progress: [██████████] 100% Phase 0 / 14% milestone
 | Phase 0 P00-08 | 4min | 2 tasks (auto) + 1 checkpoint | 2 files (README + closure SUMMARY) |
 | Phase 01 P01 | 12min | 4 tasks | 7 files |
 | Phase 01 P02 | 14min | 3 tasks | 6 files |
+| Phase 01 P01-03 | 10min | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -113,6 +114,9 @@ Recent decisions affecting current work:
 - [Phase ?]: Phase 01-02: Cody 1969 Phi coefficient table locked into shared/cody_phi_coefficients.toml; codegen.py extended (load_phi + emit_phi_{move,python,typescript} + _fmt_underscored helper); main() now writes 6 files; --check covers all 6
 - [Phase ?]: Phase 01-02: TS bigint n suffix on every phi_coefficients.ts value (Pitfall B / threat T-01-11 mitigation); auxiliary LN2_U128 emitted from same TOML for downstream phi.move/phi.py/phi.ts parity
 - [Phase ?]: Phase 01-02: CI codegen-drift job extended from 3 to 6 file paths in git diff --exit-code; job key codegen-drift preserved (branch protection invariant per PATTERNS.md sec G)
+- [Phase ?]: Phase 01-03: Python canonical SVI evaluator complete (isqrt + phi + ln + svi cloned from vendored math.move + oracle.move at SHA 1159d79a; 50 tests pass; Cody Phi within 1e-7 of scipy; 100-input snapshot pinned for Plan 01-05 Move cross-check)
+- [Phase ?]: Phase 01-03: ECannotBeNegative on-chain assert is provably unreachable in pure SVI math when sigma > 0; kept as defensive parity, tests exercise EZeroVariance path instead
+- [Phase ?]: Phase 01-03: Tier A vectors hand-computed from raw-SVI closed-form (5 cases); Plan 01-04 supersedes via golden-vectors.json from this same evaluator
 
 ### Pending Todos
 
@@ -152,6 +156,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-09T14:49:03.368Z
+Last session: 2026-05-09T15:06:17.139Z
 Stopped at: Phase 01-01 complete (4/4 tasks, MATH: prefix policy locked, [svi] schema rewritten, 5 spikes resolved). Plans 01-02..01-08 unblocked simultaneously.
 Resume file: None

@@ -4,14 +4,14 @@ milestone: v1.1
 milestone_name: milestone
 status: executing
 stopped_at: "Phase 01-01 complete (4/4 tasks, MATH: prefix policy locked, [svi] schema rewritten, 5 spikes resolved). Plans 01-02..01-08 unblocked simultaneously."
-last_updated: "2026-05-09T14:34:35.558Z"
+last_updated: "2026-05-09T14:49:51.196Z"
 last_activity: 2026-05-09
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 16
-  completed_plans: 9
-  percent: 56
+  completed_plans: 10
+  percent: 63
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 01 (math-foundation-svi-parity-gate) — EXECUTING
-Plan: 2 of 8
+Plan: 3 of 8
 Status: Ready to execute
 Next phase: Phase 1 — Math Foundation (SVI Parity Gate); requirements MATH-01..06; depends on Phase 0
 Last activity: 2026-05-09
@@ -62,6 +62,7 @@ Progress: [██████████] 100% Phase 0 / 14% milestone
 | Phase 0 P00-07 | 6min | 3 tasks (auto) + 1 checkpoint | 3 files |
 | Phase 0 P00-08 | 4min | 2 tasks (auto) + 1 checkpoint | 2 files (README + closure SUMMARY) |
 | Phase 01 P01 | 12min | 4 tasks | 7 files |
+| Phase 01 P02 | 14min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -109,6 +110,9 @@ Recent decisions affecting current work:
 - [Phase ?]: Phase 01-01 Spike 2: bit-shift seed sequence (64,32,16,8,4,2,1) verified at vendored math.move:281-292; reformulated 1000-input check as 100 fixed inputs across Plans 01-03 + 01-05 (random.Random(seed=42))
 - [Phase ?]: Phase 01-01 Spike 4: contracts/sources/helpers/ layout (mirrors Predict helper/ shape); planned files: helpers/{i64,isqrt,phi,math}.move + top-level svi_view.move + phi_coefficients.move
 - [Phase ?]: Phase 01-01 deviation: vendored scripts/deepbookv3/packages/predict/tests/oracle_tests.move does NOT exist — Plan 01-08 Tier C2 must source from local sui move test runs OR predict-server REST (recorded in 01-01-SPIKE-NOTES.md)
+- [Phase ?]: Phase 01-02: Cody 1969 Phi coefficient table locked into shared/cody_phi_coefficients.toml; codegen.py extended (load_phi + emit_phi_{move,python,typescript} + _fmt_underscored helper); main() now writes 6 files; --check covers all 6
+- [Phase ?]: Phase 01-02: TS bigint n suffix on every phi_coefficients.ts value (Pitfall B / threat T-01-11 mitigation); auxiliary LN2_U128 emitted from same TOML for downstream phi.move/phi.py/phi.ts parity
+- [Phase ?]: Phase 01-02: CI codegen-drift job extended from 3 to 6 file paths in git diff --exit-code; job key codegen-drift preserved (branch protection invariant per PATTERNS.md sec G)
 
 ### Pending Todos
 
@@ -148,6 +152,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-09T14:34:35.518Z
+Last session: 2026-05-09T14:49:03.368Z
 Stopped at: Phase 01-01 complete (4/4 tasks, MATH: prefix policy locked, [svi] schema rewritten, 5 spikes resolved). Plans 01-02..01-08 unblocked simultaneously.
-Resume file: .planning/phases/01-math-foundation-svi-parity-gate/01-02-PLAN.md
+Resume file: None

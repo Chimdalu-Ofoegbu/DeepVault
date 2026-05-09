@@ -1,0 +1,28 @@
+# contracts/Move.toml
+# Sui Move package for the DeepVault structured product.
+# Pinned per .planning/phases/00-setup-ground-rules/00-RESEARCH.md Pattern 3.
+
+[package]
+name = "deepvault"
+version = "0.1.0"
+edition = "2024.beta"
+authors = ["DeepVault solo builder"]
+
+[dependencies]
+Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "framework/mainnet" }
+
+# DeepBookV3 — predict-testnet-4-16 branch SHA-pinned per Pitfall 0-A.
+# Bump only after a Monday Predict sweep triages the diff (see scripts/predict-diff.sh, Plan 05).
+# SHA captured 2026-05-09 from `git ls-remote https://github.com/MystenLabs/deepbookv3.git predict-testnet-4-16`.
+DeepBookV3 = { git = "https://github.com/MystenLabs/deepbookv3.git", subdir = "packages/deepbook", rev = "1159d79af33c70e09e406310e1d8f067832ede9d" }
+
+[addresses]
+deepvault = "0x0"
+# Predict testnet package — from CLAUDE.md Stack Pins (Phase 5 swaps in mainnet address)
+predict   = "0xf5ea2b3749c65d6e56507cc35388719aadb28f9cab873696a2f8687f5c785138"
+sui       = "0x2"
+std       = "0x1"
+clock     = "0x6"
+
+[dev-dependencies]
+# Empty for Phase 0; Phase 1+ may add test-only deps

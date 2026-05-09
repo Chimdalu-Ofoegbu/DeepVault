@@ -1,0 +1,52 @@
+# shared/strategy.toml
+# Single source of truth for cross-runtime constants.
+# Edit this file, then run `make codegen` to regenerate the three constants files:
+#   - contracts/sources/strategy_constants.move
+#   - backtest/src/deepvault/strategy_constants.py
+#   - dashboard/src/lib/strategy_constants.ts
+#
+# DO NOT edit the generated files directly — they are overwritten on next codegen.
+# CI's `codegen-drift` job (Plan 07) fails the build if generated files are out of sync.
+
+schema_version = 1
+last_updated = "2026-05-09"
+
+[fixed_point]
+# All on-chain math is fixed-point; document the scale here.
+decimals = 18                       # standard for prices / NAV-per-share
+variance_decimals = 27              # higher precision for SVI total variance
+share_decimals = 9                  # vault share decimals (Sui Coin convention)
+
+[hedge_policy]
+# LOCKED per CONTEXT.md D-01..D-04 (Phase 0 commit, before backtest opens).
+# Re-tunable ONLY in Phase 3 backtest on out-of-sample-aware walk-forward analysis.
+# After Phase 3 close, FROZEN PERMANENTLY (see CONTRIBUTING.md §"Hedge-ratio policy is locked").
+allocation_bps = 1000               # D-01: 10% of new deposit (10000 bps = 100%)
+strike_otm_bps = 1500               # D-02: -15% OTM
+tenor_seconds = 1209600             # D-03: 14 days = 14 * 86400
+roll_trigger_seconds = 172800       # D-03: roll when expiry < 2 days = 2 * 86400
+sizing_function = "fixed"           # D-04: v1 fixed; "dynamic" reserved for v2 swap
+
+[token_bucket]
+# Per-user withdrawal limiter — placeholders, Phase 2 (vault) backtest-validates.
+capacity_bps = 1000                 # 10% of vault per period
+refill_rate_bps_per_sec = 1         # placeholder
+period_seconds = 3600               # 1 hour
+
+[ltv]
+# Worst-case haircut bounds — Phase 3 PTB-05 (-30% NAV shock liquidation test) validates.
+margin_ltv_cap_bps = 5000                       # 50% defensive cap (below Margin's recommended 55%)
+worst_case_settlement_haircut_bps = 10000       # 100% — assume full Predict adverse outcome
+
+[oracle]
+max_staleness_seconds = 300         # 5 min; vault refuses supply/rebalance if exceeded
+
+[svi]
+# SSVI parameterization placeholders — Phase 1 fills full schema after Gatheral evaluator audit.
+parameterization = "ssvi"
+grid_points_for_arb_check = 200     # ≥200-point g(k) grid scan per MATH-04
+strike_range_sigma = 4              # ±4σ around spot for arb scan
+
+[meta]
+btc_decimals = 8
+quote_decimals = 6                  # USDsui mainnet, dUSDC testnet

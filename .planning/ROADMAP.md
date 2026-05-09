@@ -91,7 +91,7 @@ Drop in this order, never reverse:
 - [x] 01-06-PLAN.md (Wave 4) — TypeScript evaluator: math/isqrt/phi/ln/svi.ts + Vitest setup + tests
 - [x] 01-07-PLAN.md (Wave 5) — CI parity job wiring: 3-runtime cross-check + forbidden-token grep
 - [x] 01-08-PLAN.md (Wave 6) — Arb-checker (Python + TS) + g(k) array + Tier C JackJacquier fixture
-- [ ] 01-09-PLAN.md (Wave 7, gap closure) — Close CR-01: per-row arb-violating Move rejection tests + WR-02 emit-time defensive assertion
+- [x] 01-09-PLAN.md (Wave 7, gap closure) — Close CR-01: per-row arb-violating Move rejection tests + WR-02 emit-time defensive assertion
 
 ### Phase 2: Vault Move Package + Testnet Deploy
 **Goal**: A deployed `deepvault::` Move package on Sui testnet supporting end-to-end supply→hedge→redeem with vault share tokens, withdrawal queue, and pause authority — auditable, tested, and integration-verified against current Predict contracts.

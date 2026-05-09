@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
 status: executing
-stopped_at: "Phase 1 context gathered (4 areas: SSVI φ-family, binary pricing, parity, golden vectors). Ready for /gsd-plan-phase 1."
-last_updated: "2026-05-09T11:54:20.293Z"
-last_activity: 2026-05-09 -- Phase 0 planning complete
+stopped_at: "Phase 01-01 complete (4/4 tasks, MATH: prefix policy locked, [svi] schema rewritten, 5 spikes resolved). Plans 01-02..01-08 unblocked simultaneously."
+last_updated: "2026-05-09T14:34:35.558Z"
+last_activity: 2026-05-09
 progress:
   total_phases: 7
   completed_phases: 1
-  total_plans: 8
-  completed_plans: 8
-  percent: 100
+  total_plans: 16
+  completed_plans: 9
+  percent: 56
 ---
 
 # Project State
@@ -21,15 +21,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-08)
 
 **Core value:** A working PLP+Hedge vault on DeepBook Predict with a credible, auditable risk dashboard, deployed on mainnet by 2026-06-16. Quality of vault math, backtest, and dashboard polish > component count.
-**Current focus:** Phase 1 — Math Foundation (SVI Parity Gate) — next-up
+**Current focus:** Phase 01 — math-foundation-svi-parity-gate
 
 ## Current Position
 
-Phase: 0 (Setup & Ground Rules) — COMPLETE-WITH-CHECKPOINTS
-Plan: 8 of 8
+Phase: 01 (math-foundation-svi-parity-gate) — EXECUTING
+Plan: 2 of 8
 Status: Ready to execute
 Next phase: Phase 1 — Math Foundation (SVI Parity Gate); requirements MATH-01..06; depends on Phase 0
-Last activity: 2026-05-09 -- Phase 0 planning complete
+Last activity: 2026-05-09
 
 Progress: [██████████] 100% Phase 0 / 14% milestone
 
@@ -61,6 +61,7 @@ Progress: [██████████] 100% Phase 0 / 14% milestone
 | Phase 0 P00-06 | 4min | 3 tasks | 3 files |
 | Phase 0 P00-07 | 6min | 3 tasks (auto) + 1 checkpoint | 3 files |
 | Phase 0 P00-08 | 4min | 2 tasks (auto) + 1 checkpoint | 2 files (README + closure SUMMARY) |
+| Phase 01 P01 | 12min | 4 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -101,6 +102,13 @@ Recent decisions affecting current work:
 - [Phase ?]: Plan 00-07: docs/CI-BRANCH-PROTECTION.md ships both UI click-path (Settings → Branches) and gh CLI scripted path (gh api PUT branches/main/protection) for one-time setup; Task 4 awaits human action because gh repo create requires explicit owner/visibility/auth confirmation and required-status-checks only become selectable after each named job has run on default branch.
 - [Phase ?]: Plan 00-07: Local default branch is currently 'master' (git init default); Resume Signal in 00-07-SUMMARY.md flags that user must `git branch -M main` before first push so workflow triggers fire (Pitfall 0-D guard).
 - [Phase 0]: Plan 00-08: README polished from skeleton to judge-readable form (Status, Architecture at a Glance, Quick Start, Stack, Build Log Week 1 with Phase 0 closure entry, Hosting placeholder). 00-08-SUMMARY.md is the Phase 0 closure traceability matrix: 8/8 SETUP-XX PASS, 16/16 D-XX attributed, 5/5 ROADMAP success criteria cross-checked, 12/12 pitfalls (4 cross-cutting + 8 Phase-0-specific) mitigated. 3 outstanding human-action items: Plan 02 Task 4 (wallet provisioning), Plan 07 Task 4 (GitHub repo + branch protection), Plan 08 Task 3 (fresh-clone end-to-end verification). None block Phase 1 math.
+- [Phase ?]: Phase 01-01: Locked SVI math contract — raw 5-param SVI at 1e9 FLOAT_SCALING, Cody 1969 Phi, 7-iter Newton sqrt; cloned from vendored Predict SHA 1159d79af33c70e09e406310e1d8f067832ede9d (re-routes D-01,09,10,11,13,14)
+- [Phase ?]: Phase 01-01: Top-level [svi].scale=9 schema (NOT nested [fixed_point.svi]); k_max_log_strike=2_500_000_000; per-param bounds (a_max=4e9, b_max=8e9, sigma in [1, 4e9], |m| <= 2.5e9) propagated via codegen to 3 runtimes
+- [Phase ?]: Phase 01-01: MATH: commit-prefix policy added as CONTRIBUTING.md sec 6 — gates shared/svi-spec.md, cody_phi_coefficients.toml, [svi] block, helpers/{i64,isqrt,phi}.move, svi_view.move, deepvault/{isqrt,phi,svi}.{py,ts}; mirrors POLICY: discipline
+- [Phase ?]: Phase 01-01 Spike 1: oracle.compute_price is public(package) per oracle.move:331 — NOT callable from deepvault::svi_view; MATH-02 parity asserted INDIRECTLY via 120 golden vectors; Phase 2 vault.rebalance does live testnet predict.get_trade_amounts comparison
+- [Phase ?]: Phase 01-01 Spike 2: bit-shift seed sequence (64,32,16,8,4,2,1) verified at vendored math.move:281-292; reformulated 1000-input check as 100 fixed inputs across Plans 01-03 + 01-05 (random.Random(seed=42))
+- [Phase ?]: Phase 01-01 Spike 4: contracts/sources/helpers/ layout (mirrors Predict helper/ shape); planned files: helpers/{i64,isqrt,phi,math}.move + top-level svi_view.move + phi_coefficients.move
+- [Phase ?]: Phase 01-01 deviation: vendored scripts/deepbookv3/packages/predict/tests/oracle_tests.move does NOT exist — Plan 01-08 Tier C2 must source from local sui move test runs OR predict-server REST (recorded in 01-01-SPIKE-NOTES.md)
 
 ### Pending Todos
 
@@ -140,6 +148,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-09T11:54:20.269Z
-Stopped at: Phase 1 context gathered (4 areas: SSVI φ-family, binary pricing, parity, golden vectors). Ready for /gsd-plan-phase 1.
-Resume file: .planning/phases/01-math-foundation-svi-parity-gate/01-CONTEXT.md
+Last session: 2026-05-09T14:34:35.518Z
+Stopped at: Phase 01-01 complete (4/4 tasks, MATH: prefix policy locked, [svi] schema rewritten, 5 spikes resolved). Plans 01-02..01-08 unblocked simultaneously.
+Resume file: .planning/phases/01-math-foundation-svi-parity-gate/01-02-PLAN.md

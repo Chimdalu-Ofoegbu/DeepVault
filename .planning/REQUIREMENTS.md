@@ -20,12 +20,12 @@ Requirements for the Sui Overflow 2026 submission (target 2026-06-16). Each maps
 
 ### Math Foundation (SVI)
 
-- [ ] **MATH-01**: Python SSVI evaluator (3-parameter, closed-form) audited against Gatheral & Jacquier 2014 published test cases
-- [ ] **MATH-02**: Move `deepvault::svi_view` SSVI evaluator producing identical output to Python on 100+ golden vectors (within 1 wei tolerance)
-- [ ] **MATH-03**: TypeScript `dashboard/lib/svi.ts` SSVI evaluator producing identical output to Python on the same 100+ golden vectors
-- [ ] **MATH-04**: Arbitrage-free checker with closed-form SSVI butterfly check + ≥200-point g(k) grid scan + calendar-monotonicity test, with diagnostic visualization (visible g(k) plot, not boolean)
-- [ ] **MATH-05**: Three-way parity gate enforced in CI — failing the gate blocks any further phase work
-- [ ] **MATH-06**: Theoretical binary-price function derived from SVI parameters at target strike (powers vault hedge pricing AND backtest)
+- [x] **MATH-01**: Python SSVI evaluator (3-parameter, closed-form) audited against Gatheral & Jacquier 2014 published test cases
+- [x] **MATH-02**: Move `deepvault::svi_view` SSVI evaluator producing identical output to Python on 100+ golden vectors (within 1 wei tolerance)
+- [x] **MATH-03**: TypeScript `dashboard/lib/svi.ts` SSVI evaluator producing identical output to Python on the same 100+ golden vectors
+- [x] **MATH-04**: Arbitrage-free checker with closed-form SSVI butterfly check + ≥200-point g(k) grid scan + calendar-monotonicity test, with diagnostic visualization (visible g(k) plot, not boolean)
+- [x] **MATH-05**: Three-way parity gate enforced in CI — failing the gate blocks any further phase work
+- [x] **MATH-06**: Theoretical binary-price function derived from SVI parameters at target strike (powers vault hedge pricing AND backtest)
 
 ### Vault Move Package
 
@@ -155,12 +155,12 @@ Phase mapping finalized by gsd-roadmapper on 2026-05-09 against ROADMAP.md. Ever
 | SETUP-06 | Phase 0 | Complete (00-06) |
 | SETUP-07 | Phase 0 | Complete (00-06) |
 | SETUP-08 | Phase 0 | Complete (00-07 artifacts + 00-08 closure; Task 4 branch-protection awaits human action — recipe in 00-07-SUMMARY.md Resume Signal) |
-| MATH-01 | Phase 1 | Pending |
-| MATH-02 | Phase 1 | Pending |
-| MATH-03 | Phase 1 | Pending |
-| MATH-04 | Phase 1 | Pending |
-| MATH-05 | Phase 1 | Pending |
-| MATH-06 | Phase 1 | Pending |
+| MATH-01 | Phase 1 | Complete |
+| MATH-02 | Phase 1 | Complete |
+| MATH-03 | Phase 1 | Complete |
+| MATH-04 | Phase 1 | Complete |
+| MATH-05 | Phase 1 | Complete |
+| MATH-06 | Phase 1 | Complete |
 | VAULT-01 | Phase 2 | Pending |
 | VAULT-02 | Phase 2 | Pending |
 | VAULT-03 | Phase 2 | Pending |

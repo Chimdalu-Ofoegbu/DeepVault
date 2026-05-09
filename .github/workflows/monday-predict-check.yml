@@ -1,0 +1,45 @@
+# .github/workflows/monday-predict-check.yml
+# Weekly Monday Predict contract-version sweep — Pitfall 6 mitigation.
+#
+# Runs scripts/predict-diff.sh and creates a triage Issue with the diff output.
+# NEVER auto-fails CI — Issue creation is the alert mechanism.
+#
+# CRITICAL: This workflow file MUST live on the default branch (main/master)
+# for the schedule trigger to fire (per Pitfall 0-D / GitHub Actions docs).
+
+name: Monday Predict Sweep
+
+on:
+  schedule:
+    - cron: '0 14 * * 1'    # Mondays 14:00 UTC = 09:00 ET / 06:00 PT (with delay headroom)
+  workflow_dispatch: {}      # allow manual trigger for testing
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  sweep:
+    name: Diff predict-testnet-4-16 vs last sweep
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0       # full history needed for subtree git operations
+
+      - name: Run predict-diff
+        id: sweep
+        run: |
+          mkdir -p /tmp/sweep
+          bash scripts/predict-diff.sh /tmp/sweep/report.md
+          cat /tmp/sweep/report.md
+
+      - name: Create Issue from report
+        uses: peter-evans/create-issue-from-file@v6
+        with:
+          title: "Monday Predict Sweep — ${{ github.run_id }}"
+          content-filepath: /tmp/sweep/report.md
+          labels: |
+            predict-sweep
+            triage

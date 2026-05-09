@@ -15,10 +15,10 @@ install:
 	cd backtest && uv sync --locked
 
 codegen:
-	@echo "ERROR: codegen target not yet wired (Plan 03 fills this). Run 'python scripts/codegen.py' once it exists." >&2
-	@exit 1
+	cd backtest && uv run --no-project python ../scripts/codegen.py
+	@echo "Generated constants files. Don't edit them directly."
 
-build:
+build: codegen
 	cd contracts && sui move build
 	pnpm -r run build
 

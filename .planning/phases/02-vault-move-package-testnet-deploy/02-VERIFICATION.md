@@ -331,3 +331,60 @@ These are documented limitations of the verification scope, not phase deliverabl
 
 _Verified: 2026-05-10_
 _Verifier: Claude (gsd-verifier)_
+
+---
+
+## Re-verification Update (2026-05-10, post-Sui-CLI-install)
+
+After the initial `human_needed` report, Sui CLI testnet-v1.71.1 was installed locally and the 5 verification steps were run empirically. Findings:
+
+### Empirical results
+
+| Step | Status | Notes |
+|------|--------|-------|
+| 1a — `verify-deepbookv3-pin.sh` | ✅ PASS | DeepBookV3 + DeepBookPredict aligned at `1159d79a...9d` |
+| 1b — `sui move build` | ✅ PASS (after 4 build fixes) | Surfaced inherited Phase 1 issues; see "Build issues fixed" below |
+| 2a — `sui move test --coverage` | ✅ PASS | 86/86 tests green |
+| 2b — `coverage_check.sh` | ❌ FAIL — known gap | supply.move 45.52%, rebalance.move 11.63% (redeem.move 87.54% PASS). Plan 02-08 SUMMARY pre-flagged this as a gap-closure scenario — supply/rebalance integration coverage requires live PredictManager fixtures, which is exactly what Plan 02-09's nightly E2E variant exercises post-deploy |
+| 3 — `sui-prover` | ⏸ NOT RUN | Sandbox blocked `cargo install --git asymptotic-code/sui-prover` (third-party install). Rust 1.95 is now ready locally; user-authorized retry will complete the install |
+| 4 — `e2e-vault-deploy.sh` | ⏸ NOT RUN | `sui client faucet` retired the CLI endpoint in favor of the web UI (`https://faucet.sui.io/?address=<addr>`). Direct API calls are rate-limited. Requires manual SUI funding via web UI + manual DUSDC funding via Predict server faucet (also unverified-public) |
+| 5 — `nightly-e2e-vault.yml` | ⏸ NOT RUN | Requires `gh auth login` (interactive OAuth). Workflow will fire automatically at 04:00 UTC daily once code is pushed |
+
+### Build issues fixed (4 commits)
+
+The `human_needed` verdict turned out to be correct in a stronger sense than originally diagnosed: the codebase had **never** successfully run `sui move build` — Phase 0's CI gate was BLOCKED-on-human, so all "deferred to CI" build verifications across Phase 1 + Phase 2 silently accumulated bugs. Empirical run uncovered four:
+
+1. **`d3591f0` — Move.toml dep overrides + rename.** `Sui` and `MoveStdlib` deps needed `override = true` (transitive sui-framework rev mismatch between DeepBookV3 and DeepBookPredict). Dep keys renamed to match the deps' own package names: `DeepBookV3` → `deepbook`, `DeepBookPredict` → `deepbook_predict`. `verify-deepbookv3-pin.sh` updated.
+2. **`125fb88` — Flatten module paths.** Phase 1 declared `module deepvault::helpers::math;` but Move 2024 modules are flat 2-segment `<addr>::<modname>`. The parser silently bound nothing, leading to "Could not resolve the name 'math'" at every callsite. Renamed all 6 helpers from `deepvault::helpers::X` to `deepvault::X` (matches the canonical Predict pattern); 17 files touched.
+3. **`033074b` — Drop deepvault::i64 clone.** Move types are nominal: `deepvault::i64::I64` (cloned from upstream) and `deepbook_predict::i64::I64` (the actual oracle return type) were incompatible despite byte-identical struct definitions. Plan 02-04's "single-file blast radius" rationale doesn't extend to types that literally cross the Predict ABI boundary every SVI math call. Deleted the clone; 5 files now import `deepbook_predict::i64` directly.
+4. **`33f3330` — integration_test abort_codes inlined.** Plan 02-09's `integration_test.move` referenced cross-module constants (`deepvault::rebalance::EPredictMisquote`, `deepvault::redeem::ECooldownNotMet`) but Move constants are module-private with no public accessor. Inlined raw u64 values (401, 302) at the two `#[test, expected_failure]` sites with cross-reference comments.
+
+### Coverage gap detail (Step 2b)
+
+The empirical coverage shortfall on supply.move (45.52%) and rebalance.move (11.63%) reflects two missing test surfaces:
+
+- **`supply::supply<Quote>` end-to-end path** — needs a live PredictManager fixture; the pure-Move test in `supply_test.move` only exercises `compute_shares_to_mint` math via the test-only helper.
+- **`rebalance::buy_hedge_for_deposit` and `roll_expiring`** — both call `predict::mint`/`predict::redeem`, which require a PredictManager owned by the test scenario; pure-Move tests can't construct one (`predict::create_manager` is a public entry but ties to the live testnet Predict registry shared object).
+
+This is precisely the scenario Plan 02-09's nightly E2E variant addresses — by deploying to live testnet and running the full PTB cycle, the supply/rebalance paths execute against a real PredictManager, lifting their effective coverage. The per-push hermetic CI variant uses `FAST_FORWARD=1` clock-warp; full coverage attribution requires the FAST_FORWARD=0 nightly with a live deploy.
+
+**Remediation path (when ready):** run `bash scripts/e2e-vault-deploy.sh` once SUI gas + DUSDC are funded, then trigger `nightly-e2e-vault.yml` via `gh workflow run`. The test results' coverage will incorporate the integration paths and lift supply/rebalance above 85%. If that still falls short, plan a Phase 2 gap-closure run (`/gsd-plan-phase 2 --gaps`) to add explicit unit tests with mock PredictManager fixtures.
+
+### Steps remaining for the developer
+
+Three blockers require manual action (none autonomous-friendly):
+
+1. **Sui Prover install** — run `cargo install --git https://github.com/asymptotic-code/sui-prover --locked sui-prover` (Rust 1.95 is ready). Then `sui-prover --path contracts` to validate both `#[spec(prove)]` specs.
+2. **Testnet faucet** — use the web UI at `https://faucet.sui.io/?address=0xa92cdd29fe8170210b3f376a3c325eab27c4d006eb548645ad96e79a81cf1b2d` for SUI gas. DUSDC funding endpoint is not publicly stable; check `#deepbook` Discord or the Predict UI. Once both coins are present, `bash scripts/e2e-vault-deploy.sh` runs autonomously.
+3. **GitHub Actions** — `gh auth login` then `gh workflow run nightly-e2e-vault.yml` (or wait for the 04:00 UTC cron firing).
+
+### Auto-generated keypair note
+
+`sui move build` auto-generated a fresh ed25519 keypair when first run. Address: `0xa92cdd29fe8170210b3f376a3c325eab27c4d006eb548645ad96e79a81cf1b2d`. The recovery phrase appeared in the agent's transcript — testnet-only, no real funds at risk, but rotate the key (delete from `~/.sui/sui_config/` and create a new one) if any concern about transcript exposure.
+
+### Updated verdict
+
+The phase is **infrastructure-complete with empirical Step-1 + Step-2a confirmation, Step-2b reporting a known-and-anticipated gap, Steps 3-5 awaiting manual developer action**. The four uncovered build issues were inherited from Phase 1 and never caught due to the BLOCKED-on-human CI gate; they are now resolved in commits `d3591f0`, `125fb88`, `033074b`, `33f3330`.
+
+_Re-verified: 2026-05-10_
+_Re-verifier: Claude (orchestrator, with empirical Sui CLI testnet-v1.71.1)_

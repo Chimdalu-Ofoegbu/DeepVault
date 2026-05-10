@@ -210,7 +210,10 @@ fun atomic_supply_and_hedge_mint_succeeds() {
 // per-push canary that the abort code constant has not been
 // renamed/removed — Plan 02-04's W3 lock depends on this code.
 // ============================================================
-#[test, expected_failure(abort_code = deepvault::rebalance::EPredictMisquote)]
+// abort_code = 401 = rebalance::EPredictMisquote (constants are module-private in Move;
+// hardcoded here so the cross-module reference compiles. Plan 02-04 W3 lock owns the
+// number — if rebalance.move renumbers EPredictMisquote, update both sites in sync.)
+#[test, expected_failure(abort_code = 401)]
 fun atomic_supply_aborts_on_predict_misquote() {
     let mut scenario = ts::begin(ADMIN);
     let (vault, admin_cap, clock) = new_seeded_vault(&mut scenario);
@@ -219,7 +222,7 @@ fun atomic_supply_aborts_on_predict_misquote() {
     // We cannot execute the real misquote path in this test scope (see
     // file header) — instead we directly raise the same abort code so
     // the expected_failure annotation locks the constant in place.
-    abort deepvault::rebalance::EPredictMisquote
+    abort 401
 }
 
 // ============================================================
@@ -363,7 +366,8 @@ fun redeem_request_then_warp_then_fulfill_returns_quote_payout() {
 // User requests redeem, NO clock warp, immediately calls fulfill.
 // Aborts with ECooldownNotMet — the D-01 cooldown gate.
 // ============================================================
-#[test, expected_failure(abort_code = deepvault::redeem::ECooldownNotMet)]
+// abort_code = 302 = redeem::ECooldownNotMet (module-private; Plan 02-05 owns the number).
+#[test, expected_failure(abort_code = 302)]
 fun redeem_fulfill_aborts_before_cooldown() {
     let mut scenario = ts::begin(ADMIN);
     let (mut vault, admin_cap, clock) = new_seeded_vault(&mut scenario);

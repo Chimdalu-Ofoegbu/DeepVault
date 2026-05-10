@@ -37,3 +37,9 @@ contracts/build/
 # Misc
 *.log
 coverage/
+
+# Sui Move build artifacts
+contracts/build/
+contracts/Move.lock
+contracts/.coverage_map.mvcov
+contracts/traces/

@@ -4,14 +4,14 @@ milestone: v1.1
 milestone_name: milestone
 status: executing
 stopped_at: Phase 2 context gathered
-last_updated: "2026-05-10T00:50:36.161Z"
-last_activity: 2026-05-10 -- Phase 02 planning complete
+last_updated: "2026-05-10T09:46:43.221Z"
+last_activity: 2026-05-10
 progress:
   total_phases: 7
   completed_phases: 2
   total_plans: 26
-  completed_plans: 17
-  percent: 65
+  completed_plans: 18
+  percent: 69
 ---
 
 # Project State
@@ -21,15 +21,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-08)
 
 **Core value:** A working PLP+Hedge vault on DeepBook Predict with a credible, auditable risk dashboard, deployed on mainnet by 2026-06-16. Quality of vault math, backtest, and dashboard polish > component count.
-**Current focus:** Phase 01 — math-foundation-svi-parity-gate
+**Current focus:** Phase 02 — vault-move-package-testnet-deploy
 
 ## Current Position
 
-Phase: 01 (math-foundation-svi-parity-gate) — EXECUTING
+Phase: 02 (vault-move-package-testnet-deploy) — EXECUTING
 Plan: 2 of 9
 Status: Ready to execute
 Next phase: Phase 2 — Vault & Strategy (PLP+Hedge vault, predict_adapter, rebalance); imports parity-gate-protected svi_view::binary_price; depends on Phase 1
-Last activity: 2026-05-10 -- Phase 02 planning complete
+Last activity: 2026-05-10
 
 Progress: [█████████████████] 100% Phase 1 / 100% milestone
 
@@ -70,6 +70,7 @@ Progress: [█████████████████] 100% Phase 1 / 1
 | Phase 01 P01-07 | 9min | - tasks | - files |
 | Phase 01 P01-08 | 7min | 3 tasks | 8 files |
 | Phase 01 P09 | 8min | 2 tasks | 3 files |
+| Phase 02 P01 | 30min | 4 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -143,6 +144,10 @@ Recent decisions affecting current work:
 - [Phase 01]: Phase 01-08: Tier C JackJacquier fixture shipped as documented stub per CONTEXT.md re-route D-17 (5 vectors, expected_w stub-derived from deepvault.svi). Notebook execution + sui move test capture for Tier C2 source upgrade DEFERRED to Phase 6 (blocked by upstream LICENSE absence + Sui CLI unavailability + testnet wallet provisioning gates). Whitepaper claim ladder unchanged — spec already documents Tier C2 source as deferred to 01-08, and 01-08 forwards to Phase 6.
 - [Phase 01]: Phase 01 CLOSED — all 6 MATH requirements (MATH-01..MATH-06) DONE across 8 plans. CI parity gate enforced (MATH-05); three-way bit-equal parity on 141 vectors at 1 unit tolerance at 1e9; arb-checker delivers g(k) array (MATH-04 differentiator). Phase 2 (vault.rebalance) UNBLOCKED.
 - [Phase ?]: [Phase 01]: Plan 01-09: CR-01 (BLOCKER from 01-REVIEW.md) and partial truth in 01-VERIFICATION.md gaps[0] CLOSED via defense-in-depth — 10 per-row arb_violating_NNN_aborts_when_passed_to_svi_view tests at offsets 111..120 (replacing deleted golden_vectors_arb_violating_all_reject misuse-test) + WR-02 emit-time assertion in golden_emit.py. All 10 per-row tests predicted PASS via static review against vendored Predict SHA 1159d79a (a=0,b=0 -> total_var=0 -> EZeroVariance at svi_view.move:104); first CI run is documented-conditional empirical confirmation gate per Plans 01-05 / 01-07. Phase 1 closure unchanged: 6/6 MATH requirements DONE across 9 plans.
+- [Phase 02]: Phase 02-01: PredictManager ownership = supplier-owned (option b) per WAVE0-DECISION.md spike. Vault never owns/stores a PredictManager — supplier brings &mut PredictManager into vault::supply. Single PTB story preserved (predict::create_manager + vault::supply in one Transaction).
+- [Phase 02]: Phase 02-01: DeepBookPredict added as separate Move.toml dep (Rule 3 latent Phase 1 build fix). Same SHA pin as DeepBookV3; verify-deepbookv3-pin.sh enforces alignment with vendored subtree.
+- [Phase 02]: Phase 02-01: scripts/verify-deepbookv3-pin.sh + new step in ci.yml move job before sui move build. 5-job matrix preserved (move/ts/python/codegen-drift/parity).
+- [Phase 02]: Phase 02-01: Open Questions resolved — Q#1 + Q#4 by this plan; Q#2 deferred to 02-07; Q#3 by 02-09 deploy script; Q#5 to Phase 4; Q#6 to 02-02 + Phase 3. Heading renamed '## Open Questions (RESOLVED)'.
 
 ### Pending Todos
 
@@ -183,6 +188,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-09T19:52:46.781Z
+Last session: 2026-05-10T09:45:53.484Z
 Stopped at: Phase 2 context gathered
-Resume file: .planning/phases/02-vault-move-package-testnet-deploy/02-CONTEXT.md
+Resume file: None

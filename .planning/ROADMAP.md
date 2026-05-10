@@ -104,7 +104,7 @@ Drop in this order, never reverse:
   4. The Move test suite reports ≥85% line coverage on supply/redeem/rebalance and the Sui Prover spec passes for inflation-safety, share-NAV monotonicity, and capability containment (TreasuryCap and AdminCap never escape).
   5. The end-to-end testnet supply→hedge→redeem cycle script runs green in CI on every push, and `worst_case_haircut` returns a documented bound consumable by the future Margin liquidation path.
 **Plans**: 9 plans
-- [ ] 02-01-PLAN.md (Wave 0) — PredictManager-ownership spike + WAVE0-DECISION.md + DeepBookV3 SHA-pin verification + RESEARCH.md inline RESOLVED annotations
+- [x] 02-01-PLAN.md (Wave 0) — PredictManager-ownership spike + WAVE0-DECISION.md + DeepBookV3 SHA-pin verification + RESEARCH.md inline RESOLVED annotations
 - [ ] 02-02-PLAN.md (Wave 0) — strategy.toml [token_bucket] schema shift to absolute u64 micro-units + max_price_premium_bps + inflation_defense + codegen.py extensions
 - [ ] 02-03-PLAN.md (Wave 1) — share.move OTW + helpers/rate_limiter.move clone + vault.move FINAL struct schema (W1 lock) + predict_adapter.move thin wrapper (closes VAULT-01, VAULT-02, VAULT-07)
 - [ ] 02-04-PLAN.md (Wave 2) — supply.move (virtual-shares math + atomic hedge) + rebalance.move (W3 lock: predict_manager::deposit BEFORE predict_adapter::mint) + ltv.move (closes VAULT-03, VAULT-05 supply portion, VAULT-06)

@@ -227,6 +227,11 @@ public fun redeem_cancel<Quote>(
 /// is the BURST cap, not a starting handicap. After the first consume,
 /// refill follows the configured rate.
 ///
+/// Reads `vault::effective_token_bucket_capacity` /
+/// `effective_token_bucket_refill_rate_per_ms` so admin_tune_strategy
+/// mutations apply to NEW buckets initialized after the tune call (Plan
+/// 02-06 D-11.3). Existing buckets retain their original config.
+///
 /// W1 LOCK: uses `vault::rate_limiters_mut` (the post-W1 accessor).
 public(package) fun get_or_init_user_bucket<Quote>(
     vault: &mut Vault<Quote>,
@@ -234,18 +239,20 @@ public(package) fun get_or_init_user_bucket<Quote>(
     clock: &Clock,
 ): &mut RateLimiter {
     if (!vault::rate_limiters_mut(vault).contains(user)) {
+        let capacity = vault::effective_token_bucket_capacity(vault);
+        let refill_rate = vault::effective_token_bucket_refill_rate_per_ms(vault);
         let mut bucket = rate_limiter::new(clock);
         rate_limiter::update_config(
             &mut bucket,
-            strategy_constants::token_bucket_capacity(),
-            strategy_constants::token_bucket_refill_rate_per_ms(),
+            capacity,
+            refill_rate,
             clock,
         );
         rate_limiter::enable(&mut bucket, clock);
         // Seed the bucket full — D-05 capacity is a per-burst CAP.
         rate_limiter::record_deposit(
             &mut bucket,
-            strategy_constants::token_bucket_capacity(),
+            capacity,
             clock,
         );
         vault::rate_limiters_mut(vault).add(user, bucket);

@@ -142,13 +142,15 @@ public fun roll_expiring<Quote>(
         // Mint replacement at fresh -15% OTM / +14d / fresh fair value.
         // alloc_value is the original cost basis carried forward (sizing
         // anchor); the actual Coin movement is internal to PredictManager.
+        // Reads effective_* so admin_tune_strategy mutations take effect
+        // on the next roll (Plan 02-06 D-11.3).
         let forward = oracle::forward_price(oracle);
         let strike = math::mul_div_round_down(
             forward,
-            10_000 - strategy_constants::strike_otm_bps(),
+            10_000 - vault::effective_strike_otm_bps(vault),
             10_000,
         );
-        let expiry_ms = now_ms + strategy_constants::tenor_seconds() * 1_000;
+        let expiry_ms = now_ms + vault::effective_tenor_seconds(vault) * 1_000;
         let fair_value = svi_view::binary_price(oracle, strike);
         assert!(fair_value > 0, EFairValueZero);
 
@@ -231,15 +233,17 @@ public(package) fun buy_hedge_for_deposit<Quote>(
     );
 
     // 1. Compute strike at -15% OTM (D-02). forward at FLOAT_SCALING.
+    // Reads effective_* so admin_tune_strategy mutations apply to the
+    // next supply call (Plan 02-06 D-11.3).
     let forward = oracle::forward_price(oracle);
     let strike = math::mul_div_round_down(
         forward,
-        10_000 - strategy_constants::strike_otm_bps(),
+        10_000 - vault::effective_strike_otm_bps(vault),
         10_000,
     );
 
     // 2. Compute expiry at +14d (D-03).
-    let expiry_ms = clock.timestamp_ms() + strategy_constants::tenor_seconds() * 1_000;
+    let expiry_ms = clock.timestamp_ms() + vault::effective_tenor_seconds(vault) * 1_000;
 
     // 3. SVI fair value (Phase 1 evaluator) — used for misquote check + sizing.
     let fair_value = svi_view::binary_price(oracle, strike);

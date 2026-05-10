@@ -71,8 +71,10 @@ public fun supply<Quote>(
     let shares_to_mint = validate_supply_preconditions(vault, amount);
 
     // Split: hedge_alloc (10% per D-01) goes to predict_adapter::mint via
-    // PredictManager; remainder lands in vault.balance.
-    let hedge_alloc_bps = strategy_constants::allocation_bps();
+    // PredictManager; remainder lands in vault.balance. Reads the
+    // effective allocation_bps so admin_tune_strategy mutations take
+    // effect on the next supply call (Plan 02-06 D-11.3).
+    let hedge_alloc_bps = vault::effective_hedge_alloc_bps(vault);
     let hedge_amount = math::mul_div_round_down(amount, hedge_alloc_bps, 10_000);
     let mut deposit_balance: Balance<Quote> = deposit.into_balance();
     let hedge_balance = deposit_balance.split(hedge_amount);

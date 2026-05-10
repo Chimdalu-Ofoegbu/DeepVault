@@ -17,11 +17,16 @@
 module deepvault::vault;
 
 use deepbook_predict::market_key::MarketKey;
-use deepbook_predict::predict::{Self};
+use deepbook_predict::oracle::OracleSVI;
+use deepbook_predict::predict::{Self, Predict};
+use deepbook_predict::predict_manager::PredictManager;
 use deepvault::helpers::rate_limiter::RateLimiter;
+use deepvault::predict_adapter;
 use deepvault::share::{Self, SHARE, PendingTreasury};
 use deepvault::strategy_constants;
+use std::string::String;
 use sui::balance::{Self, Balance};
+use sui::clock::Clock;
 use sui::coin::{Self, Coin, TreasuryCap};
 use sui::event;
 use sui::table::{Self, Table};
@@ -36,6 +41,12 @@ const EAlreadyInitialized: u64 = 101;
 const ENotPaused: u64 = 102;
 #[allow(unused_const)]
 const EZeroShares: u64 = 103;
+/// D-11.3: `admin_tune_strategy` was called with a key that does not match
+/// any of the five recognized tunable parameters.
+const EUnknownTuneKey: u64 = 104;
+/// D-11.4: `admin_emergency_unwind` was called with a MarketKey that is
+/// not present in the hedge registry.
+const EHedgeNotFound: u64 = 105;
 
 // === Constants ===
 
@@ -196,30 +207,38 @@ public struct HedgeUnwound has copy, drop, store {
     payout_quote: u64,
 }
 
-#[allow(unused_field)]
+/// D-11.1: pause toggled. `paused` is the NEW value; consumers compute
+/// the transition by tracking last-seen state.
 public struct Paused has copy, drop, store {
     vault_id: ID,
     paused: bool,
 }
 
-#[allow(unused_field)]
+/// D-11.2: admin runtime override of `max_staleness_seconds` (DISPLAY-ONLY
+/// per RESEARCH.md note 1; Predict's hard 30s gate is unaffected).
 public struct AdminOverride has copy, drop, store {
     vault_id: ID,
+    parameter: vector<u8>,
     old_value: u64,
     new_value: u64,
 }
 
-#[allow(unused_field)]
+/// D-11.3: admin runtime mutation of one of five tunable strategy
+/// parameters via `admin_tune_strategy`. `key` is the human-readable
+/// identifier (e.g. b"[hedge_policy].ratio_bps").
 public struct AdminTune has copy, drop, store {
     vault_id: ID,
-    key: vector<u8>,
+    key: String,
+    old_value: u64,
     new_value: u64,
 }
 
-#[allow(unused_field)]
+/// D-11.4: admin closed one specific open hedge via
+/// `admin_emergency_unwind`. The MarketKey identifies which position was
+/// closed (oracle_id + expiry + strike + direction).
 public struct AdminUnwind has copy, drop, store {
     vault_id: ID,
-    oracle_id: ID,
+    market_key: MarketKey,
 }
 
 // === Public Functions: Lifecycle ===
@@ -516,6 +535,207 @@ public(package) fun request_split_shares(
     amount: u64,
 ): Balance<SHARE> {
     slot.shares_escrowed.split(amount)
+}
+
+// === Public Functions: Effective Parameter Read Accessors ===
+//
+// Sentinel-zero fallback to strategy_constants. By construction (per
+// `create_vault` initialization) the tunable_* fields are seeded with
+// strategy_constants values, so the zero branch is unreachable in normal
+// operation; the guard remains as defense-in-depth in case
+// `admin_tune_strategy` ever sets a field to 0.
+
+public fun effective_token_bucket_capacity<Quote>(self: &Vault<Quote>): u64 {
+    if (self.tunable_token_bucket_capacity_quote_micro_units == 0) {
+        strategy_constants::token_bucket_capacity()
+    } else {
+        self.tunable_token_bucket_capacity_quote_micro_units
+    }
+}
+
+public fun effective_token_bucket_refill_rate_per_ms<Quote>(self: &Vault<Quote>): u64 {
+    if (self.tunable_token_bucket_refill_rate_quote_micro_units_per_ms == 0) {
+        strategy_constants::token_bucket_refill_rate_per_ms()
+    } else {
+        self.tunable_token_bucket_refill_rate_quote_micro_units_per_ms
+    }
+}
+
+public fun effective_hedge_alloc_bps<Quote>(self: &Vault<Quote>): u64 {
+    if (self.tunable_hedge_policy_allocation_bps == 0) {
+        strategy_constants::allocation_bps()
+    } else {
+        self.tunable_hedge_policy_allocation_bps
+    }
+}
+
+public fun effective_strike_otm_bps<Quote>(self: &Vault<Quote>): u64 {
+    if (self.tunable_hedge_policy_strike_otm_bps == 0) {
+        strategy_constants::strike_otm_bps()
+    } else {
+        self.tunable_hedge_policy_strike_otm_bps
+    }
+}
+
+public fun effective_tenor_seconds<Quote>(self: &Vault<Quote>): u64 {
+    if (self.tunable_hedge_policy_tenor_seconds == 0) {
+        strategy_constants::tenor_seconds()
+    } else {
+        self.tunable_hedge_policy_tenor_seconds
+    }
+}
+
+// ============================================================
+// AdminCap-gated entry functions (D-11). AdminCap is `key`-only,
+// non-transferable in v1 (D-12). NO admin_transfer_cap exists.
+// NO admin_withdraw_fees exists (D-13 — no fees in v1).
+//
+// The four powers, and ONLY these four:
+//   1. admin_pause                       — toggle pause flag
+//   2. admin_oracle_staleness_override   — runtime override (display-only)
+//   3. admin_tune_strategy               — runtime tune one of five params
+//   4. admin_emergency_unwind            — close one specific hedge
+//
+// Capability is the SECOND argument per move.md "Capabilities Go Second".
+// Capability ownership is enforced by Sui's transfer system; holding
+// `&AdminCap` as an argument is sufficient — no `assert!(ctx.sender()...)`
+// runtime check is needed.
+// ============================================================
+
+// === Tune-key constants (avoids hardcoding byte strings in five places) ===
+
+const TUNE_KEY_TOKEN_BUCKET_CAPACITY: vector<u8> = b"[token_bucket].capacity";
+const TUNE_KEY_TOKEN_BUCKET_REFILL_RATE: vector<u8> = b"[token_bucket].refill_rate";
+const TUNE_KEY_HEDGE_RATIO_BPS: vector<u8> = b"[hedge_policy].ratio_bps";
+const TUNE_KEY_HEDGE_STRIKE_OTM_BPS: vector<u8> = b"[hedge_policy].strike_otm_bps";
+const TUNE_KEY_HEDGE_TENOR_SECONDS: vector<u8> = b"[hedge_policy].tenor_seconds";
+
+/// D-11.1: toggle the pause flag. Pause halts SUPPLY only — `redeem_request`,
+/// `redeem_fulfill`, `redeem_cancel`, and `rebalance::roll_expiring` keep
+/// working when `paused == true` (D-10). The strongest "safe to LP here"
+/// posture: users can ALWAYS exit, the vault can ALWAYS keep its hedge
+/// book alive.
+public fun admin_pause<Quote>(
+    vault: &mut Vault<Quote>,
+    _cap: &AdminCap,
+    paused: bool,
+) {
+    vault.paused = paused;
+    event::emit(Paused { vault_id: object::id(vault), paused });
+}
+
+/// D-11.2: runtime override of `max_staleness_seconds`.
+///
+/// IMPORTANT — DISPLAY-ONLY. Predict's on-chain
+/// `oracle_config::assert_live_oracle` enforces a HARD 30-second staleness
+/// ceiling at `predict::mint` call time
+/// (`constants::staleness_threshold_ms!() = 30_000`). AdminCap CANNOT
+/// relax that gate. This setting only affects vault-local diagnostics
+/// (e.g. dashboard "expected stale" panel). Actual `predict::mint` calls
+/// fail when the oracle is older than 30 seconds, regardless of this
+/// value. Resets to `strategy.toml` default on next deploy.
+/// (RESEARCH.md note 1 / CONTEXT.md D-11.2.)
+public fun admin_oracle_staleness_override<Quote>(
+    vault: &mut Vault<Quote>,
+    _cap: &AdminCap,
+    max_seconds: u64,
+) {
+    let old = vault.tunable_oracle_max_staleness_seconds;
+    vault.tunable_oracle_max_staleness_seconds = max_seconds;
+    event::emit(AdminOverride {
+        vault_id: object::id(vault),
+        parameter: b"max_staleness_seconds",
+        old_value: old,
+        new_value: max_seconds,
+    });
+}
+
+/// D-11.3: runtime tune one of five strategy parameters. Recognized keys:
+///   - "[token_bucket].capacity"
+///   - "[token_bucket].refill_rate"
+///   - "[hedge_policy].ratio_bps"
+///   - "[hedge_policy].strike_otm_bps"
+///   - "[hedge_policy].tenor_seconds"
+///
+/// Aborts with `EUnknownTuneKey` on unrecognized keys.
+///
+/// Note: existing per-user RateLimiter buckets keep their original config.
+/// Runtime tune of `[token_bucket].capacity` / `.refill_rate` only affects
+/// NEW buckets that lazy-init after the tune call. This is acceptable for
+/// v1: the dashboard displays per-user bucket state, so an admin can
+/// observe drift between the new tune and existing buckets.
+public fun admin_tune_strategy<Quote>(
+    vault: &mut Vault<Quote>,
+    _cap: &AdminCap,
+    key: String,
+    value: u64,
+) {
+    let key_bytes = *key.as_bytes();
+    let old: u64;
+    if (key_bytes == TUNE_KEY_TOKEN_BUCKET_CAPACITY) {
+        old = vault.tunable_token_bucket_capacity_quote_micro_units;
+        vault.tunable_token_bucket_capacity_quote_micro_units = value;
+    } else if (key_bytes == TUNE_KEY_TOKEN_BUCKET_REFILL_RATE) {
+        old = vault.tunable_token_bucket_refill_rate_quote_micro_units_per_ms;
+        vault.tunable_token_bucket_refill_rate_quote_micro_units_per_ms = value;
+    } else if (key_bytes == TUNE_KEY_HEDGE_RATIO_BPS) {
+        old = vault.tunable_hedge_policy_allocation_bps;
+        vault.tunable_hedge_policy_allocation_bps = value;
+    } else if (key_bytes == TUNE_KEY_HEDGE_STRIKE_OTM_BPS) {
+        old = vault.tunable_hedge_policy_strike_otm_bps;
+        vault.tunable_hedge_policy_strike_otm_bps = value;
+    } else if (key_bytes == TUNE_KEY_HEDGE_TENOR_SECONDS) {
+        old = vault.tunable_hedge_policy_tenor_seconds;
+        vault.tunable_hedge_policy_tenor_seconds = value;
+    } else {
+        abort EUnknownTuneKey
+    };
+    event::emit(AdminTune {
+        vault_id: object::id(vault),
+        key,
+        old_value: old,
+        new_value: value,
+    });
+}
+
+/// D-11.4: close one specific open hedge regardless of expiry. Narrow
+/// but load-bearing for the institutional "we can pull the plug if oracle
+/// is wrong" story. Removes the hedge from `vault.hedges` Table AND from
+/// the parallel `vault.hedge_keys` index, then calls `predict_adapter::redeem`
+/// to close the position via Predict.
+///
+/// Aborts with `EHedgeNotFound` if `market_key` is not in the registry.
+public fun admin_emergency_unwind<Quote>(
+    vault: &mut Vault<Quote>,
+    _cap: &AdminCap,
+    predict: &mut Predict,
+    predict_manager: &mut PredictManager,
+    oracle: &OracleSVI,
+    market_key: MarketKey,
+    clock: &Clock,
+    ctx: &mut TxContext,
+) {
+    assert!(vault.hedges.contains(market_key), EHedgeNotFound);
+
+    let hedge = vault.hedges.remove(market_key);
+    let (found, idx) = vector::index_of(&vault.hedge_keys, &market_key);
+    if (found) {
+        vector::remove(&mut vault.hedge_keys, idx);
+    };
+
+    let quantity = hedge.quantity;
+
+    predict_adapter::redeem<Quote>(
+        predict,
+        predict_manager,
+        oracle,
+        market_key,
+        quantity,
+        clock,
+        ctx,
+    );
+
+    event::emit(AdminUnwind { vault_id: object::id(vault), market_key });
 }
 
 // === Test-only ===

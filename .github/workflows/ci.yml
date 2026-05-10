@@ -62,6 +62,35 @@ jobs:
         working-directory: contracts
         run: sui move test
 
+      - name: Capability containment grep (VAULT-10 lightweight check)
+        # W4 lock (Plan 02-07): this grep is the LOAD-BEARING enforcement
+        # of the capability-containment property for VAULT-10. The
+        # contracts/specs/capability_containment.move file is a
+        # documentation_anchor() stub only.
+        #
+        # Pattern detail:
+        #   - Main regex `\)\s*:\s*\&?(mut )?(TreasuryCap|AdminCap)`
+        #     anchors on the return-type position (`)` followed by `:`)
+        #     so parameter annotations like `cap: AdminCap` are NOT
+        #     flagged. Only functions that RETURN the cap are flagged.
+        #   - First filter excludes `_test.move` test fixtures.
+        #   - Second filter excludes `public(package) fun` callsites
+        #     (intra-package borrowing of TreasuryCap is fine — supply
+        #     and redeem legitimately need `&mut TreasuryCap<SHARE>`
+        #     via `vault::treasury_cap_mut`). Anchor is `public(package) fun`
+        #     anywhere on the line (NOT `^\s*public(package)` which
+        #     fails to match the `file:line:` prefix that grep -n emits).
+        run: |
+          set -euo pipefail
+          if grep -nE '\)\s*:\s*\&?(mut )?(TreasuryCap|AdminCap)' \
+              contracts/sources/*.move 2>/dev/null \
+              | grep -v '_test.move' \
+              | grep -vE 'public\(package\) fun'; then
+            echo "::error::Capability containment violated — a public function exposes TreasuryCap or AdminCap by reference. See VAULT-10 in REQUIREMENTS.md."
+            exit 1
+          fi
+          echo "Capability containment OK: no public function returns TreasuryCap or AdminCap."
+
   ts:
     name: TypeScript tests
     runs-on: ubuntu-latest

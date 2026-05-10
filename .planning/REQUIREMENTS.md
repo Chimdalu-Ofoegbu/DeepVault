@@ -32,7 +32,7 @@ Requirements for the Sui Overflow 2026 submission (target 2026-06-16). Each maps
 - [x] **VAULT-01**: `deepvault::vault` shared object with internal `total_assets` counter, hedge-position registry, and pause flag
 - [x] **VAULT-02**: `deepvault::share` module with TreasuryCap quarantined inside the shared Vault (no external mint surface) — issues `Coin<VAULT_SHARE>` standard fungible coin
 - [ ] **VAULT-03**: `vault::supply` with virtual-shares + virtual-assets pattern (`decimals_offset` 10^6+) and deploy-time seed transaction (shares burned to dead address) preventing first-deposit inflation attack
-- [ ] **VAULT-04**: `vault::redeem_request` + `vault::redeem_fulfill` two-step flow with per-user token-bucket withdrawal limiter
+- [x] **VAULT-04**: `vault::redeem_request` + `vault::redeem_fulfill` two-step flow with per-user token-bucket withdrawal limiter
 - [ ] **VAULT-05**: `vault::rebalance::buy_hedge_for_deposit` purchases binary OTM hedge via `predict::mint` at theoretical SSVI price, with sell-back / roll near expiry
 - [ ] **VAULT-06**: `vault::ltv::worst_case_haircut` view function returning worst-case-NAV-per-share against any open Predict outcome (consumed by Margin liquidation path)
 - [x] **VAULT-07**: `vault::predict_adapter` thin wrapper over Predict ABI — single-file blast radius for contract churn refactors
@@ -164,7 +164,7 @@ Phase mapping finalized by gsd-roadmapper on 2026-05-09 against ROADMAP.md. Ever
 | VAULT-01 | Phase 2 | Done |
 | VAULT-02 | Phase 2 | Done |
 | VAULT-03 | Phase 2 | Pending |
-| VAULT-04 | Phase 2 | Pending |
+| VAULT-04 | Phase 2 | Done |
 | VAULT-05 | Phase 2 | Pending |
 | VAULT-06 | Phase 2 | Pending |
 | VAULT-07 | Phase 2 | Done |

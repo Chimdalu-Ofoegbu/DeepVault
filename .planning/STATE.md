@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
 status: executing
-stopped_at: Phase 02-03 complete (vault foundation modules — share/vault/predict_adapter/rate_limiter clone)
-last_updated: "2026-05-10T11:00:00.000Z"
+stopped_at: Phase 02-05 complete (redeem queue — request/fulfill/cancel + per-user token-bucket; W1+W2 locks honored)
+last_updated: "2026-05-10T12:00:00.000Z"
 last_activity: 2026-05-10
 progress:
   total_phases: 7
   completed_phases: 2
   total_plans: 26
-  completed_plans: 20
-  percent: 77
+  completed_plans: 21
+  percent: 81
 ---
 
 # Project State
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 02 (vault-move-package-testnet-deploy) — EXECUTING
-Plan: 4 of 9
-Status: 02-03 complete; ready to execute Wave 2 (02-04 supply / 02-05 redeem in parallel)
+Plan: 6 of 9
+Status: 02-05 complete; Wave 2 of Phase 2 fully landed (02-04 supply/rebalance/ltv + 02-05 redeem); ready to execute Wave 3 (02-06 admin.move)
 Next phase: Phase 2 — Vault & Strategy (PLP+Hedge vault, predict_adapter, rebalance); imports parity-gate-protected svi_view::binary_price; depends on Phase 1
 Last activity: 2026-05-10
 
@@ -73,6 +73,8 @@ Progress: [█████████████████] 100% Phase 1 / 1
 | Phase 02 P01 | 30min | 4 tasks | 7 files |
 | Phase 02 P02 | 12min | 3 tasks | 5 files |
 | Phase 02 P03 | ~25min | 3 tasks | 7 files |
+| Phase 02 P04 | ~30min | 3 tasks | 6 files |
+| Phase 02 P05 | ~28min | 1 task | 4 files |
 
 ## Accumulated Context
 
@@ -156,6 +158,11 @@ Recent decisions affecting current work:
 - [Phase 02]: Phase 02-03: share.move SHARE OTW + PendingTreasury bridge — TreasuryCap<SHARE> escapes init() only via `consume_pending` (public(package)); deployer never holds free TreasuryCap. helpers/rate_limiter.move line-for-line clone of vendored Predict at SHA 1159d79a (only changes: module path + DeepVault MIT header). predict_adapter.move 47-line two-function passthrough (single-file blast radius for Pitfall 6 ABI churn).
 - [Phase 02]: Phase 02-03: Rule 3 deviation — plan body's `predict_manager::new(ctx)` is `public(package)` and unreachable; switched to public wrapper `predict::create_manager(ctx)` (predict.move:192). Semantics preserved (manager owner == ctx.sender()); WAVE0-DECISION.md option (b) unchanged.
 - [Phase 02]: Phase 02-03: 10 DUSDC seed (10_000_000 quote micro-units) locked into Vault.balance + 1_000_000 SHARE coins minted via TreasuryCap and burned to @0xdead via const DEAD_ADDRESS. Pre-burn assert!(seed.value() == strategy_constants::seed_quote_micro_units(), ESeedAmountMismatch) is the only abort path tested locally; full happy-path coverage moves to Plan 02-09 E2E script.
+- [Phase 02]: Phase 02-05: redeem.move (request/fulfill/cancel + per-user token-bucket lazy-init) lands Wave 2's second plan. W1 lock honored (request_slots_mut, rate_limiters_mut throughout); W2 Balance<SHARE> lock honored via vault::request_split_shares / request_destroy / request_shares_value accessors. D-01 1h cooldown gate, D-03 partial-fulfill timestamp invariance (slot remains escrowed with original ts), D-04 cancel-anytime, D-05 cloned rate_limiter consume — all covered by 8 named test cases. No struct edits to vault.move (production schema unchanged); test-only helpers (mint_shares_for_testing, inflate_liquid_for_testing, drain_liquid_for_testing) added to bypass the supply path's PredictManager dependency for unit tests.
+- [Phase 02]: Phase 02-05: math::min(a,b) helper added to helpers/math.move (Rule 2 — required by acceptance gate `grep -q 'math::min(math::min'`). Single-line `if (a < b) a else b` body keeps the helper trivially auditable; matches the math module's pattern of pure mul_div_round_down/up helpers.
+- [Phase 02]: Phase 02-05: Lazy-init bucket seeded FULL via record_deposit(capacity) post-enable (Rule 2 deviation from amendment block sketch). Without the seed, available=0 and first-time users would hit EInsufficientWithdrawalBudget on every redeem_fulfill. Per D-05, the capacity is a 2-days-of-pro-rata BURST CAP, not a starting handicap. Mirrors predict.move:471-503 supply-time `withdrawal_limiter.record_deposit` pattern.
+- [Phase 02]: Phase 02-05: rate_limiter::update_config 4-arg signature confirmed (self, capacity, refill_rate_per_ms, &Clock). Amendment block sketch had 3 args; the cloned helpers/rate_limiter.move (line-for-line from vendored Predict at SHA 1159d79a) requires the Clock arg. Adopted the actual signature (Rule 3 deviation).
+- [Phase 02]: Phase 02-05: RedeemRequested/RedeemFulfilled/RedeemCanceled events declared in BOTH vault.move (with #[allow(unused_field)] as event-surface placeholders) AND redeem.move (the actual emitters). Indexers parse by `module::Type` so they're distinct types — same pattern supply.move set with its own Supplied event. RedeemFulfilled in redeem.move extends the placeholder with `remainder_shares: u64` for D-03 partial-fulfill telemetry.
 
 ### Pending Todos
 
@@ -196,6 +203,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-10T11:00:00.000Z
-Stopped at: Phase 02-03 complete (vault foundation modules — share/vault/predict_adapter/rate_limiter clone; W1+W2 locks in place)
+Last session: 2026-05-10T12:00:00.000Z
+Stopped at: Phase 02-05 complete (redeem queue — request/fulfill/cancel + per-user token-bucket; W1+W2 locks honored; Wave 2 of Phase 2 fully landed)
 Resume file: None

@@ -1,6 +1,10 @@
 # .github/workflows/ci.yml
 # Required status check for the main branch (Pitfall 0-F).
-# Five jobs: move, ts, python, codegen-drift, parity.
+# Six jobs: move, ts, python, codegen-drift, parity, e2e-vault.
+#
+# Plan 02-09 added the 6th job e2e-vault (VAULT-11). Branch protection
+# rules in repo settings need updating to add e2e-vault as a required
+# status check.
 #
 # parity is the gate the whole project hangs on:
 #   Phase 1 (MATH-05) wires three-runtime cross-check:
@@ -9,6 +13,11 @@
 #     - Move svi_view_tests::golden_vectors_*: deepvault::svi_view vs Move companion
 #     - Forbidden-token grep on dashboard/src/lib/{math,isqrt,phi,ln,svi}.ts
 #   Stays green forever after; if it goes red, halt feature work.
+#
+# e2e-vault runs the per-push hermetic Move integration suite
+# (`sui move test --filter integration_test`) via
+# scripts/e2e-vault-cycle.sh with FAST_FORWARD=1. The real-testnet
+# variant (1h cooldown wait) lives in nightly-e2e-vault.yml.
 
 name: CI
 
@@ -292,3 +301,29 @@ jobs:
           echo "  - TypeScript parity_runner: pass"
           echo "  - Move svi_view_tests::golden_vectors_*: pass"
           echo "  - Forbidden-token grep on TS evaluator: clean"
+
+  e2e-vault:
+    name: E2E vault cycle (Move integration; FAST_FORWARD=1)
+    runs-on: ubuntu-latest
+    needs: [move, parity]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Sui CLI (mainnet-v1.71.1)
+        run: |
+          set -euo pipefail
+          SUI_VERSION="mainnet-v1.71.1"
+          ASSET="sui-${SUI_VERSION}-ubuntu-x86_64.tgz"
+          URL="https://github.com/MystenLabs/sui/releases/download/${SUI_VERSION}/${ASSET}"
+          curl -fsSL "${URL}" -o /tmp/sui.tgz
+          mkdir -p "$HOME/.sui/bin"
+          tar -xzf /tmp/sui.tgz -C "$HOME/.sui/bin"
+          echo "$HOME/.sui/bin" >> "$GITHUB_PATH"
+
+      - name: Verify Sui version
+        run: sui --version
+
+      - name: Run E2E vault cycle (FAST_FORWARD=1, hermetic)
+        env:
+          FAST_FORWARD: "1"
+        run: bash scripts/e2e-vault-cycle.sh

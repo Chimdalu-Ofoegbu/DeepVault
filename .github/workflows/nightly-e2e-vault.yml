@@ -1,0 +1,77 @@
+# .github/workflows/nightly-e2e-vault.yml
+# Nightly real-testnet E2E vault cycle (FAST_FORWARD=0).
+#
+# Performs the full 1h cooldown wait between redeem_request and
+# redeem_fulfill. Too expensive for per-push CI — the per-push
+# hermetic variant lives in ci.yml's e2e-vault job (FAST_FORWARD=1).
+#
+# Cron offset (04:00 UTC) is intentionally one hour past
+# nightly-prover.yml (03:00 UTC) so the two nightlies do not contend
+# for the same testnet RPC window or GitHub Actions runner pool.
+#
+# VAULT-11 nightly variant.
+
+name: Nightly E2E vault (real testnet)
+
+on:
+  schedule:
+    - cron: '0 4 * * *'   # 04:00 UTC daily
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  e2e-vault-real:
+    name: E2E vault cycle (FAST_FORWARD=0, real testnet, 1h cooldown)
+    runs-on: ubuntu-latest
+    timeout-minutes: 90    # 1h cooldown + 30 min buffer
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: '10'
+
+      - name: Install dashboard deps
+        working-directory: dashboard
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Sui CLI (mainnet-v1.71.1)
+        run: |
+          set -euo pipefail
+          SUI_VERSION="mainnet-v1.71.1"
+          ASSET="sui-${SUI_VERSION}-ubuntu-x86_64.tgz"
+          URL="https://github.com/MystenLabs/sui/releases/download/${SUI_VERSION}/${ASSET}"
+          curl -fsSL "${URL}" -o /tmp/sui.tgz
+          mkdir -p "$HOME/.sui/bin"
+          tar -xzf /tmp/sui.tgz -C "$HOME/.sui/bin"
+          echo "$HOME/.sui/bin" >> "$GITHUB_PATH"
+
+      - name: Verify Sui version
+        run: sui --version
+
+      - name: Configure ephemeral testnet wallet
+        env:
+          TESTNET_E2E_KEY: ${{ secrets.TESTNET_E2E_KEY }}
+        run: |
+          # Per Phase 0 D-09: ephemeral generated keypairs in CI.
+          # The TESTNET_E2E_KEY secret is configured in repo settings.
+          # If missing, the job warns and skips rather than failing.
+          if [[ -z "${TESTNET_E2E_KEY:-}" ]]; then
+            echo "::warning::TESTNET_E2E_KEY secret not configured; nightly job will skip."
+            exit 0
+          fi
+          echo "SUI_PRIVATE_KEY=${TESTNET_E2E_KEY}" >> "$GITHUB_ENV"
+
+      - name: Run real-testnet E2E cycle
+        env:
+          FAST_FORWARD: "0"
+          ORACLE_SVI_ID: ${{ vars.ORACLE_SVI_ID }}
+        run: bash scripts/e2e-vault-cycle.sh

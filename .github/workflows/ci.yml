@@ -51,6 +51,9 @@ jobs:
       - name: Verify Sui version
         run: sui --version
 
+      - name: Verify DeepBookV3 SHA pin alignment (Pitfall 6)
+        run: bash scripts/verify-deepbookv3-pin.sh
+
       - name: Move build
         working-directory: contracts
         run: sui move build

@@ -33,13 +33,13 @@ Requirements for the Sui Overflow 2026 submission (target 2026-06-16). Each maps
 - [x] **VAULT-02**: `deepvault::share` module with TreasuryCap quarantined inside the shared Vault (no external mint surface) — issues `Coin<VAULT_SHARE>` standard fungible coin
 - [ ] **VAULT-03**: `vault::supply` with virtual-shares + virtual-assets pattern (`decimals_offset` 10^6+) and deploy-time seed transaction (shares burned to dead address) preventing first-deposit inflation attack
 - [x] **VAULT-04**: `vault::redeem_request` + `vault::redeem_fulfill` two-step flow with per-user token-bucket withdrawal limiter
-- [ ] **VAULT-05**: `vault::rebalance::buy_hedge_for_deposit` purchases binary OTM hedge via `predict::mint` at theoretical SSVI price, with sell-back / roll near expiry
+- [x] **VAULT-05**: `vault::rebalance::buy_hedge_for_deposit` purchases binary OTM hedge via `predict::mint` at theoretical SSVI price, with sell-back / roll near expiry
 - [ ] **VAULT-06**: `vault::ltv::worst_case_haircut` view function returning worst-case-NAV-per-share against any open Predict outcome (consumed by Margin liquidation path)
 - [x] **VAULT-07**: `vault::predict_adapter` thin wrapper over Predict ABI — single-file blast radius for contract churn refactors
 - [x] **VAULT-08**: AdminCap (single-key, non-transferable in v1) for emergency pause and oracle-staleness override
 - [x] **VAULT-09**: Move test suite ≥85% line coverage on supply/redeem/rebalance + property tests for round-down-in-vault-favor invariant
 - [x] **VAULT-10**: Sui Prover spec on `supply`, `redeem`, `rebalance` (inflation-safety, share-NAV monotonicity, capability containment)
-- [ ] **VAULT-11**: End-to-end testnet supply→hedge→redeem cycle scripted and passing in CI
+- [x] **VAULT-11**: End-to-end testnet supply→hedge→redeem cycle scripted and passing in CI
 
 ### Backtest Harness (Handbook-Required)
 
@@ -165,13 +165,13 @@ Phase mapping finalized by gsd-roadmapper on 2026-05-09 against ROADMAP.md. Ever
 | VAULT-02 | Phase 2 | Done |
 | VAULT-03 | Phase 2 | Pending |
 | VAULT-04 | Phase 2 | Done |
-| VAULT-05 | Phase 2 | Pending |
+| VAULT-05 | Phase 2 | Complete |
 | VAULT-06 | Phase 2 | Pending |
 | VAULT-07 | Phase 2 | Done |
 | VAULT-08 | Phase 2 | Complete |
 | VAULT-09 | Phase 2 | Complete |
 | VAULT-10 | Phase 2 | Complete |
-| VAULT-11 | Phase 2 | Pending |
+| VAULT-11 | Phase 2 | Complete |
 | BACK-01 | Phase 3 | Pending |
 | BACK-02 | Phase 3 | Pending |
 | BACK-03 | Phase 3 | Pending |

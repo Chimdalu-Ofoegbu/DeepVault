@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
-status: executing
-stopped_at: "Phase 02-08 complete (VAULT-09 closed — property_test.move with 50-case round-down + W5-locked redeem fulfill body + seed-once invariant; coverage_check.sh + ci.yml move job >= 85% gate on supply/redeem/rebalance; 5-job matrix preserved)"
-last_updated: "2026-05-10T12:50:00.000Z"
+status: verifying
+stopped_at: Phase 02-08 complete (VAULT-09 closed — property_test.move with 50-case round-down + W5-locked redeem fulfill body + seed-once invariant; coverage_check.sh + ci.yml move job >= 85% gate on supply/redeem/rebalance; 5-job matrix preserved)
+last_updated: "2026-05-10T12:01:25.757Z"
 last_activity: 2026-05-10
 progress:
   total_phases: 7
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 26
-  completed_plans: 25
-  percent: 96
+  completed_plans: 26
+  percent: 100
 ---
 
 # Project State
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 
 Phase: 02 (vault-move-package-testnet-deploy) — EXECUTING
 Plan: 9 of 9
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Next phase: Phase 2 — Vault & Strategy (PLP+Hedge vault, predict_adapter, rebalance); imports parity-gate-protected svi_view::binary_price; depends on Phase 1
 Last activity: 2026-05-10
 
@@ -78,6 +78,7 @@ Progress: [█████████████████] 100% Phase 1 / 1
 | Phase 02 P06 | 28 | 1 tasks | 5 files |
 | Phase 02 P07 | 25min | 3 tasks | 5 files |
 | Phase 02 P08 | 22min | 2 tasks | 6 files |
+| Phase 02 P09 | 10 | 4 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -176,6 +177,9 @@ Recent decisions affecting current work:
 - [Phase 02]: Plan 02-08 added two #[test_only] helpers — `supply::compute_shares_to_mint_for_test` (pure-math scalar inputs, exposes the production formula without requiring a vault per test case) and `vault::test_mint_shares_to` (W5-mandated: mint via TreasuryCap then transfer to recipient address; distinct from existing mint_shares_for_testing which returns Coin<SHARE> by value). Both `#[test_only]`; production schema unchanged.
 - [Phase 02]: Plan 02-08 Rule 3 deviation — production `vault::create_vault` calls `predict::create_manager(ctx)` which requires a live Predict shared object; pure-Move tests use `vault::new_vault_for_testing` (test-only constructor that produces an identically-seeded Vault<Quote> without touching Predict). Matches Plan 02-04 supply_test.move and Plan 02-05 redeem_test.move precedent.
 - [Phase 02]: Plan 02-08 Rule 3 deviation — coverage gate REPLACES the existing 'Move test' step in ci.yml move job with an instrumented 'Move test with coverage' run + the gate, instead of duplicating tests. Single instrumented run satisfies both gates. The 5-job matrix names (move/ts/python/codegen-drift/parity) are PATTERNS.md sec G branch-protection invariants and remain intact.
+- [Phase ?]: VAULT-11 closed: per-push CI runs hermetic Move integration suite (FAST_FORWARD=1); nightly cron runs live testnet PTB cycle (FAST_FORWARD=0) including the real 1h cooldown wait.
+- [Phase ?]: TESTNET-DEPLOY.json is canonical handle: deploy script writes, cycle script reads, dashboard (Phase 4) consumes; placeholder ships with status=pending_first_deploy so per-push CI never fails pre-deploy.
+- [Phase ?]: ci.yml matrix grew 5 to 6 jobs (+e2e-vault); Plans 02-07/02-08 'matrix unchanged' invariant was protecting against ACCIDENTAL additions; deliberate VAULT-11 addition documented in file header.
 
 ### Pending Todos
 
@@ -216,6 +220,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-10T12:50:00.000Z
+Last session: 2026-05-10T12:01:00.643Z
 Stopped at: Phase 02-08 complete (VAULT-09 closed — property_test.move with 50-case round-down + W5-locked redeem fulfill body + seed-once invariant; coverage_check.sh + ci.yml move job >= 85% gate on supply/redeem/rebalance; 5-job matrix preserved)
 Resume file: None

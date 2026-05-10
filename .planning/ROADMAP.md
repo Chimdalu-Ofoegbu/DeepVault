@@ -112,7 +112,7 @@ Drop in this order, never reverse:
 - [x] 02-06-PLAN.md (Wave 3) — vault.move admin functions (admin_pause, admin_oracle_staleness_override, admin_tune_strategy, admin_emergency_unwind) (closes VAULT-08)
 - [x] 02-07-PLAN.md (Wave 4) — Two Sui Prover specs (inflation_safe + nav_monotone) + capability_containment.move stub + grep CI step + nightly-prover.yml workflow (closes VAULT-10 per W4 lock)
 - [x] 02-08-PLAN.md (Wave 4) — property_test.move (50-case round-down + W5-locked redeem fulfill body + seed-once) + coverage_check.sh + CI ≥85% gate (closes VAULT-09)
-- [ ] 02-09-PLAN.md (Wave 5) — e2e-vault-deploy.sh + e2e-vault-cycle.sh/.ts + integration_test.move (absorbs deferred 02-04 Predict-integration tests) + ci.yml 6th job e2e-vault + nightly-e2e-vault.yml (closes VAULT-11 + materially closes testnet deploy step)
+- [x] 02-09-PLAN.md (Wave 5) — e2e-vault-deploy.sh + e2e-vault-cycle.sh/.ts + integration_test.move (absorbs deferred 02-04 Predict-integration tests) + ci.yml 6th job e2e-vault + nightly-e2e-vault.yml (closes VAULT-11 + materially closes testnet deploy step)
 
 ### Phase 3: Backtest Harness + Two-Protocol PTB
 **Goal**: Two independent tracks complete in the same window: (A) the flagship two-protocol PTB (Margin borrow + Predict PLP supply + hedge mint, atomic) demonstrated on testnet, and (B) a 30-day handbook-grade Python backtest with lookahead-bias audit and Move↔Python trace-replay parity.

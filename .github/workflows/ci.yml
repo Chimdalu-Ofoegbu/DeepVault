@@ -58,9 +58,13 @@ jobs:
         working-directory: contracts
         run: sui move build
 
-      - name: Move test
+      - name: Move test with coverage (VAULT-09 gate)
         working-directory: contracts
-        run: sui move test
+        run: sui move test --gas-limit 100000000000 --coverage
+
+      - name: Coverage gate (>= 85% on supply/redeem/rebalance) [VAULT-09]
+        working-directory: contracts
+        run: bash tests/coverage_check.sh
 
       - name: Capability containment grep (VAULT-10 lightweight check)
         # W4 lock (Plan 02-07): this grep is the LOAD-BEARING enforcement

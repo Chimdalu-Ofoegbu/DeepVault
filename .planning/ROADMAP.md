@@ -103,7 +103,16 @@ Drop in this order, never reverse:
   3. `vault::rebalance::buy_hedge_for_deposit` purchases an OTM binary hedge via `predict::mint` at the SSVI theoretical price, with sell-back/roll near expiry handled deterministically.
   4. The Move test suite reports ≥85% line coverage on supply/redeem/rebalance and the Sui Prover spec passes for inflation-safety, share-NAV monotonicity, and capability containment (TreasuryCap and AdminCap never escape).
   5. The end-to-end testnet supply→hedge→redeem cycle script runs green in CI on every push, and `worst_case_haircut` returns a documented bound consumable by the future Margin liquidation path.
-**Plans**: TBD
+**Plans**: 9 plans
+- [ ] 02-01-PLAN.md (Wave 0) — PredictManager-ownership spike + WAVE0-DECISION.md + DeepBookV3 SHA-pin verification + RESEARCH.md inline RESOLVED annotations
+- [ ] 02-02-PLAN.md (Wave 0) — strategy.toml [token_bucket] schema shift to absolute u64 micro-units + max_price_premium_bps + inflation_defense + codegen.py extensions
+- [ ] 02-03-PLAN.md (Wave 1) — share.move OTW + helpers/rate_limiter.move clone + vault.move FINAL struct schema (W1 lock) + predict_adapter.move thin wrapper (closes VAULT-01, VAULT-02, VAULT-07)
+- [ ] 02-04-PLAN.md (Wave 2) — supply.move (virtual-shares math + atomic hedge) + rebalance.move (W3 lock: predict_manager::deposit BEFORE predict_adapter::mint) + ltv.move (closes VAULT-03, VAULT-05 supply portion, VAULT-06)
+- [ ] 02-05-PLAN.md (Wave 2) — redeem.move (request + fulfill + cancel + per-user RateLimiter lazy-init via Balance<SHARE> form per W2 lock) (closes VAULT-04)
+- [ ] 02-06-PLAN.md (Wave 3) — vault.move admin functions (admin_pause, admin_oracle_staleness_override, admin_tune_strategy, admin_emergency_unwind) (closes VAULT-08)
+- [ ] 02-07-PLAN.md (Wave 4) — Two Sui Prover specs (inflation_safe + nav_monotone) + capability_containment.move stub + grep CI step + nightly-prover.yml workflow (closes VAULT-10 per W4 lock)
+- [ ] 02-08-PLAN.md (Wave 4) — property_test.move (50-case round-down + W5-locked redeem fulfill body + seed-once) + coverage_check.sh + CI ≥85% gate (closes VAULT-09)
+- [ ] 02-09-PLAN.md (Wave 5) — e2e-vault-deploy.sh + e2e-vault-cycle.sh/.ts + integration_test.move (absorbs deferred 02-04 Predict-integration tests) + ci.yml 6th job e2e-vault + nightly-e2e-vault.yml (closes VAULT-11 + materially closes testnet deploy step)
 
 ### Phase 3: Backtest Harness + Two-Protocol PTB
 **Goal**: Two independent tracks complete in the same window: (A) the flagship two-protocol PTB (Margin borrow + Predict PLP supply + hedge mint, atomic) demonstrated on testnet, and (B) a 30-day handbook-grade Python backtest with lookahead-bias audit and Move↔Python trace-replay parity.
@@ -164,7 +173,7 @@ Decimal phases (e.g., 2.1) reserved for urgent insertions and execute between th
 |-------|----------------|--------|-----------|
 | 0. Setup & Ground Rules | 8/8 | Complete-with-checkpoints | 2026-05-09 |
 | 1. Math Foundation (SVI Parity Gate) | 6/8 | In progress | - |
-| 2. Vault Move Package + Testnet Deploy | 0/TBD | Not started | - |
+| 2. Vault Move Package + Testnet Deploy | 0/9 | Not started | - |
 | 3. Backtest Harness + Two-Protocol PTB | 0/TBD | Not started | - |
 | 4. PLP Risk Studio Dashboard + Relay | 0/TBD | Not started | - |
 | 5. Mainnet Redeploy + Smoke Test | 0/TBD | Not started | - |

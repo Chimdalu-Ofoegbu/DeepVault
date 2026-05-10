@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
 status: executing
-stopped_at: Phase 02-02 complete (codegen schema migration to v2)
-last_updated: "2026-05-10T10:30:00.000Z"
+stopped_at: Phase 02-03 complete (vault foundation modules — share/vault/predict_adapter/rate_limiter clone)
+last_updated: "2026-05-10T11:00:00.000Z"
 last_activity: 2026-05-10
 progress:
   total_phases: 7
   completed_phases: 2
   total_plans: 26
-  completed_plans: 19
-  percent: 73
+  completed_plans: 20
+  percent: 77
 ---
 
 # Project State
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 02 (vault-move-package-testnet-deploy) — EXECUTING
-Plan: 3 of 9
-Status: 02-02 complete; ready to execute Wave 1 (02-03)
+Plan: 4 of 9
+Status: 02-03 complete; ready to execute Wave 2 (02-04 supply / 02-05 redeem in parallel)
 Next phase: Phase 2 — Vault & Strategy (PLP+Hedge vault, predict_adapter, rebalance); imports parity-gate-protected svi_view::binary_price; depends on Phase 1
 Last activity: 2026-05-10
 
@@ -72,6 +72,7 @@ Progress: [█████████████████] 100% Phase 1 / 1
 | Phase 01 P09 | 8min | 2 tasks | 3 files |
 | Phase 02 P01 | 30min | 4 tasks | 7 files |
 | Phase 02 P02 | 12min | 3 tasks | 5 files |
+| Phase 02 P03 | ~25min | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -151,6 +152,10 @@ Recent decisions affecting current work:
 - [Phase 02]: Phase 02-01: Open Questions resolved — Q#1 + Q#4 by this plan; Q#2 deferred to 02-07; Q#3 by 02-09 deploy script; Q#5 to Phase 4; Q#6 to 02-02 + Phase 3. Heading renamed '## Open Questions (RESOLVED)'.
 - [Phase 02]: Phase 02-02: shared/strategy.toml schema_version bumped 1 -> 2 (BREAKING). [token_bucket] BPS schema replaced with absolute u64 micro-units (capacity_quote_micro_units = 100_000_000 = 100 DUSDC; refill_rate_quote_micro_units_per_ms = 1200) to match vendored deepbook_predict::rate_limiter.move u64 capacity + refill_rate_per_ms field types. New [inflation_defense] block (seed_quote_micro_units = 10_000_000, virtual_shares = 1_000_000) ports OpenZeppelin ERC-4626 v5 inflation defense to cross-runtime constants. New [hedge_policy].max_price_premium_bps = 50 implements RESEARCH.md Pitfall 2 abstain threshold.
 - [Phase 02]: Phase 02-02: codegen.py emit_move/emit_python/emit_typescript extended with 6 new accessors per runtime (token_bucket_capacity, token_bucket_refill_rate_per_ms, seed_quote_micro_units, virtual_shares, nav_scale = 1_000_000_000 hardcoded, max_price_premium_bps). TS bigint 'n' suffix policy extended to TOKEN_BUCKET_CAPACITY/REFILL_RATE_PER_MS/SEED_QUOTE_MICRO_UNITS/VIRTUAL_SHARES/NAV_SCALE. load_strategy schema guard bumped 1 -> 2 in lockstep. CI codegen-drift job stays green (--check exit 0). Three generated files regenerated bit-equally; idempotent.
+- [Phase 02]: Phase 02-03: Vault<phantom Quote> shared object + AdminCap + create_vault landed with W1-locked 18-field schema (treasury_cap, admin, paused, balance, escrow_balance, request_slots, rate_limiters, hedges, hedge_keys, predict_manager_id, total_shares_supply, total_assets, six tunable_*) and W2-locked RequestSlot { shares_escrowed: Balance<SHARE>, request_timestamp_ms, claimed_so_far }. AdminCap is `key`-only — non-transferable v1 per D-12. Closes VAULT-01, VAULT-02, VAULT-07.
+- [Phase 02]: Phase 02-03: share.move SHARE OTW + PendingTreasury bridge — TreasuryCap<SHARE> escapes init() only via `consume_pending` (public(package)); deployer never holds free TreasuryCap. helpers/rate_limiter.move line-for-line clone of vendored Predict at SHA 1159d79a (only changes: module path + DeepVault MIT header). predict_adapter.move 47-line two-function passthrough (single-file blast radius for Pitfall 6 ABI churn).
+- [Phase 02]: Phase 02-03: Rule 3 deviation — plan body's `predict_manager::new(ctx)` is `public(package)` and unreachable; switched to public wrapper `predict::create_manager(ctx)` (predict.move:192). Semantics preserved (manager owner == ctx.sender()); WAVE0-DECISION.md option (b) unchanged.
+- [Phase 02]: Phase 02-03: 10 DUSDC seed (10_000_000 quote micro-units) locked into Vault.balance + 1_000_000 SHARE coins minted via TreasuryCap and burned to @0xdead via const DEAD_ADDRESS. Pre-burn assert!(seed.value() == strategy_constants::seed_quote_micro_units(), ESeedAmountMismatch) is the only abort path tested locally; full happy-path coverage moves to Plan 02-09 E2E script.
 
 ### Pending Todos
 
@@ -191,6 +196,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-10T10:30:00.000Z
-Stopped at: Phase 02-02 complete (codegen schema migration to v2)
+Last session: 2026-05-10T11:00:00.000Z
+Stopped at: Phase 02-03 complete (vault foundation modules — share/vault/predict_adapter/rate_limiter clone; W1+W2 locks in place)
 Resume file: None

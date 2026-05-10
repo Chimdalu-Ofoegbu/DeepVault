@@ -106,7 +106,7 @@ Drop in this order, never reverse:
 **Plans**: 9 plans
 - [x] 02-01-PLAN.md (Wave 0) — PredictManager-ownership spike + WAVE0-DECISION.md + DeepBookV3 SHA-pin verification + RESEARCH.md inline RESOLVED annotations
 - [x] 02-02-PLAN.md (Wave 0) — strategy.toml [token_bucket] schema shift to absolute u64 micro-units + max_price_premium_bps + inflation_defense + codegen.py extensions
-- [ ] 02-03-PLAN.md (Wave 1) — share.move OTW + helpers/rate_limiter.move clone + vault.move FINAL struct schema (W1 lock) + predict_adapter.move thin wrapper (closes VAULT-01, VAULT-02, VAULT-07)
+- [x] 02-03-PLAN.md (Wave 1) — share.move OTW + helpers/rate_limiter.move clone + vault.move FINAL struct schema (W1 lock) + predict_adapter.move thin wrapper (closes VAULT-01, VAULT-02, VAULT-07)
 - [ ] 02-04-PLAN.md (Wave 2) — supply.move (virtual-shares math + atomic hedge) + rebalance.move (W3 lock: predict_manager::deposit BEFORE predict_adapter::mint) + ltv.move (closes VAULT-03, VAULT-05 supply portion, VAULT-06)
 - [ ] 02-05-PLAN.md (Wave 2) — redeem.move (request + fulfill + cancel + per-user RateLimiter lazy-init via Balance<SHARE> form per W2 lock) (closes VAULT-04)
 - [ ] 02-06-PLAN.md (Wave 3) — vault.move admin functions (admin_pause, admin_oracle_staleness_override, admin_tune_strategy, admin_emergency_unwind) (closes VAULT-08)

@@ -36,7 +36,7 @@ Requirements for the Sui Overflow 2026 submission (target 2026-06-16). Each maps
 - [ ] **VAULT-05**: `vault::rebalance::buy_hedge_for_deposit` purchases binary OTM hedge via `predict::mint` at theoretical SSVI price, with sell-back / roll near expiry
 - [ ] **VAULT-06**: `vault::ltv::worst_case_haircut` view function returning worst-case-NAV-per-share against any open Predict outcome (consumed by Margin liquidation path)
 - [x] **VAULT-07**: `vault::predict_adapter` thin wrapper over Predict ABI — single-file blast radius for contract churn refactors
-- [ ] **VAULT-08**: AdminCap (single-key, non-transferable in v1) for emergency pause and oracle-staleness override
+- [x] **VAULT-08**: AdminCap (single-key, non-transferable in v1) for emergency pause and oracle-staleness override
 - [ ] **VAULT-09**: Move test suite ≥85% line coverage on supply/redeem/rebalance + property tests for round-down-in-vault-favor invariant
 - [ ] **VAULT-10**: Sui Prover spec on `supply`, `redeem`, `rebalance` (inflation-safety, share-NAV monotonicity, capability containment)
 - [ ] **VAULT-11**: End-to-end testnet supply→hedge→redeem cycle scripted and passing in CI
@@ -168,7 +168,7 @@ Phase mapping finalized by gsd-roadmapper on 2026-05-09 against ROADMAP.md. Ever
 | VAULT-05 | Phase 2 | Pending |
 | VAULT-06 | Phase 2 | Pending |
 | VAULT-07 | Phase 2 | Done |
-| VAULT-08 | Phase 2 | Pending |
+| VAULT-08 | Phase 2 | Complete |
 | VAULT-09 | Phase 2 | Pending |
 | VAULT-10 | Phase 2 | Pending |
 | VAULT-11 | Phase 2 | Pending |

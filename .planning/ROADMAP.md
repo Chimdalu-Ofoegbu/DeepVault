@@ -109,7 +109,7 @@ Drop in this order, never reverse:
 - [x] 02-03-PLAN.md (Wave 1) — share.move OTW + helpers/rate_limiter.move clone + vault.move FINAL struct schema (W1 lock) + predict_adapter.move thin wrapper (closes VAULT-01, VAULT-02, VAULT-07)
 - [x] 02-04-PLAN.md (Wave 2) — supply.move (virtual-shares math + atomic hedge) + rebalance.move (W3 lock: predict_manager::deposit BEFORE predict_adapter::mint) + ltv.move (closes VAULT-03, VAULT-05 supply portion, VAULT-06)
 - [x] 02-05-PLAN.md (Wave 2) — redeem.move (request + fulfill + cancel + per-user RateLimiter lazy-init via Balance<SHARE> form per W2 lock) (closes VAULT-04)
-- [ ] 02-06-PLAN.md (Wave 3) — vault.move admin functions (admin_pause, admin_oracle_staleness_override, admin_tune_strategy, admin_emergency_unwind) (closes VAULT-08)
+- [x] 02-06-PLAN.md (Wave 3) — vault.move admin functions (admin_pause, admin_oracle_staleness_override, admin_tune_strategy, admin_emergency_unwind) (closes VAULT-08)
 - [ ] 02-07-PLAN.md (Wave 4) — Two Sui Prover specs (inflation_safe + nav_monotone) + capability_containment.move stub + grep CI step + nightly-prover.yml workflow (closes VAULT-10 per W4 lock)
 - [ ] 02-08-PLAN.md (Wave 4) — property_test.move (50-case round-down + W5-locked redeem fulfill body + seed-once) + coverage_check.sh + CI ≥85% gate (closes VAULT-09)
 - [ ] 02-09-PLAN.md (Wave 5) — e2e-vault-deploy.sh + e2e-vault-cycle.sh/.ts + integration_test.move (absorbs deferred 02-04 Predict-integration tests) + ci.yml 6th job e2e-vault + nightly-e2e-vault.yml (closes VAULT-11 + materially closes testnet deploy step)

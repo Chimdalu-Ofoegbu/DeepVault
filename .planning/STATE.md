@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
 status: executing
-stopped_at: Phase 02-05 complete (redeem queue — request/fulfill/cancel + per-user token-bucket; W1+W2 locks honored)
-last_updated: "2026-05-10T12:00:00.000Z"
+stopped_at: Phase 02-06 complete (AdminCap entry functions — admin_pause / oracle_staleness_override (DISPLAY-only) / tune_strategy / emergency_unwind; D-10/D-11/D-12/D-13 enforced; supply/redeem/rebalance switched to vault::effective_* tunable accessors; Wave 3 of Phase 2 first plan landed; closes VAULT-08)
+last_updated: "2026-05-10T11:11:52.886Z"
 last_activity: 2026-05-10
 progress:
   total_phases: 7
   completed_phases: 2
   total_plans: 26
-  completed_plans: 21
-  percent: 81
+  completed_plans: 23
+  percent: 88
 ---
 
 # Project State
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 02 (vault-move-package-testnet-deploy) — EXECUTING
-Plan: 6 of 9
-Status: 02-05 complete; Wave 2 of Phase 2 fully landed (02-04 supply/rebalance/ltv + 02-05 redeem); ready to execute Wave 3 (02-06 admin.move)
+Plan: 7 of 9
+Status: 02-06 complete; Wave 3 begun (admin.move landed); ready to execute Plan 02-07 (Sui Prover specs — VAULT-10)
 Next phase: Phase 2 — Vault & Strategy (PLP+Hedge vault, predict_adapter, rebalance); imports parity-gate-protected svi_view::binary_price; depends on Phase 1
 Last activity: 2026-05-10
 
@@ -75,6 +75,7 @@ Progress: [█████████████████] 100% Phase 1 / 1
 | Phase 02 P03 | ~25min | 3 tasks | 7 files |
 | Phase 02 P04 | ~30min | 3 tasks | 6 files |
 | Phase 02 P05 | ~28min | 1 task | 4 files |
+| Phase 02 P06 | 28 | 1 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -163,6 +164,11 @@ Recent decisions affecting current work:
 - [Phase 02]: Phase 02-05: Lazy-init bucket seeded FULL via record_deposit(capacity) post-enable (Rule 2 deviation from amendment block sketch). Without the seed, available=0 and first-time users would hit EInsufficientWithdrawalBudget on every redeem_fulfill. Per D-05, the capacity is a 2-days-of-pro-rata BURST CAP, not a starting handicap. Mirrors predict.move:471-503 supply-time `withdrawal_limiter.record_deposit` pattern.
 - [Phase 02]: Phase 02-05: rate_limiter::update_config 4-arg signature confirmed (self, capacity, refill_rate_per_ms, &Clock). Amendment block sketch had 3 args; the cloned helpers/rate_limiter.move (line-for-line from vendored Predict at SHA 1159d79a) requires the Clock arg. Adopted the actual signature (Rule 3 deviation).
 - [Phase 02]: Phase 02-05: RedeemRequested/RedeemFulfilled/RedeemCanceled events declared in BOTH vault.move (with #[allow(unused_field)] as event-surface placeholders) AND redeem.move (the actual emitters). Indexers parse by `module::Type` so they're distinct types — same pattern supply.move set with its own Supplied event. RedeemFulfilled in redeem.move extends the placeholder with `remainder_shares: u64` for D-03 partial-fulfill telemetry.
+- [Phase ?]: [Phase 02]: Phase 02-06: AdminCap-gated entry functions landed — admin_pause (D-11.1), admin_oracle_staleness_override (D-11.2 — DISPLAY-only — Predict 30s gate cannot be relaxed per RESEARCH.md note 1), admin_tune_strategy (D-11.3 — five recognized keys via TUNE_KEY_* byte-literal consts; aborts EUnknownTuneKey on unknown), admin_emergency_unwind (D-11.4 — removes from vault.hedges + hedge_keys, then predict_adapter::redeem; aborts EHedgeNotFound). Closes VAULT-08. AdminCap is key-only (no store; D-12 structural — non-transferable v1).
+- [Phase ?]: [Phase 02]: Phase 02-06: D-10 (pause halts supply only) enforced via grep guards (rebalance.move + redeem.move have 0 is_paused references) AND 4 pause_does_not_halt_* tests in admin_test.move (request, fulfill, cancel, roll_expiring precondition path). supply.move retains is_paused check at validate_supply_preconditions. The roll_expiring full integration test (live Predict + OracleSVI + PredictManager) deferred to Plan 02-09 integration_test.move.
+- [Phase ?]: [Phase 02]: Phase 02-06: Wired five tunable_* fields through five new effective_* read accessors on vault.move (sentinel-zero fallback to strategy_constants). supply.move::supply, redeem.move::get_or_init_user_bucket, rebalance.move::buy_hedge_for_deposit, rebalance.move::roll_expiring all switched to read tunables via vault::effective_* — without this switchover, admin_tune_strategy mutations would not propagate to supply/redeem/rebalance behavior. Per-user RateLimiter buckets retain their original config across runtime tunes (acceptable for v1; documented in get_or_init_user_bucket doc comment).
+- [Phase ?]: [Phase 02]: Phase 02-06: Tightened existing W1 #[allow(unused_field)] event placeholders (Paused / AdminOverride / AdminTune / AdminUnwind) to production shapes — AdminOverride gains parameter: vector<u8> (forward-compatible — only b'max_staleness_seconds' emitted in v1); AdminTune gains key: String + old_value + new_value; AdminUnwind switches oracle_id: ID -> market_key: MarketKey (more precise — carries oracle_id + strike + expiry + direction). Indexers parse by module::Type so the rename is BCS-safe.
+- [Phase ?]: [Phase 02]: Phase 02-06: Rule 2 deviation — added EHedgeNotFound (105) abort + explicit assert!(vault.hedges.contains(market_key)) in admin_emergency_unwind. The plan body did vault.hedges.remove() directly which would abort with sui::table's generic EKeyNotFound; explicit guard makes the abort code grepable and module-local (PATTERNS.md error-range 100-199 preserved). Rule 3 deviation — extracted five TUNE_KEY_* byte-literal constants at module level so test fixtures and dispatch reference the same canonical strings (move.md 'don't hardcode values that exist in constants module').
 
 ### Pending Todos
 
@@ -203,6 +209,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-10T12:00:00.000Z
-Stopped at: Phase 02-05 complete (redeem queue — request/fulfill/cancel + per-user token-bucket; W1+W2 locks honored; Wave 2 of Phase 2 fully landed)
+Last session: 2026-05-10T11:10:07.088Z
+Stopped at: Phase 02-06 complete (AdminCap entry functions — admin_pause / oracle_staleness_override (DISPLAY-only) / tune_strategy / emergency_unwind; D-10/D-11/D-12/D-13 enforced; supply/redeem/rebalance switched to vault::effective_* tunable accessors; Wave 3 of Phase 2 first plan landed; closes VAULT-08)
 Resume file: None

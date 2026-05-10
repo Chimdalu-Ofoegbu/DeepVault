@@ -1,0 +1,92 @@
+# .github/workflows/nightly-prover.yml
+# Nightly Sui Prover run for the deepvault package.
+#
+# Separate from ci.yml because Sui Prover runtime budget (~10 minutes for
+# the two specs per RESEARCH.md Pattern 6) is too high for per-push CI.
+# The 5-job matrix in ci.yml (move, ts, python, codegen-drift, parity)
+# is unaffected by this workflow — branch-protection invariants preserved
+# (Phase 0 D-13).
+#
+# Two specs are run here:
+#   1. contracts/specs/inflation_safe.move — proves shares_to_mint > 0
+#      for any meaningful deposit on a seeded vault (closes the
+#      inflation-attack terminal state under virtual-shares defense).
+#   2. contracts/specs/nav_monotone.move — proves NAV-per-share never
+#      decreases beyond hedge-cost tolerance for any monotone state
+#      transition produced by `vault::supply`.
+#
+# capability_containment is NOT proven by sui-prover here — it is
+# enforced by the per-push grep step in ci.yml's move job. The
+# contracts/specs/capability_containment.move file is a
+# documentation_anchor() stub.
+#
+# VAULT-10 nightly verification (Plan 02-07 Task 3).
+
+name: Nightly Sui Prover
+
+on:
+  schedule:
+    - cron: '0 3 * * *'        # 03:00 UTC daily
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  prover:
+    name: sui-prover (2 specs)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30          # generous for first runs; tighten after benchmarking
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ============================================================
+      # Install Sui CLI (mainnet-v1.71.1) — copy from ci.yml move job
+      # ============================================================
+      - name: Install Sui CLI (mainnet-v1.71.1)
+        run: |
+          set -euo pipefail
+          SUI_VERSION="mainnet-v1.71.1"
+          ASSET="sui-${SUI_VERSION}-ubuntu-x86_64.tgz"
+          URL="https://github.com/MystenLabs/sui/releases/download/${SUI_VERSION}/${ASSET}"
+          curl -fsSL "${URL}" -o /tmp/sui.tgz
+          mkdir -p "$HOME/.sui/bin"
+          tar -xzf /tmp/sui.tgz -C "$HOME/.sui/bin"
+          echo "$HOME/.sui/bin" >> "$GITHUB_PATH"
+
+      - name: Verify Sui version
+        run: sui --version
+
+      # ============================================================
+      # Install sui-prover from asymptotic-code/sui-prover.
+      # First nightly run will empirically validate the spec syntax;
+      # if the released asset name pattern changes, update here.
+      # ============================================================
+      - name: Install sui-prover
+        run: |
+          set -euo pipefail
+          curl -L https://github.com/asymptotic-code/sui-prover/releases/latest/download/sui-prover-linux-x86_64 \
+            -o /tmp/sui-prover
+          chmod +x /tmp/sui-prover
+          sudo mv /tmp/sui-prover /usr/local/bin/sui-prover
+          sui-prover --version || true
+
+      # ============================================================
+      # Run sui-prover on the deepvault package. The asymptotic-code
+      # convention is to auto-discover `specs/` as a sibling to
+      # `sources/`; the two #[spec(prove)] specs in
+      # contracts/specs/ are picked up here.
+      # ============================================================
+      - name: Run sui-prover
+        working-directory: contracts
+        run: |
+          set -euo pipefail
+          echo "Running sui-prover on contracts/ — VAULT-10 nightly check"
+          sui-prover
+
+      - name: Prover summary
+        if: success()
+        run: |
+          echo "Sui Prover passed: inflation_safe + nav_monotone specs verified."
+          echo "Capability containment is asserted by the grep CI step in the move job (per push)."

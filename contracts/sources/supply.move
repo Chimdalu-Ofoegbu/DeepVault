@@ -154,3 +154,29 @@ public(package) fun compute_shares_to_mint<Quote>(vault: &Vault<Quote>, deposit:
     assert!(shares <= (std::u64::max_value!() as u128), EShareOverflow);
     shares as u64
 }
+
+// === Test-only ===
+
+/// Test-only pure-math version of `compute_shares_to_mint` that takes
+/// `(total_assets, total_shares, deposit)` directly without requiring a
+/// `Vault<Quote>` instance. Consumed by `property_test.move`'s 50-case
+/// round-down-in-vault-favor invariant test (VAULT-09 supplement).
+///
+/// Identical math to `compute_shares_to_mint` — the only change is that the
+/// inputs come as scalars, not from a Vault accessor. Since this helper is
+/// `#[test_only]` it cannot be called from production code paths, so the
+/// production invariant (compute_shares_to_mint reads from vault::total_*)
+/// is preserved.
+#[test_only]
+public fun compute_shares_to_mint_for_test(
+    total_assets: u64,
+    total_shares: u64,
+    deposit: u64,
+): u64 {
+    let virtual_shares = strategy_constants::virtual_shares();
+    let numerator = (deposit as u128) * ((total_shares as u128) + (virtual_shares as u128));
+    let denominator = (total_assets as u128) + 1u128;
+    let shares = numerator / denominator;
+    assert!(shares <= (std::u64::max_value!() as u128), EShareOverflow);
+    shares as u64
+}

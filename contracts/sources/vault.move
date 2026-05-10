@@ -821,6 +821,26 @@ public fun mint_shares_for_testing<Quote>(
     coin::mint(&mut self.treasury_cap, amount, ctx)
 }
 
+/// Test-only mint of SHARE coins directly transferred to `recipient`.
+/// W5 helper for Plan 02-08's property_test.move
+/// `redeem_request_then_fulfill_returns_at_most_proportional_NAV` test.
+///
+/// Equivalent to `mint_shares_for_testing` followed by a
+/// `transfer::public_transfer` to `recipient`, but exposed as a single
+/// helper so the test body remains compact. Updates `total_shares_supply`
+/// to keep NAV math consistent.
+#[test_only]
+public fun test_mint_shares_to<Quote>(
+    self: &mut Vault<Quote>,
+    recipient: address,
+    amount: u64,
+    ctx: &mut TxContext,
+) {
+    self.total_shares_supply = self.total_shares_supply + amount;
+    let coin = coin::mint(&mut self.treasury_cap, amount, ctx);
+    transfer::public_transfer(coin, recipient);
+}
+
 /// Test-only liquid quote inflation. Used by Plan 02-05 redeem_fulfill
 /// tests to simulate "vault has N quote liquid" without going through
 /// the supply path. Updates `total_assets` to keep NAV math consistent.

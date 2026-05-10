@@ -11,7 +11,7 @@
 // intermediate width.
 
 /// Multiply-then-divide helpers using u128 intermediates for full precision.
-module deepvault::helpers::math;
+module deepvault::math;
 
 const EZeroDivisor: u64 = 0;
 

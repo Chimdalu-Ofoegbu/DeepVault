@@ -20,7 +20,7 @@
 #[test_only]
 module deepvault::redeem_test;
 
-use deepvault::helpers::rate_limiter;
+use deepvault::rate_limiter;
 use deepvault::redeem;
 use deepvault::share::{Self, SHARE};
 use deepvault::strategy_constants;

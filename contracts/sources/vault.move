@@ -20,7 +20,7 @@ use deepbook_predict::market_key::MarketKey;
 use deepbook_predict::oracle::OracleSVI;
 use deepbook_predict::predict::{Self, Predict};
 use deepbook_predict::predict_manager::PredictManager;
-use deepvault::helpers::rate_limiter::RateLimiter;
+use deepvault::rate_limiter::RateLimiter;
 use deepvault::predict_adapter;
 use deepvault::share::{Self, SHARE, PendingTreasury};
 use deepvault::strategy_constants;

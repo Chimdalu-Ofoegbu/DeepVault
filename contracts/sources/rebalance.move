@@ -25,7 +25,7 @@ use deepbook_predict::market_key::{Self, MarketKey};
 use deepbook_predict::oracle::{Self, OracleSVI};
 use deepbook_predict::predict::{Self, Predict};
 use deepbook_predict::predict_manager::{Self, PredictManager};
-use deepvault::helpers::math;
+use deepvault::math;
 use deepvault::predict_adapter;
 use deepvault::strategy_constants;
 use deepvault::svi_view;

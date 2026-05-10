@@ -20,11 +20,11 @@
 module deepvault::svi_view;
 
 use deepbook_predict::oracle::{Self, OracleSVI};
-use deepvault::helpers::i64::{Self, I64};
-use deepvault::helpers::isqrt;
-use deepvault::helpers::ln;
-use deepvault::helpers::math;
-use deepvault::helpers::phi;
+use deepbook_predict::i64::{Self, I64};
+use deepvault::isqrt;
+use deepvault::ln;
+use deepvault::math;
+use deepvault::phi;
 use deepvault::strategy_constants;
 
 const EZeroForward: u64 = 3;

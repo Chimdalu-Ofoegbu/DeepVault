@@ -1,7 +1,7 @@
 // Copyright (c) Mysten Labs, Inc.
 // SPDX-License-Identifier: Apache-2.0
 //
-// Unit tests for deepvault::helpers::isqrt (integer Newton sqrt for u128).
+// Unit tests for deepvault::isqrt (integer Newton sqrt for u128).
 //
 // The cross-runtime parity test inlines the FIRST 20 cases from the data
 // contract at backtest/tests/test_isqrt_random_snapshot.txt, which was
@@ -13,7 +13,7 @@
 #[test_only]
 module deepvault::isqrt_tests;
 
-use deepvault::helpers::isqrt;
+use deepvault::isqrt;
 use std::unit_test::assert_eq;
 
 #[test]

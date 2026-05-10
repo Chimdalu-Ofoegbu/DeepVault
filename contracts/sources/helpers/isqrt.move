@@ -17,7 +17,7 @@
 
 /// Fixed-point square root using a bit-length initial guess and unrolled
 /// Newton iterations.
-module deepvault::helpers::isqrt;
+module deepvault::isqrt;
 
 const EInvalidPrecision: u64 = 0;
 

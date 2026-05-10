@@ -23,9 +23,9 @@
 // at backtest/src/deepvault/ln.py per Plan 01-03 key-decisions).
 
 /// Natural logarithm at FLOAT_SCALING (1e9), returning a signed I64.
-module deepvault::helpers::ln;
+module deepvault::ln;
 
-use deepvault::helpers::i64;
+use deepbook_predict::i64;
 use deepvault::phi_coefficients;
 
 const EInputZero: u64 = 0;

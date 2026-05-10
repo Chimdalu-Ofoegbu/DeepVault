@@ -19,7 +19,7 @@
 module deepvault::svi_view_tests;
 
 use deepvault::golden_vectors_data;
-use deepvault::helpers::i64;
+use deepbook_predict::i64;
 use deepvault::svi_view;
 
 /// 1 unit at FLOAT_SCALING per re-routed D-14.

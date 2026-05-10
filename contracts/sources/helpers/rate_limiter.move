@@ -7,7 +7,7 @@
 //
 // The only changes vs upstream are:
 //   1. The `module` declaration line — `deepbook_predict::rate_limiter` becomes
-//      `deepvault::helpers::rate_limiter`.
+//      `deepvault::rate_limiter`.
 //   2. This header replaces the upstream Mysten Apache-2.0 copyright with the
 //      DeepVault MIT header + clone provenance.
 // Function bodies, struct shape, error code numeric values, and visibilities
@@ -22,7 +22,7 @@
 ///
 /// Reference: Chainlink CCIP RateLimiter
 /// https://github.com/code-423n4/2024-11-chainlink/blob/main/contracts/src/ccip/libraries/RateLimiter.sol
-module deepvault::helpers::rate_limiter;
+module deepvault::rate_limiter;
 
 use sui::clock::Clock;
 

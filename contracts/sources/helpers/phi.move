@@ -15,9 +15,9 @@
 // in this module besides the local FLOAT_SCALING aliases.
 
 /// Standard normal CDF Phi(x) using Cody 1969 piecewise rational Chebyshev.
-module deepvault::helpers::phi;
+module deepvault::phi;
 
-use deepvault::helpers::i64;
+use deepbook_predict::i64;
 use deepvault::phi_coefficients;
 
 const FLOAT_SCALING: u64 = 1_000_000_000;

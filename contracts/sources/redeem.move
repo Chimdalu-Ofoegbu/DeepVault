@@ -14,8 +14,8 @@
 /// Two-step withdrawal queue + per-user token-bucket limiter.
 module deepvault::redeem;
 
-use deepvault::helpers::math;
-use deepvault::helpers::rate_limiter::{Self, RateLimiter};
+use deepvault::math;
+use deepvault::rate_limiter::{Self, RateLimiter};
 use deepvault::ltv;
 use deepvault::share::SHARE;
 use deepvault::strategy_constants;

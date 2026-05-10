@@ -1,7 +1,7 @@
 // Copyright (c) Mysten Labs, Inc.
 // SPDX-License-Identifier: Apache-2.0
 //
-// Unit tests for deepvault::helpers::phi (Cody 1969 normal CDF).
+// Unit tests for deepvault::phi (Cody 1969 normal CDF).
 //
 // Expected values at integer-x test points come from scipy.stats.norm.cdf
 // (independently verified ground truth — see backtest/tests/test_phi_against_scipy.py
@@ -12,8 +12,8 @@
 #[test_only]
 module deepvault::phi_tests;
 
-use deepvault::helpers::i64;
-use deepvault::helpers::phi;
+use deepbook_predict::i64;
+use deepvault::phi;
 use std::unit_test::assert_eq;
 
 const FLOAT_SCALING: u64 = 1_000_000_000;

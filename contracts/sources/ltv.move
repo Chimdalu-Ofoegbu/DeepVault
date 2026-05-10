@@ -17,7 +17,7 @@
 /// Pure view module — NAV per share + worst-case haircut.
 module deepvault::ltv;
 
-use deepvault::helpers::math;
+use deepvault::math;
 use deepvault::strategy_constants;
 use deepvault::vault::{Self, Vault};
 

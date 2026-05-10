@@ -21,7 +21,7 @@ module deepvault::supply;
 use deepbook_predict::oracle::OracleSVI;
 use deepbook_predict::predict::Predict;
 use deepbook_predict::predict_manager::PredictManager;
-use deepvault::helpers::math;
+use deepvault::math;
 use deepvault::rebalance;
 use deepvault::strategy_constants;
 use deepvault::vault::{Self, Vault};

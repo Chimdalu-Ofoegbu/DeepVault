@@ -1,6 +1,6 @@
 # ===========================================================================
 # AUTO-GENERATED - DO NOT EDIT
-# Source: shared/strategy.toml (schema_version 1)
+# Source: shared/strategy.toml (schema_version 2)
 # Regenerate via: make codegen   (or: python scripts/codegen.py)
 # ===========================================================================
 """Strategy constants emitted from shared/strategy.toml."""
@@ -17,11 +17,18 @@ STRIKE_OTM_BPS: Final[int] = 1500
 TENOR_SECONDS: Final[int] = 1209600
 ROLL_TRIGGER_SECONDS: Final[int] = 172800
 SIZING_FUNCTION: Final[str] = "fixed"
+MAX_PRICE_PREMIUM_BPS: Final[int] = 50
 
-# Token bucket
-BUCKET_CAPACITY_BPS: Final[int] = 1000
-BUCKET_REFILL_RATE_BPS_PER_SEC: Final[int] = 1
-BUCKET_PERIOD_SECONDS: Final[int] = 3600
+# Token bucket (absolute u64; matches helpers/rate_limiter.move)
+TOKEN_BUCKET_CAPACITY: Final[int] = 100000000
+TOKEN_BUCKET_REFILL_RATE_PER_MS: Final[int] = 1200
+
+# Inflation defense (OpenZeppelin ERC-4626 v5)
+SEED_QUOTE_MICRO_UNITS: Final[int] = 10000000
+VIRTUAL_SHARES: Final[int] = 1000000
+
+# NAV scale (matches Phase 1 D-14/D-15 1e9 fixed-point)
+NAV_SCALE: Final[int] = 1_000_000_000
 
 # LTV
 MARGIN_LTV_CAP_BPS: Final[int] = 5000

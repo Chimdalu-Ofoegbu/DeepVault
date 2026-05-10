@@ -1,6 +1,6 @@
 // ===========================================================================
 // AUTO-GENERATED - DO NOT EDIT
-// Source: shared/strategy.toml (schema_version 1)
+// Source: shared/strategy.toml (schema_version 2)
 // Regenerate via: make codegen   (or: python scripts/codegen.py)
 // ===========================================================================
 
@@ -15,11 +15,18 @@ module deepvault::strategy_constants {
     public fun strike_otm_bps(): u64 { 1500 }
     public fun tenor_seconds(): u64 { 1209600 }
     public fun roll_trigger_seconds(): u64 { 172800 }
+    public fun max_price_premium_bps(): u64 { 50 }
 
-    // Token bucket
-    public fun bucket_capacity_bps(): u64 { 1000 }
-    public fun bucket_refill_rate_bps_per_sec(): u64 { 1 }
-    public fun bucket_period_seconds(): u64 { 3600 }
+    // Token bucket (absolute u64; matches helpers/rate_limiter.move)
+    public fun token_bucket_capacity(): u64 { 100000000 }
+    public fun token_bucket_refill_rate_per_ms(): u64 { 1200 }
+
+    // Inflation defense (OpenZeppelin ERC-4626 v5)
+    public fun seed_quote_micro_units(): u64 { 10000000 }
+    public fun virtual_shares(): u64 { 1000000 }
+
+    // NAV scale (matches Phase 1 D-14/D-15 1e9 fixed-point)
+    public fun nav_scale(): u64 { 1_000_000_000 }
 
     // LTV
     public fun margin_ltv_cap_bps(): u64 { 5000 }

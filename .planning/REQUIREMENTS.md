@@ -38,7 +38,7 @@ Requirements for the Sui Overflow 2026 submission (target 2026-06-16). Each maps
 - [x] **VAULT-07**: `vault::predict_adapter` thin wrapper over Predict ABI — single-file blast radius for contract churn refactors
 - [x] **VAULT-08**: AdminCap (single-key, non-transferable in v1) for emergency pause and oracle-staleness override
 - [ ] **VAULT-09**: Move test suite ≥85% line coverage on supply/redeem/rebalance + property tests for round-down-in-vault-favor invariant
-- [ ] **VAULT-10**: Sui Prover spec on `supply`, `redeem`, `rebalance` (inflation-safety, share-NAV monotonicity, capability containment)
+- [x] **VAULT-10**: Sui Prover spec on `supply`, `redeem`, `rebalance` (inflation-safety, share-NAV monotonicity, capability containment)
 - [ ] **VAULT-11**: End-to-end testnet supply→hedge→redeem cycle scripted and passing in CI
 
 ### Backtest Harness (Handbook-Required)
@@ -170,7 +170,7 @@ Phase mapping finalized by gsd-roadmapper on 2026-05-09 against ROADMAP.md. Ever
 | VAULT-07 | Phase 2 | Done |
 | VAULT-08 | Phase 2 | Complete |
 | VAULT-09 | Phase 2 | Pending |
-| VAULT-10 | Phase 2 | Pending |
+| VAULT-10 | Phase 2 | Complete |
 | VAULT-11 | Phase 2 | Pending |
 | BACK-01 | Phase 3 | Pending |
 | BACK-02 | Phase 3 | Pending |

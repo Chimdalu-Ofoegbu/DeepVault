@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
 status: executing
-stopped_at: Phase 02-06 complete (AdminCap entry functions — admin_pause / oracle_staleness_override (DISPLAY-only) / tune_strategy / emergency_unwind; D-10/D-11/D-12/D-13 enforced; supply/redeem/rebalance switched to vault::effective_* tunable accessors; Wave 3 of Phase 2 first plan landed; closes VAULT-08)
-last_updated: "2026-05-10T11:11:52.886Z"
+stopped_at: "Phase 02-06 complete (AdminCap entry functions — admin_pause / oracle_staleness_override (DISPLAY-only) / tune_strategy / emergency_unwind; D-10/D-11/D-12/D-13 enforced; supply/redeem/rebalance switched to vault::effective_* tunable accessors; Wave 3 of Phase 2 first plan landed; closes VAULT-08)"
+last_updated: "2026-05-10T11:24:27.905Z"
 last_activity: 2026-05-10
 progress:
   total_phases: 7
   completed_phases: 2
   total_plans: 26
-  completed_plans: 23
-  percent: 88
+  completed_plans: 24
+  percent: 92
 ---
 
 # Project State
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 02 (vault-move-package-testnet-deploy) — EXECUTING
-Plan: 7 of 9
-Status: 02-06 complete; Wave 3 begun (admin.move landed); ready to execute Plan 02-07 (Sui Prover specs — VAULT-10)
+Plan: 8 of 9
+Status: Ready to execute
 Next phase: Phase 2 — Vault & Strategy (PLP+Hedge vault, predict_adapter, rebalance); imports parity-gate-protected svi_view::binary_price; depends on Phase 1
 Last activity: 2026-05-10
 
@@ -76,6 +76,7 @@ Progress: [█████████████████] 100% Phase 1 / 1
 | Phase 02 P04 | ~30min | 3 tasks | 6 files |
 | Phase 02 P05 | ~28min | 1 task | 4 files |
 | Phase 02 P06 | 28 | 1 tasks | 5 files |
+| Phase 02 P07 | 25min | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -169,6 +170,7 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 02]: Phase 02-06: Wired five tunable_* fields through five new effective_* read accessors on vault.move (sentinel-zero fallback to strategy_constants). supply.move::supply, redeem.move::get_or_init_user_bucket, rebalance.move::buy_hedge_for_deposit, rebalance.move::roll_expiring all switched to read tunables via vault::effective_* — without this switchover, admin_tune_strategy mutations would not propagate to supply/redeem/rebalance behavior. Per-user RateLimiter buckets retain their original config across runtime tunes (acceptable for v1; documented in get_or_init_user_bucket doc comment).
 - [Phase ?]: [Phase 02]: Phase 02-06: Tightened existing W1 #[allow(unused_field)] event placeholders (Paused / AdminOverride / AdminTune / AdminUnwind) to production shapes — AdminOverride gains parameter: vector<u8> (forward-compatible — only b'max_staleness_seconds' emitted in v1); AdminTune gains key: String + old_value + new_value; AdminUnwind switches oracle_id: ID -> market_key: MarketKey (more precise — carries oracle_id + strike + expiry + direction). Indexers parse by module::Type so the rename is BCS-safe.
 - [Phase ?]: [Phase 02]: Phase 02-06: Rule 2 deviation — added EHedgeNotFound (105) abort + explicit assert!(vault.hedges.contains(market_key)) in admin_emergency_unwind. The plan body did vault.hedges.remove() directly which would abort with sui::table's generic EKeyNotFound; explicit guard makes the abort code grepable and module-local (PATTERNS.md error-range 100-199 preserved). Rule 3 deviation — extracted five TUNE_KEY_* byte-literal constants at module level so test fixtures and dispatch reference the same canonical strings (move.md 'don't hardcode values that exist in constants module').
+- [Phase ?]: Plan 02-07 W4 lock: two prove-annotated Sui Prover specs plus one grep CI step (load-bearing for capability containment); capability_containment.move is documentation_anchor() stub
 
 ### Pending Todos
 
@@ -209,6 +211,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-10T11:10:07.088Z
+Last session: 2026-05-10T11:24:09.803Z
 Stopped at: Phase 02-06 complete (AdminCap entry functions — admin_pause / oracle_staleness_override (DISPLAY-only) / tune_strategy / emergency_unwind; D-10/D-11/D-12/D-13 enforced; supply/redeem/rebalance switched to vault::effective_* tunable accessors; Wave 3 of Phase 2 first plan landed; closes VAULT-08)
 Resume file: None

@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
 status: executing
-stopped_at: Phase 2 context gathered
-last_updated: "2026-05-10T09:46:43.221Z"
+stopped_at: Phase 02-02 complete (codegen schema migration to v2)
+last_updated: "2026-05-10T10:30:00.000Z"
 last_activity: 2026-05-10
 progress:
   total_phases: 7
   completed_phases: 2
   total_plans: 26
-  completed_plans: 18
-  percent: 69
+  completed_plans: 19
+  percent: 73
 ---
 
 # Project State
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 02 (vault-move-package-testnet-deploy) — EXECUTING
-Plan: 2 of 9
-Status: Ready to execute
+Plan: 3 of 9
+Status: 02-02 complete; ready to execute Wave 1 (02-03)
 Next phase: Phase 2 — Vault & Strategy (PLP+Hedge vault, predict_adapter, rebalance); imports parity-gate-protected svi_view::binary_price; depends on Phase 1
 Last activity: 2026-05-10
 
@@ -71,6 +71,7 @@ Progress: [█████████████████] 100% Phase 1 / 1
 | Phase 01 P01-08 | 7min | 3 tasks | 8 files |
 | Phase 01 P09 | 8min | 2 tasks | 3 files |
 | Phase 02 P01 | 30min | 4 tasks | 7 files |
+| Phase 02 P02 | 12min | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -148,6 +149,8 @@ Recent decisions affecting current work:
 - [Phase 02]: Phase 02-01: DeepBookPredict added as separate Move.toml dep (Rule 3 latent Phase 1 build fix). Same SHA pin as DeepBookV3; verify-deepbookv3-pin.sh enforces alignment with vendored subtree.
 - [Phase 02]: Phase 02-01: scripts/verify-deepbookv3-pin.sh + new step in ci.yml move job before sui move build. 5-job matrix preserved (move/ts/python/codegen-drift/parity).
 - [Phase 02]: Phase 02-01: Open Questions resolved — Q#1 + Q#4 by this plan; Q#2 deferred to 02-07; Q#3 by 02-09 deploy script; Q#5 to Phase 4; Q#6 to 02-02 + Phase 3. Heading renamed '## Open Questions (RESOLVED)'.
+- [Phase 02]: Phase 02-02: shared/strategy.toml schema_version bumped 1 -> 2 (BREAKING). [token_bucket] BPS schema replaced with absolute u64 micro-units (capacity_quote_micro_units = 100_000_000 = 100 DUSDC; refill_rate_quote_micro_units_per_ms = 1200) to match vendored deepbook_predict::rate_limiter.move u64 capacity + refill_rate_per_ms field types. New [inflation_defense] block (seed_quote_micro_units = 10_000_000, virtual_shares = 1_000_000) ports OpenZeppelin ERC-4626 v5 inflation defense to cross-runtime constants. New [hedge_policy].max_price_premium_bps = 50 implements RESEARCH.md Pitfall 2 abstain threshold.
+- [Phase 02]: Phase 02-02: codegen.py emit_move/emit_python/emit_typescript extended with 6 new accessors per runtime (token_bucket_capacity, token_bucket_refill_rate_per_ms, seed_quote_micro_units, virtual_shares, nav_scale = 1_000_000_000 hardcoded, max_price_premium_bps). TS bigint 'n' suffix policy extended to TOKEN_BUCKET_CAPACITY/REFILL_RATE_PER_MS/SEED_QUOTE_MICRO_UNITS/VIRTUAL_SHARES/NAV_SCALE. load_strategy schema guard bumped 1 -> 2 in lockstep. CI codegen-drift job stays green (--check exit 0). Three generated files regenerated bit-equally; idempotent.
 
 ### Pending Todos
 
@@ -188,6 +191,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-10T09:45:53.484Z
-Stopped at: Phase 2 context gathered
+Last session: 2026-05-10T10:30:00.000Z
+Stopped at: Phase 02-02 complete (codegen schema migration to v2)
 Resume file: None

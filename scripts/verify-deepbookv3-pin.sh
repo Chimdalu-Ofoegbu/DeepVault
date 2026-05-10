@@ -32,8 +32,8 @@ extract_rev() {
     | head -n 1
 }
 
-DEEPBOOKV3_REV="$(extract_rev DeepBookV3)"
-DEEPBOOKPREDICT_REV="$(extract_rev DeepBookPredict)"
+DEEPBOOKV3_REV="$(extract_rev deepbook)"
+DEEPBOOKPREDICT_REV="$(extract_rev deepbook_predict)"
 
 if [[ -z "${DEEPBOOKV3_REV}" ]] || [[ ! "${DEEPBOOKV3_REV}" =~ ^[0-9a-f]{40}$ ]]; then
   echo "::error::Could not parse a 40-char SHA rev from ${MOVE_TOML} DeepBookV3 line."

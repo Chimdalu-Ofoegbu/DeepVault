@@ -9,19 +9,20 @@ edition = "2024.beta"
 authors = ["DeepVault solo builder"]
 
 [dependencies]
-Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "framework/mainnet" }
+Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "framework/mainnet", override = true }
+MoveStdlib = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/move-stdlib", rev = "framework/mainnet", override = true }
 
 # DeepBookV3 — predict-testnet-4-16 branch SHA-pinned per Pitfall 0-A.
 # Bump only after a Monday Predict sweep triages the diff (see scripts/predict-diff.sh, Plan 05).
 # SHA captured 2026-05-09 from `git ls-remote https://github.com/MystenLabs/deepbookv3.git predict-testnet-4-16`.
-DeepBookV3 = { git = "https://github.com/MystenLabs/deepbookv3.git", subdir = "packages/deepbook", rev = "1159d79af33c70e09e406310e1d8f067832ede9d" }
+deepbook = { git = "https://github.com/MystenLabs/deepbookv3.git", subdir = "packages/deepbook", rev = "1159d79af33c70e09e406310e1d8f067832ede9d" }
 
 # DeepBook Predict — same SHA, different subdir.
 # Required so contracts/sources/svi_view.move (`use deepbook_predict::oracle`)
 # and contracts/tests/_spike/predict_manager_owner_spike_test.move resolve.
 # Plan 02-01 Rule-3 auto-fix: Phase 1 added the import but not the dep, so
 # `sui move build` would have failed in CI on first run.
-DeepBookPredict = { git = "https://github.com/MystenLabs/deepbookv3.git", subdir = "packages/predict", rev = "1159d79af33c70e09e406310e1d8f067832ede9d" }
+deepbook_predict = { git = "https://github.com/MystenLabs/deepbookv3.git", subdir = "packages/predict", rev = "1159d79af33c70e09e406310e1d8f067832ede9d" }
 
 [addresses]
 deepvault = "0x0"

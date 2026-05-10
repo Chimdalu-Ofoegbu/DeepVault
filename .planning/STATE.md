@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
 status: executing
-stopped_at: "Phase 02-06 complete (AdminCap entry functions — admin_pause / oracle_staleness_override (DISPLAY-only) / tune_strategy / emergency_unwind; D-10/D-11/D-12/D-13 enforced; supply/redeem/rebalance switched to vault::effective_* tunable accessors; Wave 3 of Phase 2 first plan landed; closes VAULT-08)"
-last_updated: "2026-05-10T11:24:27.905Z"
+stopped_at: "Phase 02-08 complete (VAULT-09 closed — property_test.move with 50-case round-down + W5-locked redeem fulfill body + seed-once invariant; coverage_check.sh + ci.yml move job >= 85% gate on supply/redeem/rebalance; 5-job matrix preserved)"
+last_updated: "2026-05-10T12:50:00.000Z"
 last_activity: 2026-05-10
 progress:
   total_phases: 7
   completed_phases: 2
   total_plans: 26
-  completed_plans: 24
-  percent: 92
+  completed_plans: 25
+  percent: 96
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 02 (vault-move-package-testnet-deploy) — EXECUTING
-Plan: 8 of 9
+Plan: 9 of 9
 Status: Ready to execute
 Next phase: Phase 2 — Vault & Strategy (PLP+Hedge vault, predict_adapter, rebalance); imports parity-gate-protected svi_view::binary_price; depends on Phase 1
 Last activity: 2026-05-10
@@ -77,6 +77,7 @@ Progress: [█████████████████] 100% Phase 1 / 1
 | Phase 02 P05 | ~28min | 1 task | 4 files |
 | Phase 02 P06 | 28 | 1 tasks | 5 files |
 | Phase 02 P07 | 25min | 3 tasks | 5 files |
+| Phase 02 P08 | 22min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -171,6 +172,10 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 02]: Phase 02-06: Tightened existing W1 #[allow(unused_field)] event placeholders (Paused / AdminOverride / AdminTune / AdminUnwind) to production shapes — AdminOverride gains parameter: vector<u8> (forward-compatible — only b'max_staleness_seconds' emitted in v1); AdminTune gains key: String + old_value + new_value; AdminUnwind switches oracle_id: ID -> market_key: MarketKey (more precise — carries oracle_id + strike + expiry + direction). Indexers parse by module::Type so the rename is BCS-safe.
 - [Phase ?]: [Phase 02]: Phase 02-06: Rule 2 deviation — added EHedgeNotFound (105) abort + explicit assert!(vault.hedges.contains(market_key)) in admin_emergency_unwind. The plan body did vault.hedges.remove() directly which would abort with sui::table's generic EKeyNotFound; explicit guard makes the abort code grepable and module-local (PATTERNS.md error-range 100-199 preserved). Rule 3 deviation — extracted five TUNE_KEY_* byte-literal constants at module level so test fixtures and dispatch reference the same canonical strings (move.md 'don't hardcode values that exist in constants module').
 - [Phase ?]: Plan 02-07 W4 lock: two prove-annotated Sui Prover specs plus one grep CI step (load-bearing for capability containment); capability_containment.move is documentation_anchor() stub
+- [Phase 02]: Plan 02-08 closes VAULT-09 — property_test.move ships three property/invariant tests: (a) 50-case round-down-in-vault-favor via fixed-seed Python random.Random(seed=42) tuples inlined as Move literal, (b) W5-LOCKED redeem_request_then_fulfill_returns_at_most_proportional_NAV with full request -> 1h cooldown warp -> fulfill flow + bounds assertions (no stubs), (c) seed-once invariant via Sui shared-object PendingTreasury consumption check. Plus coverage_check.sh (bash + awk parse of `sui move coverage summary`) wired into ci.yml move job — fails build if any of supply/redeem/rebalance drops below 85% line coverage. 5-job matrix names unchanged; first CI run empirically reports per-module %.
+- [Phase 02]: Plan 02-08 added two #[test_only] helpers — `supply::compute_shares_to_mint_for_test` (pure-math scalar inputs, exposes the production formula without requiring a vault per test case) and `vault::test_mint_shares_to` (W5-mandated: mint via TreasuryCap then transfer to recipient address; distinct from existing mint_shares_for_testing which returns Coin<SHARE> by value). Both `#[test_only]`; production schema unchanged.
+- [Phase 02]: Plan 02-08 Rule 3 deviation — production `vault::create_vault` calls `predict::create_manager(ctx)` which requires a live Predict shared object; pure-Move tests use `vault::new_vault_for_testing` (test-only constructor that produces an identically-seeded Vault<Quote> without touching Predict). Matches Plan 02-04 supply_test.move and Plan 02-05 redeem_test.move precedent.
+- [Phase 02]: Plan 02-08 Rule 3 deviation — coverage gate REPLACES the existing 'Move test' step in ci.yml move job with an instrumented 'Move test with coverage' run + the gate, instead of duplicating tests. Single instrumented run satisfies both gates. The 5-job matrix names (move/ts/python/codegen-drift/parity) are PATTERNS.md sec G branch-protection invariants and remain intact.
 
 ### Pending Todos
 
@@ -211,6 +216,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-10T11:24:09.803Z
-Stopped at: Phase 02-06 complete (AdminCap entry functions — admin_pause / oracle_staleness_override (DISPLAY-only) / tune_strategy / emergency_unwind; D-10/D-11/D-12/D-13 enforced; supply/redeem/rebalance switched to vault::effective_* tunable accessors; Wave 3 of Phase 2 first plan landed; closes VAULT-08)
+Last session: 2026-05-10T12:50:00.000Z
+Stopped at: Phase 02-08 complete (VAULT-09 closed — property_test.move with 50-case round-down + W5-locked redeem fulfill body + seed-once invariant; coverage_check.sh + ci.yml move job >= 85% gate on supply/redeem/rebalance; 5-job matrix preserved)
 Resume file: None

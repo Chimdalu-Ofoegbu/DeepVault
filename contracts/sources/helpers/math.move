@@ -31,3 +31,10 @@ public fun mul_div_round_up(a: u64, b: u64, c: u64): u64 {
     let round = if (numerator % denominator == 0) 0 else 1;
     (result + round) as u64
 }
+
+/// Returns the smaller of two u64 values. Used by redeem.move to compute
+/// `min(pro_rata, bucket_avail, vault_liquid)` for the D-03 liquidity-short
+/// fulfill path.
+public fun min(a: u64, b: u64): u64 {
+    if (a < b) a else b
+}

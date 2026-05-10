@@ -586,6 +586,48 @@ public fun set_paused_for_testing<Quote>(self: &mut Vault<Quote>, paused: bool) 
     self.paused = paused;
 }
 
+/// Test-only mint of SHARE coins via the vault's quarantined TreasuryCap.
+/// Used by Plan 02-05's redeem_test to construct a user holding SHARE
+/// tokens without going through the supply path (which requires a live
+/// PredictManager). Updates `total_shares_supply` to keep NAV math
+/// consistent.
+#[test_only]
+public fun mint_shares_for_testing<Quote>(
+    self: &mut Vault<Quote>,
+    amount: u64,
+    ctx: &mut TxContext,
+): Coin<SHARE> {
+    self.total_shares_supply = self.total_shares_supply + amount;
+    coin::mint(&mut self.treasury_cap, amount, ctx)
+}
+
+/// Test-only liquid quote inflation. Used by Plan 02-05 redeem_fulfill
+/// tests to simulate "vault has N quote liquid" without going through
+/// the supply path. Updates `total_assets` to keep NAV math consistent.
+#[test_only]
+public fun inflate_liquid_for_testing<Quote>(
+    self: &mut Vault<Quote>,
+    quote: Coin<Quote>,
+) {
+    let amount = quote.value();
+    self.balance.join(quote.into_balance());
+    self.total_assets = self.total_assets + amount;
+}
+
+/// Test-only liquid quote drain. Used by Plan 02-05 to simulate the D-03
+/// liquidity-short fulfill path (where vault.balance < pro_rata payout).
+/// Reduces `balance` only; `total_assets` is NOT reduced (the missing
+/// quote is conceptually held in the hedge book).
+#[test_only]
+public fun drain_liquid_for_testing<Quote>(
+    self: &mut Vault<Quote>,
+    amount: u64,
+    ctx: &mut TxContext,
+): Coin<Quote> {
+    let drained = self.balance.split(amount);
+    coin::from_balance(drained, ctx)
+}
+
 #[test_only]
 public fun destroy_for_testing<Quote>(vault: Vault<Quote>) {
     let Vault {

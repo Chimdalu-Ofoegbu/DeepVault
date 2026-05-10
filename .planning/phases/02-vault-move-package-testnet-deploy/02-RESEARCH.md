@@ -902,7 +902,7 @@ fun roll_expiring_warps_clock_past_expiry() {
 
 **Critical assumptions A5+A6 are blockers — see Open Question #1.**
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Who owns the PredictManager? (BLOCKER — must resolve in Wave 0 spike)**
    - What we know: `predict::create_manager(ctx)` creates a `PredictManager` shared object with `manager.owner = ctx.sender()`. `predict::mint` asserts `ctx.sender() == manager.owner()` at line 228.
@@ -919,21 +919,33 @@ fun roll_expiring_warps_clock_past_expiry() {
      3. Observes whether the assert at `predict.move:228` passes or fails.
      - If FAIL: fall back to a different composability story — supplier's wallet IS the manager owner; supplier directly calls `predict::mint` post-supply, and vault tracks the resulting position via a callback. **Less elegant; affects the "single PTB" demo.** Mitigation: the user signs ONE PTB containing TWO `tx.moveCall`s — `vault::supply` then `predict::mint` — and Move's PTB-level atomicity still holds. We trade "single Move entry" for "single PTB" but keep the composability story.
 
+   **RESOLVED:** option (b) chosen — see WAVE0-DECISION.md (Plan 02-01 Task 2). Empirical evidence: spike `contracts/tests/_spike/predict_manager_owner_spike_test.move` (Plan 02-01 Task 1) constructs a real PredictManager via the public `predict::create_manager` and runs `predict_manager_owner_spike::assert_owner_matches_sender` (a verbatim copy of `predict.move:228`). Option (a) aborts with `ENotOwner` (sender != owner); option (b) and option (c) pass (sender == owner == supplier). Option (c) is DISALLOWED at the plan level by Plan 02-04's B4 rule because it contradicts D-06. Downstream wiring lives in Plan 02-04 (supply.move signature takes `&mut PredictManager`), Plan 02-05 (rebalance.move forwards the same ref), and Plan 02-09 (E2E PTB builds two moveCalls — `predict::create_manager` + `vault::supply` — in a single Transaction).
+
 2. **Does Sui Prover's `clone!()` work on objects with only `key` (no `copy/drop/store`)?**
    - What we know: Asymptotic README shows `clone!()` on `Pool<T>` (a struct that presumably has `key`).
    - What's unclear: Whether `clone!` does a structural deep-copy (works) or requires `copy` ability (fails for `Vault<Quote>`).
    - Recommendation: Wave 0 spike — write a trivial spec on a struct with `key` only and run `sui-prover`. If unsupported, refactor specs to compute pre-state values via field reads + arithmetic and pass them as `requires`.
+
+   **RESOLVED:** Deferred to Plan 02-07 Task 1 (the inflation_safe spec is itself the empirical spike for `clone!` semantics). The spec formulation explicitly avoids `clone!` by passing pre/post state values as `requires(...)` arithmetic — making this question moot for Phase 2 ship. If 02-07 Task 1 hits a `clone!`-related blocker, the fallback (`requires`-only formulation) is already documented in Plan 02-07's pattern map.
 
 3. **Should `vault::create_vault` be the ONLY shared-object-creating entry, or split into `create_vault` + `create_predict_manager` two-step?**
    - What we know: Predict's `create_manager` shares a manager object; that manager must be shared before `predict::mint` can be called.
    - What's unclear: Move's PTB semantics around creating-then-using a freshly-shared object in the same tx. (Sui historically requires shared objects to exist with a `initial_shared_version` BEFORE the tx that uses them.)
    - Recommendation: Plan uses two-step: Plan 02-X is `vault::create_vault` (deploy + share vault). Plan 02-Y is `vault::create_predict_manager` (separately shares a manager owned by AdminCap). Both happen as separate txs during deployment, captured to `config/testnet.toml`. **This is consistent with how Sui shared objects work and avoids the "use freshly-shared object" PTB anti-pattern.**
 
+   **RESOLVED:** Two-step deployment per the recommendation. Plan 02-09's `scripts/e2e-vault-deploy.sh` runs `sui client publish` then `sui client call vault::create_vault<DUSDC>` as separate transactions. Per the option-(b) outcome from Q#1 above, the vault does NOT create a PredictManager itself — each supplier creates their own via the PTB-level `predict::create_manager` moveCall on first deposit. All resulting object IDs (vault, AdminCap) land in `TESTNET-DEPLOY.json`; per-supplier manager IDs are dashboard-tracked, not deploy-time configuration.
+
 4. **DeepBookV3 SHA pin alignment between vendored subtree and Move.toml `rev`** — already flagged in Pitfall 6. Plan should add a CI assertion. Not a Wave 0 spike, but an early plan task.
+
+   **RESOLVED:** `scripts/verify-deepbookv3-pin.sh` (Plan 02-01 Task 3) asserts that `contracts/Move.toml`'s `DeepBookV3` and `DeepBookPredict` rev pins match the upstream SHA recorded in the vendored subtree's `git-subtree-split:` trailer. The new step "Verify DeepBookV3 SHA pin alignment (Pitfall 6)" runs in `.github/workflows/ci.yml`'s `move` job between `Verify Sui version` and `Move build`; CI fails on drift. Plan 02-09 Task 1's deploy script re-runs the same check as a deploy gate. Local invocation on the current clean checkout exits 0 (verify-deepbookv3-pin reports alignment at `1159d79af33c70e09e406310e1d8f067832ede9d`).
 
 5. **`@mysten/deepbook-v3` 0.17.0 → 1.3.6 major bump impact on E2E script** — Phase 2 E2E script imports BalanceManager creation utilities. Plan-checker should verify the `1.3.6` ABI doesn't break Phase 0's lockfile assumptions.
 
+   **RESOLVED:** Deferred to Phase 4 (PTB-01..06 covers DeepBook Margin two-protocol PTB integration). Phase 2's `e2e-vault-cycle.ts` uses only `@mysten/sui` 2.16.x `Transaction` builder — it does NOT import `@mysten/deepbook-v3`. The major-bump impact is a Phase 4 concern, not a Phase 2 blocker. Phase 4 will pin a verified `@mysten/deepbook-v3` version and re-run the lockfile parity check then.
+
 6. **`max_price_premium_bps` value** — Plan defaults to 50 bps, Phase 3 backtest tunes. Document the v1 default + tuning protocol in HEDGE-POLICY.md.
+
+   **RESOLVED:** v1 default = 50 bps, codified in `shared/strategy.toml [hedge_policy].max_price_premium_bps` (Plan 02-02 codegen). Phase 3 backtest harness will tune empirically; AdminCap can mutate at runtime via `admin_tune_strategy` per CONTEXT.md D-11.3. The 50 bps figure is also recorded in `docs/HEDGE-POLICY.md` ADR (Plan 00-06) under the walk-forward re-tuning protocol.
 
 ## Environment Availability
 

@@ -8,8 +8,8 @@
 # DO NOT edit the generated files directly — they are overwritten on next codegen.
 # CI's `codegen-drift` job (Plan 07) fails the build if generated files are out of sync.
 
-schema_version = 1
-last_updated = "2026-05-09"
+schema_version = 2
+last_updated = "2026-05-10"
 
 [fixed_point]
 # All on-chain math is fixed-point; document the scale here.
@@ -26,12 +26,22 @@ strike_otm_bps = 1500               # D-02: -15% OTM
 tenor_seconds = 1209600             # D-03: 14 days = 14 * 86400
 roll_trigger_seconds = 172800       # D-03: roll when expiry < 2 days = 2 * 86400
 sizing_function = "fixed"           # D-04: v1 fixed; "dynamic" reserved for v2 swap
+max_price_premium_bps = 50          # Plan 02-02: vault refuses predict::mint if Predict ask > SVI fair value by >0.5% (RESEARCH.md Pitfall 2)
 
 [token_bucket]
-# Per-user withdrawal limiter — placeholders, Phase 2 (vault) backtest-validates.
-capacity_bps = 1000                 # 10% of vault per period
-refill_rate_bps_per_sec = 1         # placeholder
-period_seconds = 3600               # 1 hour
+# Absolute u64 micro-units — matches deepvault::helpers::rate_limiter.move
+# (cloned from vendored Predict at SHA 1159d79a). Per CONTEXT.md D-05:
+# AdminCap can retune these at runtime via admin_tune_strategy.
+# Defaults are conservative — full bucket regenerates over 24h.
+capacity_quote_micro_units = 100_000_000          # 100 DUSDC at 6dp
+refill_rate_quote_micro_units_per_ms = 1200       # ~= capacity / 24h in ms
+
+[inflation_defense]
+# OpenZeppelin ERC-4626 v5 inflation-attack defense ports. Consumed by
+# vault::create_vault (seed) and vault::supply (virtual_shares offset).
+# See CONTEXT.md "Claude's Discretion" -> "Inflation defense seed amount".
+seed_quote_micro_units = 10_000_000               # 10 DUSDC at 6dp
+virtual_shares = 1_000_000                         # 10^6 = decimals_offset
 
 [ltv]
 # Worst-case haircut bounds — Phase 3 PTB-05 (-30% NAV shock liquidation test) validates.

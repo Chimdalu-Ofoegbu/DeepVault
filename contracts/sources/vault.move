@@ -520,6 +520,72 @@ public(package) fun request_split_shares(
 
 // === Test-only ===
 
+/// Test-only Vault<Quote> constructor that bypasses `predict::create_manager`.
+///
+/// `create_vault` calls `predict::create_manager(ctx)` which constructs a
+/// real PredictManager (sharing it as a side-effect) — that's only viable in
+/// a Plan 02-09 E2E test with a live Predict shared object. For pure-vault
+/// unit tests (Plan 02-04 supply.move math, ltv.move math, rebalance.move
+/// insert_or_consolidate_hedge invariants), we need a constructor that
+/// produces a Vault<Quote> without touching Predict.
+///
+/// W1 lock-compatible: this function does not change the Vault struct schema;
+/// it only constructs an instance of the existing schema for test scenarios.
+///
+/// `predict_manager_id` is set to a synthetic dummy ID; tests that exercise
+/// it directly should construct a real one via the E2E path.
+#[test_only]
+public fun new_vault_for_testing<Quote>(
+    cap: TreasuryCap<SHARE>,
+    seed: Coin<Quote>,
+    ctx: &mut TxContext,
+): (Vault<Quote>, AdminCap) {
+    let admin_addr = ctx.sender();
+    let dummy_uid = object::new(ctx);
+    let predict_manager_id = dummy_uid.to_inner();
+    dummy_uid.delete();
+
+    let mut vault = Vault<Quote> {
+        id: object::new(ctx),
+        treasury_cap: cap,
+        admin: admin_addr,
+        paused: false,
+        balance: balance::zero(),
+        escrow_balance: balance::zero(),
+        request_slots: table::new(ctx),
+        rate_limiters: table::new(ctx),
+        hedges: table::new(ctx),
+        hedge_keys: vector[],
+        predict_manager_id,
+        total_shares_supply: 0,
+        total_assets: 0,
+        tunable_token_bucket_capacity_quote_micro_units: strategy_constants::token_bucket_capacity(),
+        tunable_token_bucket_refill_rate_quote_micro_units_per_ms: strategy_constants::token_bucket_refill_rate_per_ms(),
+        tunable_hedge_policy_allocation_bps: strategy_constants::allocation_bps(),
+        tunable_hedge_policy_strike_otm_bps: strategy_constants::strike_otm_bps(),
+        tunable_hedge_policy_tenor_seconds: strategy_constants::tenor_seconds(),
+        tunable_oracle_max_staleness_seconds: strategy_constants::max_staleness_seconds(),
+    };
+
+    // Seed transaction: lock seed quote + mint virtual shares to vault state
+    // (test path; the real `create_vault` mints to @0xdead).
+    let seed_amt = seed.value();
+    vault.balance.join(seed.into_balance());
+    vault.total_assets = seed_amt;
+    let seed_shares_amt = strategy_constants::virtual_shares();
+    let seed_shares = coin::mint(&mut vault.treasury_cap, seed_shares_amt, ctx);
+    transfer::public_transfer(seed_shares, DEAD_ADDRESS);
+    vault.total_shares_supply = seed_shares_amt;
+
+    let admin_cap = AdminCap { id: object::new(ctx) };
+    (vault, admin_cap)
+}
+
+#[test_only]
+public fun set_paused_for_testing<Quote>(self: &mut Vault<Quote>, paused: bool) {
+    self.paused = paused;
+}
+
 #[test_only]
 public fun destroy_for_testing<Quote>(vault: Vault<Quote>) {
     let Vault {

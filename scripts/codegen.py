@@ -48,10 +48,10 @@ HEADER_LINES_PHI = [
 def load_strategy() -> dict:
     with TOML_PATH.open("rb") as f:
         data = tomllib.load(f)
-    if data.get("schema_version") != 1:
+    if data.get("schema_version") != 2:
         raise SystemExit(
             f"codegen.py: unexpected schema_version {data.get('schema_version')!r} "
-            f"in {TOML_PATH}; codegen.py supports schema_version=1"
+            f"in {TOML_PATH}; codegen.py supports schema_version=2"
         )
     return data
 
@@ -85,6 +85,7 @@ def emit_move(data: dict) -> str:
     fp = data["fixed_point"]
     hp = data["hedge_policy"]
     tb = data["token_bucket"]
+    infl = data["inflation_defense"]
     ltv = data["ltv"]
     oracle = data["oracle"]
     svi = data["svi"]
@@ -100,13 +101,30 @@ def emit_move(data: dict) -> str:
     parts.append(f"    public fun strike_otm_bps(): u64 {{ {hp['strike_otm_bps']} }}\n")
     parts.append(f"    public fun tenor_seconds(): u64 {{ {hp['tenor_seconds']} }}\n")
     parts.append(f"    public fun roll_trigger_seconds(): u64 {{ {hp['roll_trigger_seconds']} }}\n")
-    parts.append("\n    // Token bucket\n")
-    parts.append(f"    public fun bucket_capacity_bps(): u64 {{ {tb['capacity_bps']} }}\n")
     parts.append(
-        f"    public fun bucket_refill_rate_bps_per_sec(): u64 "
-        f"{{ {tb['refill_rate_bps_per_sec']} }}\n"
+        f"    public fun max_price_premium_bps(): u64 "
+        f"{{ {hp['max_price_premium_bps']} }}\n"
     )
-    parts.append(f"    public fun bucket_period_seconds(): u64 {{ {tb['period_seconds']} }}\n")
+    parts.append("\n    // Token bucket (absolute u64; matches helpers/rate_limiter.move)\n")
+    parts.append(
+        f"    public fun token_bucket_capacity(): u64 "
+        f"{{ {tb['capacity_quote_micro_units']} }}\n"
+    )
+    parts.append(
+        f"    public fun token_bucket_refill_rate_per_ms(): u64 "
+        f"{{ {tb['refill_rate_quote_micro_units_per_ms']} }}\n"
+    )
+    parts.append("\n    // Inflation defense (OpenZeppelin ERC-4626 v5)\n")
+    parts.append(
+        f"    public fun seed_quote_micro_units(): u64 "
+        f"{{ {infl['seed_quote_micro_units']} }}\n"
+    )
+    parts.append(
+        f"    public fun virtual_shares(): u64 "
+        f"{{ {infl['virtual_shares']} }}\n"
+    )
+    parts.append("\n    // NAV scale (matches Phase 1 D-14/D-15 1e9 fixed-point)\n")
+    parts.append("    public fun nav_scale(): u64 { 1_000_000_000 }\n")
     parts.append("\n    // LTV\n")
     parts.append(f"    public fun margin_ltv_cap_bps(): u64 {{ {ltv['margin_ltv_cap_bps']} }}\n")
     parts.append(
@@ -137,6 +155,7 @@ def emit_python(data: dict) -> str:
     fp = data["fixed_point"]
     hp = data["hedge_policy"]
     tb = data["token_bucket"]
+    infl = data["inflation_defense"]
     ltv = data["ltv"]
     oracle = data["oracle"]
     svi = data["svi"]
@@ -153,13 +172,23 @@ def emit_python(data: dict) -> str:
     parts.append(f"STRIKE_OTM_BPS: Final[int] = {hp['strike_otm_bps']}\n")
     parts.append(f"TENOR_SECONDS: Final[int] = {hp['tenor_seconds']}\n")
     parts.append(f"ROLL_TRIGGER_SECONDS: Final[int] = {hp['roll_trigger_seconds']}\n")
-    parts.append(f'SIZING_FUNCTION: Final[str] = "{hp["sizing_function"]}"\n\n')
-    parts.append("# Token bucket\n")
-    parts.append(f"BUCKET_CAPACITY_BPS: Final[int] = {tb['capacity_bps']}\n")
+    parts.append(f'SIZING_FUNCTION: Final[str] = "{hp["sizing_function"]}"\n')
+    parts.append(f"MAX_PRICE_PREMIUM_BPS: Final[int] = {hp['max_price_premium_bps']}\n\n")
+    parts.append("# Token bucket (absolute u64; matches helpers/rate_limiter.move)\n")
     parts.append(
-        f"BUCKET_REFILL_RATE_BPS_PER_SEC: Final[int] = {tb['refill_rate_bps_per_sec']}\n"
+        f"TOKEN_BUCKET_CAPACITY: Final[int] = {tb['capacity_quote_micro_units']}\n"
     )
-    parts.append(f"BUCKET_PERIOD_SECONDS: Final[int] = {tb['period_seconds']}\n\n")
+    parts.append(
+        f"TOKEN_BUCKET_REFILL_RATE_PER_MS: Final[int] = "
+        f"{tb['refill_rate_quote_micro_units_per_ms']}\n\n"
+    )
+    parts.append("# Inflation defense (OpenZeppelin ERC-4626 v5)\n")
+    parts.append(
+        f"SEED_QUOTE_MICRO_UNITS: Final[int] = {infl['seed_quote_micro_units']}\n"
+    )
+    parts.append(f"VIRTUAL_SHARES: Final[int] = {infl['virtual_shares']}\n\n")
+    parts.append("# NAV scale (matches Phase 1 D-14/D-15 1e9 fixed-point)\n")
+    parts.append("NAV_SCALE: Final[int] = 1_000_000_000\n\n")
     parts.append("# LTV\n")
     parts.append(f"MARGIN_LTV_CAP_BPS: Final[int] = {ltv['margin_ltv_cap_bps']}\n")
     parts.append(
@@ -187,6 +216,7 @@ def emit_typescript(data: dict) -> str:
     fp = data["fixed_point"]
     hp = data["hedge_policy"]
     tb = data["token_bucket"]
+    infl = data["inflation_defense"]
     ltv = data["ltv"]
     oracle = data["oracle"]
     svi = data["svi"]
@@ -203,11 +233,19 @@ def emit_typescript(data: dict) -> str:
     # u64-equivalent fields -> bigint literals to maintain parity with Move
     parts.append(f"  TENOR_SECONDS: {hp['tenor_seconds']}n,\n")
     parts.append(f"  ROLL_TRIGGER_SECONDS: {hp['roll_trigger_seconds']}n,\n")
-    parts.append(f"  SIZING_FUNCTION: '{hp['sizing_function']}' as const,\n\n")
-    parts.append("  // Token bucket\n")
-    parts.append(f"  BUCKET_CAPACITY_BPS: {tb['capacity_bps']},\n")
-    parts.append(f"  BUCKET_REFILL_RATE_BPS_PER_SEC: {tb['refill_rate_bps_per_sec']},\n")
-    parts.append(f"  BUCKET_PERIOD_SECONDS: {tb['period_seconds']},\n\n")
+    parts.append(f"  SIZING_FUNCTION: '{hp['sizing_function']}' as const,\n")
+    parts.append(f"  MAX_PRICE_PREMIUM_BPS: {hp['max_price_premium_bps']},\n\n")
+    parts.append("  // Token bucket (absolute u64; matches helpers/rate_limiter.move)\n")
+    parts.append(f"  TOKEN_BUCKET_CAPACITY: {tb['capacity_quote_micro_units']}n,\n")
+    parts.append(
+        f"  TOKEN_BUCKET_REFILL_RATE_PER_MS: "
+        f"{tb['refill_rate_quote_micro_units_per_ms']}n,\n\n"
+    )
+    parts.append("  // Inflation defense (OpenZeppelin ERC-4626 v5)\n")
+    parts.append(f"  SEED_QUOTE_MICRO_UNITS: {infl['seed_quote_micro_units']}n,\n")
+    parts.append(f"  VIRTUAL_SHARES: {infl['virtual_shares']}n,\n\n")
+    parts.append("  // NAV scale (matches Phase 1 D-14/D-15 1e9 fixed-point)\n")
+    parts.append("  NAV_SCALE: 1_000_000_000n,\n\n")
     parts.append("  // LTV\n")
     parts.append(f"  MARGIN_LTV_CAP_BPS: {ltv['margin_ltv_cap_bps']},\n")
     parts.append(

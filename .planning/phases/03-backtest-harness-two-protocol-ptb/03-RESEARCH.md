@@ -1333,6 +1333,8 @@ fi
 
 ## Open Questions
 
+**Note (revision iteration 1, 2026-05-11):** Per project convention (Phase 2 precedent), the Open Questions below are resolved at Wave 0 execution time by Plan 03-01's spike, not at plan-check time. This section will be re-edited inline to add `**RESOLVED:**` annotations under each of Q1-Q6 when Plan 03-01 Task 4 ships. The heading will be renamed to `## Open Questions (RESOLVED)` at that time.
+
 1. **Does Margin testnet have a DUSDC margin pool that can be borrowed against?**
    - What we know: CLAUDE.md does not list one; the vendored DeepBookV3 contracts don't specify testnet pool IDs.
    - What's unclear: whether Mysten has bootstrapped any pools on Margin testnet at all (Margin is a separate package from Predict; its testnet launch state is undocumented in our research surface).

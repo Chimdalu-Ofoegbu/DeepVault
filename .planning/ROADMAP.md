@@ -124,7 +124,16 @@ Drop in this order, never reverse:
   3. A Python `vault_state` machine consumes a JSON action trace (supply/redeem/rebalance) and produces NAV/share state identical to the same trace executed via Move PTBs on testnet, within 1 wei.
   4. The 30+ day backtest report renders an institutional-grade HTML/PDF with assumption ledger, max drawdown, Sharpe/Sortino on out-of-sample 30%, and PnL attribution split into PLP yield / hedge cost / hedge payoff — and the shuffled-label sanity test produces ~zero alpha (proving no lookahead leak).
   5. Capability-flow tests prove `TradeCap` never leaves the user's BalanceManager and `TreasuryCap<VAULT_SHARE>` never leaves the shared Vault, and the -30% NAV shock liquidation property test passes against the worst-case Predict outcome.
-**Plans**: TBD
+**Plans**: 9 plans
+- [ ] 03-01-PLAN.md (Wave 0) - Spike: 5-call PTB shape lock + DUSDC margin pool discovery + SDK version pin + runtime budget + 6 open questions resolved -> WAVE0-DECISION.md + CONTEXT.md D-17 amendment + MARGIN-WHITELIST-DECISION.md
+- [ ] 03-02-PLAN.md (Wave 1, Track B) - data_ingest.py + replay.py @strategy_fn decorator + .planning/backtest-assumptions.md (BACK-01, BACK-03 foundation, BACK-06 foundation)
+- [ ] 03-03-PLAN.md (Wave 1, Track A) - scripts/two-protocol-ptb-demo.{ts,sh} skeleton + contracts/tests/mock_margin_pool.move (PTB-01, PTB-02)
+- [ ] 03-04-PLAN.md (Wave 2, Track B, TDD) - vault_state.py + lookahead_audit.py + tests; bit-equal Move parity + shuffled-label/hand-recompute machinery (BACK-02, BACK-06)
+- [ ] 03-05-PLAN.md (Wave 2, Track A) - Complete 5-call PTB body + Move ptb_capability_test.move + Python test_ptb_capability_grep.py (PTB-03, PTB-04, PTB-06)
+- [ ] 03-06-PLAN.md (Wave 3, Track B) - replay.py simulate() + replay_trace() CLI + e2e-vault-cycle.ts trace dump + 7-day micro-fixture + 1-wei parity test (BACK-04, BACK-05 trace capture)
+- [ ] 03-07-PLAN.md (Wave 3, Track A) - liquidation_test.move at -30% NAV shock + Python test_liquidation_parity.py cross-asserting worst_case_nav at 1-wei (PTB-05)
+- [ ] 03-08-PLAN.md (Wave 4, Track B) - walk_forward.py + pnl_attribution.py with 6-column accountant + Sharpe/Sortino/drawdown on OOS (BACK-07, BACK-08, BACK-09)
+- [ ] 03-09-PLAN.md (Wave 5, Track B + closure) - report.py + report.html.j2 + hand-recompute.ipynb + ci.yml per-push micro-fixture + nightly-backtest.yml + Margin-side capability grep (BACK-05 closure, BACK-09, BACK-10, PTB-04 grep gate)
 
 ### Phase 4: PLP Risk Studio Dashboard + Relay
 **Goal**: A live React dashboard streaming SVI surface updates from a Node.js event relay, with vault panels, arbitrage checker, what-if simulator, and dApp Kit deposit/withdraw flows — running end-to-end against the testnet vault.

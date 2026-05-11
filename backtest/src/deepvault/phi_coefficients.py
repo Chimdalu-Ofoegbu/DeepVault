@@ -4,6 +4,7 @@
 # Regenerate via: make codegen   (or: python scripts/codegen.py)
 # ===========================================================================
 """Cody 1969 normal-CDF coefficients (clone of helper/math.move:31-65)."""
+
 from typing import Final
 
 # Small range threshold (|x| < 0.66291)

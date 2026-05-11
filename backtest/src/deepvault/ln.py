@@ -22,6 +22,7 @@ Python int is signed natively; we return signed int directly without
 the i64 sign-magnitude wrapper used on-chain. Per shared/svi-spec.md sec
 "Sign convention", positive zero is the canonical normalization.
 """
+
 from .phi_coefficients import LN2_U128
 
 F: int = 1_000_000_000  # FLOAT_SCALING

@@ -13,6 +13,7 @@ Python evaluator on the same paper inputs and writes them to
 shared/golden-vectors.json, which Plans 01-05 / 01-06 read for cross-runtime
 parity. Vectors marked xfail here will be back-filled by Plan 01-04.
 """
+
 import pytest
 
 from deepvault.svi import SVIParams, total_variance
@@ -64,9 +65,7 @@ VECTOR_2 = {
 #   w = 400e6 + 200e6 * 559_901_951 / 1e9 = 400e6 + 111_980_390 = 511_980_390
 VECTOR_3 = {
     "id": "G2014-sec3.2-negative-skew-otm-put",
-    "svi": SVIParams(
-        a=400_000_000, b=200_000_000, rho=-500_000_000, m=0, sigma=500_000_000
-    ),
+    "svi": SVIParams(a=400_000_000, b=200_000_000, rho=-500_000_000, m=0, sigma=500_000_000),
     "k": -100_000_000,
     "expected_w": 511_980_390,
     "tolerance": 2,
@@ -80,9 +79,7 @@ VECTOR_3 = {
 #   w = 400e6 + 200e6 * 459_901_951 / 1e9 = 400e6 + 91_980_390 = 491_980_390
 VECTOR_4 = {
     "id": "G2014-sec3.2-negative-skew-otm-call",
-    "svi": SVIParams(
-        a=400_000_000, b=200_000_000, rho=-500_000_000, m=0, sigma=500_000_000
-    ),
+    "svi": SVIParams(a=400_000_000, b=200_000_000, rho=-500_000_000, m=0, sigma=500_000_000),
     "k": 100_000_000,
     "expected_w": 491_980_390,
     "tolerance": 2,

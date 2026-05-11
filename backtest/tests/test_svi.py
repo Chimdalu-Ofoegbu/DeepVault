@@ -4,6 +4,7 @@ Tests in this file are independent of the golden vector pipeline and assert
 high-level properties: ATM ~= 0.5, OTM call < 0.5, OTM put > 0.5, EZeroForward,
 total variance positive, strict-int return, ECannotBeNegative.
 """
+
 import pytest
 
 from deepvault.svi import SVIParams, binary_price, total_variance
@@ -78,7 +79,11 @@ def test_inner_negative_raises():
     # sigma > 0 — the assert is defensive code mirroring the on-chain guard.
     # We test EZeroVariance instead which IS reachable.
     svi_zero = SVIParams(
-        a=0, b=0, rho=0, m=0, sigma=1_000_000  # b=0 forces w=a=0
+        a=0,
+        b=0,
+        rho=0,
+        m=0,
+        sigma=1_000_000,  # b=0 forces w=a=0
     )
     with pytest.raises(ValueError, match="EZeroVariance"):
         total_variance(svi_zero, 0)

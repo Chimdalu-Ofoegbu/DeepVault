@@ -9,6 +9,7 @@ Source: scripts/deepbookv3/packages/predict/sources/helper/math.move:191-239
         plus exp_u128 (math.move:149-173) + exp_series_u128 (math.move:176-187)
 SHA: 1159d79af33c70e09e406310e1d8f067832ede9d
 """
+
 from .phi_coefficients import (
     LN2_U128,
     MEDIUM_C0,

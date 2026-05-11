@@ -29,6 +29,7 @@ Caller responsibility (per shared/svi-spec.md sec "Max safe input domain"):
   - forward > 0, strike > 0
   - |k| <= SVI_K_MAX_LOG_STRIKE = 2_500_000_000 (Phase 2 vault.rebalance enforces)
 """
+
 from typing import NamedTuple
 
 from .isqrt import isqrt_u128

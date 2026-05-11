@@ -4,6 +4,7 @@ scipy is the ground truth here; our Cody clone in deepvault.phi is the unit unde
 THIS IS THE ONLY test file allowed to import scipy in evaluator code paths
 (Pitfall A: scipy must NEVER be imported by deepvault.svi/phi/isqrt/ln).
 """
+
 import pytest
 import scipy.stats  # noqa: I001 — exception per file docstring above
 
@@ -31,9 +32,7 @@ def test_extreme_positive_clamps_to_f():
     assert normal_cdf(10 * F) == F
 
 
-@pytest.mark.parametrize(
-    "x_float", [-3.0, -2.0, -1.0, -0.5, 0.0, 0.5, 1.0, 2.0, 3.0]
-)
+@pytest.mark.parametrize("x_float", [-3.0, -2.0, -1.0, -0.5, 0.0, 0.5, 1.0, 2.0, 3.0])
 def test_against_scipy(x_float: float):
     """Cody coefficient transcription correctness — proves Plan 01-02's TOML."""
     x_int = round(x_float * F)

@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
 status: verifying
-stopped_at: Phase 02-08 complete (VAULT-09 closed — property_test.move with 50-case round-down + W5-locked redeem fulfill body + seed-once invariant; coverage_check.sh + ci.yml move job >= 85% gate on supply/redeem/rebalance; 5-job matrix preserved)
-last_updated: "2026-05-10T12:01:25.757Z"
+stopped_at: Phase 3 context gathered
+last_updated: "2026-05-11T02:31:40.680Z"
 last_activity: 2026-05-10
 progress:
   total_phases: 7
@@ -220,6 +220,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-10T12:01:00.643Z
-Stopped at: Phase 02-08 complete (VAULT-09 closed — property_test.move with 50-case round-down + W5-locked redeem fulfill body + seed-once invariant; coverage_check.sh + ci.yml move job >= 85% gate on supply/redeem/rebalance; 5-job matrix preserved)
-Resume file: None
+Last session: 2026-05-11T02:31:40.620Z
+Stopped at: Phase 3 context gathered
+Resume file: .planning/phases/03-backtest-harness-two-protocol-ptb/03-CONTEXT.md

@@ -49,7 +49,8 @@ bash scripts/verify-deepbookv3-pin.sh
 # 2. Build (drives Move.toml dependency resolution).
 # ============================================================
 echo "==> Building deepvault package..."
-(cd contracts && sui move build --skip-fetch-latest-git-deps)
+# --skip-fetch-latest-git-deps removed in Sui CLI v1.71.1+ (fetch is automatic).
+(cd contracts && sui move build)
 
 # ============================================================
 # 3. Active environment + funded deployer
@@ -70,7 +71,6 @@ fi
 echo "==> Publishing deepvault package on testnet..."
 PUBLISH_JSON="$(cd contracts && sui client publish \
     --gas-budget 500000000 \
-    --skip-fetch-latest-git-deps \
     --json)"
 
 PACKAGE_ID="$(echo "${PUBLISH_JSON}" \

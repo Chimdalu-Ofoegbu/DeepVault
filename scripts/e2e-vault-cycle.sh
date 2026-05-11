@@ -41,10 +41,13 @@ if [[ "${MODE}" == "1" ]]; then
   # WAVE0-DECISION.md "Empirical evidence preserved").
   # ============================================================
   echo "==> Running Move integration tests (clock-warped, hermetic)..."
+  # Note: --filter and --skip-fetch-latest-git-deps were removed in
+  # recent Sui CLI versions. Filter is now positional; the fetch
+  # optimization is automatic. Keeping --gas-limit explicit because
+  # the default may be too low for the full integration suite.
   (cd contracts && sui move test \
       --gas-limit 100000000000 \
-      --filter integration_test \
-      --skip-fetch-latest-git-deps)
+      integration_test)
   echo "OK: Move integration tests passed (atomic supply+hedge invariants,"
   echo "    redeem cycle, roll_expiring registry mutations)."
   exit 0

@@ -302,8 +302,11 @@ jobs:
         run: pnpm exec tsx src/lib/parity_runner.ts
 
       - name: Move golden vectors test
+        # `sui move test` takes the filter as a positional arg, not --filter.
+        # The --filter form was renamed in a recent Sui CLI release; the
+        # mainnet-v1.71.1 binary uses the positional form.
         working-directory: contracts
-        run: sui move test --gas-limit 100000000000 --filter golden_vectors
+        run: sui move test --gas-limit 100000000000 golden_vectors
 
       - name: Move full test suite (sanity)
         working-directory: contracts

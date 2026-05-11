@@ -66,7 +66,7 @@ def test_deterministic_random_inputs_for_move_cross_check():
         outputs.append(s)
     # Write snapshot for Plan 01-05's Move test cross-check.
     SNAPSHOT_PATH.write_text(
-        "".join(f"{x:032x}={s:032x}\n" for x, s in zip(inputs, outputs)),
+        "".join(f"{x:032x}={s:032x}\n" for x, s in zip(inputs, outputs, strict=True)),
         encoding="utf-8",
         newline="\n",
     )

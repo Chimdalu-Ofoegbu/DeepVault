@@ -27,7 +27,7 @@ def test_extreme_negative_clamps_to_zero():
     assert normal_cdf(-10 * F) == 0
 
 
-def test_extreme_positive_clamps_to_F():
+def test_extreme_positive_clamps_to_f():
     assert normal_cdf(10 * F) == F
 
 

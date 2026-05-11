@@ -4,7 +4,6 @@
 # Regenerate via: make codegen   (or: python scripts/codegen.py)
 # ===========================================================================
 """Strategy constants emitted from shared/strategy.toml."""
-
 from typing import Final
 
 # Fixed-point scales

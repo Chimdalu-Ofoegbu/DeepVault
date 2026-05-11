@@ -36,6 +36,13 @@ packages = ["src/deepvault"]
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+# Codegen outputs are emitted byte-equal by scripts/codegen.py and verified
+# bit-equal by CI's codegen-drift job. Excluding them from ruff format/lint
+# prevents ruff from rewriting the codegen output and tripping drift.
+extend-exclude = [
+  "src/deepvault/strategy_constants.py",
+  "src/deepvault/phi_coefficients.py",
+]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "N"]

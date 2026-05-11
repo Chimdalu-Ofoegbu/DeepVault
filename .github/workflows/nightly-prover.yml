@@ -59,17 +59,30 @@ jobs:
         run: sui --version
 
       # ============================================================
-      # Install sui-prover from asymptotic-code/sui-prover.
-      # First nightly run will empirically validate the spec syntax;
-      # if the released asset name pattern changes, update here.
+      # Install sui-prover from source via cargo install.
+      # asymptotic-code/sui-prover does NOT publish pre-built binaries
+      # to GitHub Releases (verified 2026-05-11: releases/latest returns
+      # zero assets). The canonical install is `cargo install --git`,
+      # which requires Rust >=1.85 for edition2024.
       # ============================================================
-      - name: Install sui-prover
+      - name: Install Rust toolchain (stable, >=1.85 for edition2024)
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo registry + sui-prover build
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.cargo/bin/sui-prover
+          key: sui-prover-${{ runner.os }}-cargo-v1
+
+      - name: Install sui-prover (cargo install --git, ~5 min first run, cached after)
         run: |
           set -euo pipefail
-          curl -L https://github.com/asymptotic-code/sui-prover/releases/latest/download/sui-prover-linux-x86_64 \
-            -o /tmp/sui-prover
-          chmod +x /tmp/sui-prover
-          sudo mv /tmp/sui-prover /usr/local/bin/sui-prover
+          if ! command -v sui-prover >/dev/null 2>&1; then
+            cargo install --git https://github.com/asymptotic-code/sui-prover --locked sui-prover
+          fi
           sui-prover --version || true
 
       # ============================================================

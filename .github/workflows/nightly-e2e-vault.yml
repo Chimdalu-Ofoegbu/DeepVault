@@ -35,9 +35,12 @@ jobs:
           node-version: '22'
 
       - name: Setup pnpm
+        # pnpm/action-setup@v4 reads the version from package.json's
+        # packageManager field. Passing `version:` input alongside
+        # packageManager errors with "Multiple versions of pnpm
+        # specified." Drop the input — packageManager: pnpm@10.0.0
+        # is the source of truth.
         uses: pnpm/action-setup@v4
-        with:
-          version: '10'
 
       - name: Install dashboard deps
         working-directory: dashboard

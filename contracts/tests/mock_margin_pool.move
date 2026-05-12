@@ -124,10 +124,13 @@ public fun deposit_reserves_for_testing<Quote>(
 /// per the plan body — preferred over abort-on-duplicate so test
 /// orchestration is simpler).
 public fun register_collateral_type<Quote, Collat>(
-    _pool: &mut MockMarginPool<Quote>,
+    pool: &mut MockMarginPool<Quote>,
     _ctx: &mut TxContext,
 ) {
-    abort 999 // RED stub
+    let collat_type = type_name::with_defining_ids<Collat>();
+    if (!pool.registered_collateral.contains(collat_type)) {
+        pool.registered_collateral.add(collat_type, true);
+    };
 }
 
 /// Mock borrow against collateral. Asserts Collat type is registered,
@@ -136,15 +139,53 @@ public fun register_collateral_type<Quote, Collat>(
 ///
 /// Unlike production Margin::borrow_quote (which auto-deposits the borrowed
 /// coin into BalanceManager), the mock RETURNS the coin so the 5-call PTB
-/// bridge step is exercisable in tests.
+/// bridge step is exercisable in tests. The collateral coin is absorbed
+/// into pool reserves (simplification — production Margin tracks shares).
 public fun borrow_quote_against_collateral<Quote, Collat>(
-    _pool: &mut MockMarginPool<Quote>,
-    _collateral: Coin<Collat>,
-    _worst_case_nav_per_share: u64,
-    _loan_amount: u64,
-    _ctx: &mut TxContext,
+    pool: &mut MockMarginPool<Quote>,
+    collateral: Coin<Collat>,
+    worst_case_nav_per_share: u64,
+    loan_amount: u64,
+    ctx: &mut TxContext,
 ): Coin<Quote> {
-    abort 999 // RED stub
+    let collat_type = type_name::with_defining_ids<Collat>();
+    assert!(
+        pool.registered_collateral.contains(collat_type) &&
+            *pool.registered_collateral.borrow(collat_type),
+        ENotRegistered,
+    );
+
+    let collat_value = collateral.value();
+    // max_loan = collat_value * nav / NAV_SCALE * LTV_CAP_BPS / 10_000
+    // (u128 intermediates protect the 1e9 * 1e9 multiply.)
+    let max_loan_u128 = (collat_value as u128)
+        * (worst_case_nav_per_share as u128)
+        / (NAV_SCALE as u128)
+        * (MARGIN_LTV_CAP_BPS as u128)
+        / 10_000u128;
+    assert!((loan_amount as u128) <= max_loan_u128, EInsufficientCollateral);
+
+    // Position bookkeeping for the liquidation path. Use coin.value() as
+    // the collateral_value witness — simpler than NAV-scaling at open time
+    // since liquidate_position reapplies the NAV scaling against the
+    // CURRENT NAV per share.
+    let sender = ctx.sender();
+    if (pool.positions.contains(sender)) {
+        let _old = pool.positions.remove(sender);
+    };
+    pool.positions.add(sender, Position {
+        collateral_value_at_open: collat_value,
+        debt: loan_amount,
+    });
+
+    // Dispose of collateral (test-only simplification — production Margin
+    // stores collateral in BalanceManager; we drop into a fresh per-call
+    // sink because Balance<Collat> can't be joined into Balance<Quote>).
+    // Plan 03-05 capability tests do not depend on the destination of
+    // burned collat — only that the borrow returns Coin<Quote>.
+    transfer::public_transfer(collateral, @0x0);
+
+    coin::from_balance(pool.quote_reserves.split(loan_amount), ctx)
 }
 
 /// Mock liquidation. Reads the borrower's open Position, scales
@@ -153,11 +194,22 @@ public fun borrow_quote_against_collateral<Quote, Collat>(
 /// Aborts ENotLiquidatable if the position is healthy; otherwise returns
 /// the risk_ratio_bps (caller-visible signal that liquidation fired).
 public fun liquidate_position<Quote, Collat>(
-    _pool: &mut MockMarginPool<Quote>,
-    _user: address,
-    _current_worst_case_nav_per_share: u64,
+    pool: &mut MockMarginPool<Quote>,
+    user: address,
+    current_worst_case_nav_per_share: u64,
 ): u64 {
-    abort 999 // RED stub
+    assert!(pool.positions.contains(user), ENoPosition);
+    let pos = pool.positions.borrow(user);
+    let current_collateral_value_u128 = (pos.collateral_value_at_open as u128)
+        * (current_worst_case_nav_per_share as u128)
+        / (NAV_SCALE as u128);
+    // risk_ratio_bps = current_collateral_value * 10_000 / debt
+    // Higher = healthier; below LIQUIDATION_LTV_BPS = liquidatable.
+    let risk_ratio_bps_u128 = current_collateral_value_u128 * 10_000u128
+        / (pos.debt as u128);
+    let risk_ratio_bps = risk_ratio_bps_u128 as u64;
+    assert!(risk_ratio_bps < LIQUIDATION_LTV_BPS, ENotLiquidatable);
+    risk_ratio_bps
 }
 
 // === Inline tests (RED — fail because public stubs abort 999) ===

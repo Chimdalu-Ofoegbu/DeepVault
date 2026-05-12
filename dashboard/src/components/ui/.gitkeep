@@ -1,3 +1,0 @@
-# shadcn UI primitives land here via `pnpm dlx shadcn add <component>`
-# in Plan 04-03 (Style Tokens & shadcn pull). Placeholder so the alias
-# `@/components/ui` in components.json resolves.

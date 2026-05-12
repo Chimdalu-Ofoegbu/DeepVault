@@ -208,7 +208,8 @@ jobs:
         run: uv run ruff format --check .
 
       - name: Test
-        run: uv run pytest
+        # -v surfaces failing test names; --tb=short keeps logs readable
+        run: uv run pytest -v --tb=short
 
       - name: 7-day micro-fixture replay parity (BACK-04 per-push gate)
         # Plan 03-09 W1 sub-task 3a: explicit log step for the 7-day micro-

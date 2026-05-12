@@ -60,7 +60,7 @@ Requirements for the Sui Overflow 2026 submission (target 2026-06-16). Each maps
 - [x] **PTB-02**: VAULT_SHARE-as-Margin-collateral whitelist verification spike completed; if whitelisted, register and demo; if not, demote to documented-future and demo borrows quote-only — decision recorded with date
 - [x] **PTB-03**: Single PTB opener: `Margin::borrow_quote` → `vault::supply::deposit` → `vault::rebalance::buy_hedge_for_deposit`, atomic rollback on any failure
 - [x] **PTB-04**: Capability-flow tests proving TradeCap and TreasuryCap<VAULT_SHARE> never escape their owners
-- [ ] **PTB-05**: Liquidation simulation property test: -30% NAV shock against worst-case Predict outcome triggers Margin liquidation path correctly
+- [x] **PTB-05**: Liquidation simulation property test: -30% NAV shock against worst-case Predict outcome triggers Margin liquidation path correctly
 - [x] **PTB-06**: Fresh-wallet end-to-end test on testnet showing the full PTB completing with deterministic tx digest
 
 ### PLP Risk Studio Dashboard
@@ -186,7 +186,7 @@ Phase mapping finalized by gsd-roadmapper on 2026-05-09 against ROADMAP.md. Ever
 | PTB-02 | Phase 3 | Complete |
 | PTB-03 | Phase 3 | Complete |
 | PTB-04 | Phase 3 | Complete |
-| PTB-05 | Phase 3 | Pending |
+| PTB-05 | Phase 3 | Complete |
 | PTB-06 | Phase 3 | Complete |
 | DASH-01 | Phase 4 | Pending |
 | DASH-02 | Phase 4 | Pending |

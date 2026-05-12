@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-05-PLAN.md
-last_updated: "2026-05-12T13:25:18.697Z"
+stopped_at: Completed 03-07-PLAN.md
+last_updated: "2026-05-12T13:45:46.878Z"
 last_activity: 2026-05-12
 progress:
   total_phases: 7
   completed_phases: 3
   total_plans: 35
-  completed_plans: 32
-  percent: 91
+  completed_plans: 33
+  percent: 94
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 03 (backtest-harness-two-protocol-ptb) — EXECUTING
-Plan: 7 of 9
+Plan: 8 of 9
 Status: Ready to execute
 Next phase: Phase 2 — Vault & Strategy (PLP+Hedge vault, predict_adapter, rebalance); imports parity-gate-protected svi_view::binary_price; depends on Phase 1
 Last activity: 2026-05-12
@@ -85,6 +85,7 @@ Progress: [█████████████████] 100% Phase 1 / 1
 | Phase 03 P04 | 25min | 2 tasks | 5 files |
 | Phase 03 P05 | 30min | 3 tasks | 4 files |
 | Phase 03 P06 | 35min | 3 tasks | 5 files |
+| Phase 03 P07 | 35min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -204,6 +205,9 @@ Recent decisions affecting current work:
 - [Phase ?]: Phase 03-05 Rule 3 deviation: MockMarginPool disposal uses sui::test_utils::destroy (not transfer::transfer) — pool is key-only; cross-module transfer is rejected by E02009
 - [Phase ?]: Phase 03-05 scope: CI wiring for test_ptb_capability_grep.py DEFERRED to Plan 03-09 per plan body 'this plan ships the test only'
 - [Phase ?]: Plan 03-06: trace-replay parity at 1-wei tolerance — replay.py simulate/replay_trace/main + micro-fixture-7d.json + 22 new tests; coverage on deepvault.replay = 96%
+- [Phase ?]: Phase 03-07: PTB-05 closed — Move liquidation_test.move (3 tests) + Python test_liquidation_parity.py (11 tests) cross-assert worst_case_nav at 1-wei tolerance under -30% shock anchor (wcn_pre=9_009_900_990, wcn_post=6_306_930_693)
+- [Phase ?]: Phase 03-07: Compound -60% shock model adopted for the integration test — pure -30% balance shock at 50% LTV-open does not algebraically cross 1.15 risk gate; D-20's 'binary expires worthless AND vault collateral drops 30%' compounds to -60% effective magnitude on liquid balance
+- [Phase ?]: Phase 03-07: expected_failure cross-module pattern locked — abort_code = 603, location = deepvault::mock_margin_pool (mirrors integration_test.move:216 pattern for EPredictMisquote)
 
 ### Pending Todos
 
@@ -244,6 +248,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-12T13:25:09.563Z
-Stopped at: Completed 03-05-PLAN.md
+Last session: 2026-05-12T13:45:46.858Z
+Stopped at: Completed 03-07-PLAN.md
 Resume file: None

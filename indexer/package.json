@@ -2,10 +2,28 @@
   "name": "@deepvault/indexer",
   "version": "0.0.0",
   "private": true,
-  "description": "Sui RPC event relay (Phase 4 placeholder)",
+  "description": "Sui RPC event relay (Phase 4 Wave 1 fills src/)",
+  "type": "module",
   "scripts": {
-    "build": "echo 'Phase 4 fills this in' && exit 0",
-    "test": "echo 'Phase 4 fills this in' && exit 0",
-    "lint": "echo 'Phase 4 fills this in' && exit 0"
+    "dev": "tsx watch src/relay.ts",
+    "build": "tsc --noEmit",
+    "start": "tsx src/relay.ts",
+    "test": "vitest run --passWithNoTests",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@mysten/sui": "2.16.0",
+    "ws": "^8.18.0",
+    "pino": "^9.5.0",
+    "dotenv": "^17.0.0",
+    "date-fns": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.18",
+    "@types/ws": "^8.5.0",
+    "tsx": "^4.21.0",
+    "typescript": "~5.6.0",
+    "vitest": "^4.1.5"
   }
 }

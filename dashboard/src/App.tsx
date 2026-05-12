@@ -28,8 +28,10 @@ import { BucketGauge } from './components/panels/BucketGauge';
 import { ExposurePanel } from './components/panels/ExposurePanel';
 import { SurfacePanel } from './components/panels/SurfacePanel';
 import { VaultPanel } from './components/panels/VaultPanel';
+import { WhatIfSimulator } from './components/panels/WhatIfSimulator';
 import { env } from './env';
 import { useExposure } from './hooks/useExposure';
+import { useSigmaEstimates } from './hooks/useSigmaEstimates';
 import { useSurfaceSnapshot } from './hooks/useSurfaceSnapshot';
 import { useVaultState } from './hooks/useVaultState';
 import { useWebSocket } from './hooks/useWebSocket';
@@ -39,6 +41,7 @@ export function App() {
   const surface = useSurfaceSnapshot(snapshot);
   const vaultView = useVaultState(snapshot);
   const hedges = useExposure(snapshot);
+  const sigma = useSigmaEstimates(snapshot);
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
@@ -75,7 +78,9 @@ export function App() {
         <section data-section="exposure">
           <ExposurePanel hedges={hedges} vault={snapshot?.vault ?? null} />
         </section>
-        <section data-section="what-if" />
+        <section data-section="what-if">
+          <WhatIfSimulator hedges={hedges} surface={surface} sigma={sigma} />
+        </section>
         <section data-section="deposit-withdraw" />
         <section data-section="position-viewer" />
       </main>

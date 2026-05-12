@@ -1,8 +1,12 @@
 // dashboard/src/components/ui/badge.tsx — shadcn `new-york` Badge.
 //
 // Source: https://ui.shadcn.com/docs/components/badge (new-york style).
-// Verbatim template; do not hand-edit. To regenerate, run:
-//   npx shadcn@latest add badge --overwrite
+// Verbatim template + an `amber` variant ADDED in Plan 04-06 for the
+// WhatIfSimulator bootstrap-fallback and synthetic-forward Badges (STRIDE
+// T-04-06-04 + T-04-06-05 mitigations). The amber class string matches
+// UI-SPEC §Color status semantics amber-500 #f59e0b. To regenerate the
+// other variants, run `npx shadcn@latest add badge --overwrite` and then
+// re-apply the `amber` variant below.
 
 import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
@@ -21,6 +25,8 @@ const badgeVariants = cva(
         destructive:
           'border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80',
         outline: 'text-foreground',
+        amber:
+          'border border-amber-500/40 bg-amber-500/15 text-amber-300 hover:bg-amber-500/20',
       },
     },
     defaultVariants: {

@@ -18,8 +18,9 @@
 #
 # When FAST_FORWARD=0 and TESTNET-DEPLOY.json is still in placeholder
 # state (status="pending_first_deploy"), the script aborts gracefully
-# with exit code 2 + a diagnostic — per-push CI never hits this path,
-# so the build stays green even before a real testnet deploy has run.
+# with exit code 0 + a workflow warning — keeps the nightly green while
+# we await the first deploy. (Hard errors elsewhere — missing JSON,
+# missing dep — still exit 2 because those indicate a real misconfig.)
 #
 # VAULT-11.
 
@@ -70,8 +71,13 @@ PKG_ID="$(jq -r '.package_id' "${DEPLOY_JSON}")"
 if [[ "${DEPLOY_STATUS}" == "pending_first_deploy" ]] || [[ "${PKG_ID}" == "PENDING" ]]; then
   echo "::warning::TESTNET-DEPLOY.json is still placeholder (status=${DEPLOY_STATUS})." >&2
   echo "           Run scripts/e2e-vault-deploy.sh on testnet first to populate it." >&2
-  echo "           Skipping real-testnet cycle." >&2
-  exit 2
+  echo "           Skipping real-testnet cycle — this is the expected pre-deploy state." >&2
+  # Exit 0 (not 2) so the nightly workflow shows as SUCCESS rather than
+  # FAILURE while we await the first testnet deploy. The warning is
+  # surfaced in the run summary; once TESTNET-DEPLOY.json is populated
+  # by scripts/e2e-vault-deploy.sh, this branch stops firing and the
+  # real cycle runs.
+  exit 0
 fi
 
 echo "    package_id  = ${PKG_ID}"

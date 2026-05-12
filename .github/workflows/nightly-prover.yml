@@ -92,6 +92,22 @@ jobs:
       # contracts/specs/ are picked up here.
       # ============================================================
       - name: Run sui-prover
+        # SOFT-FAIL until Plan 03-01 Wave 0 spike resolves the framework
+        # dep alignment. sui-prover auto-injects mainnet DeepBook at
+        # `0xdee9`, which collides with our predict-testnet-4-16 branch's
+        # `deepbook = 0x0`. Error: "Conflicting assignments for address
+        # 'deepbook': '0x0' and '0xdee9'." Empirically reproduced locally
+        # 2026-05-12 with sui-prover 1.5.3.
+        #
+        # Two known resolution paths (Plan 03-01 picks one):
+        #   (a) Move specs into a satellite package without the Predict
+        #       dep, so sui-prover's implicit DeepBook injection is fine.
+        #   (b) Add explicit `SuiProver` + `DeepBook` deps to align with
+        #       the prover's expectations.
+        #
+        # Re-arm to hard-fail by removing `continue-on-error: true` once
+        # Plan 03-01 lands the chosen fix.
+        continue-on-error: true
         working-directory: contracts
         run: |
           set -euo pipefail

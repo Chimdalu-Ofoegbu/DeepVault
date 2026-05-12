@@ -146,7 +146,16 @@ def test_no_ts_demo_lets_extract_tradecap_outside_sdk_layer():
     """
     pattern = r"^\s*(const|let)\s+(tradeCap|trade_cap|TradeCap|withdrawCap|depositCap)\s*="
     matches = _grep(pattern, REPO_ROOT / "scripts", glob="*.ts")
-    leaks = [m for m in matches if "node_modules" not in m]
+    # Filter:
+    #   - node_modules (no-deps install would still surface this dir)
+    #   - scripts/deepbookv3/ (vendored Mysten subtree; their example TS
+    #     transactions legitimately use `const tradeCap = ...` — not our
+    #     capability-discipline concern)
+    leaks = [
+        m
+        for m in matches
+        if "node_modules" not in m and "deepbookv3" not in m
+    ]
     assert not leaks, (
         "TS demo extracts capability outside SDK layer:\n"
         + "\n".join(leaks)

@@ -10,7 +10,13 @@ importers:
     dependencies:
       '@mysten/deepbook-v3':
         specifier: 1.3.6
-        version: 1.3.6(@mysten/sui@1.38.0(typescript@5.6.3))
+        version: 1.3.6(@mysten/sui@2.16.0(typescript@5.6.3))
+      '@mysten/sui':
+        specifier: 2.16.0
+        version: 2.16.0(typescript@5.6.3)
+      '@types/node':
+        specifier: ^22.19.18
+        version: 22.19.18
     devDependencies:
       eslint:
         specifier: 9.13.0
@@ -307,9 +313,6 @@ packages:
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
 
-  '@mysten/bcs@1.8.0':
-    resolution: {integrity: sha512-bDoLN1nN+XPONsvpNyNyqYHndM3PKWS419GLeRnbLoWyNm4bnyD1X4luEpJLLDq400hBuXiCan4RWjofvyTUIQ==}
-
   '@mysten/bcs@2.0.5':
     resolution: {integrity: sha512-Dop9Xq36DPLlsmIDQZvUg4uJeBBxIGirgp2OXGaEff+mtLKFBoW2HnE3aSTSSpiMQH9XRhjwtiM16zFJhFqz0Q==}
 
@@ -319,12 +322,9 @@ packages:
     peerDependencies:
       '@mysten/sui': ^2.16.2
 
-  '@mysten/sui@1.38.0':
-    resolution: {integrity: sha512-tH6V4BJsYi5d97MOiLoOhyldrYxkm/cu8dYV52asqh1i88HrSVMbPAJ9sVoeWN2Ju+QsJ/Go4ldSjdCkaBCyJQ==}
-    engines: {node: '>=18'}
-
-  '@mysten/utils@0.2.0':
-    resolution: {integrity: sha512-CM6kJcJHX365cK6aXfFRLBiuyXc5WSBHQ43t94jqlCAIRw8umgNcTb5EnEA9n31wPAQgLDGgbG/rCUISCTJ66w==}
+  '@mysten/sui@2.16.0':
+    resolution: {integrity: sha512-xnf3e3uIuJGzIVEBLEl372Xk51CB45CP2ZlXXLSnWHH1MI0xIpko10JSQ44ohde9XhxygAy1jz26rkrlCgDGXQ==}
+    engines: {node: '>=22'}
 
   '@mysten/utils@0.3.3':
     resolution: {integrity: sha512-gVHn5toh24eXXLEyBknwwM2F/tbDgqPX0yj77KtHjuoYUallcQ9vSwGfGsAy39IcTB259Yprt/ZOEwdup+zrpA==}
@@ -335,13 +335,9 @@ packages:
       '@emnapi/core': ^1.7.1
       '@emnapi/runtime': ^1.7.1
 
-  '@noble/curves@1.9.7':
-    resolution: {integrity: sha512-gbKGcRUYIjA3/zCCNaWDciTMFI0dCkvou3TL8Zmy5Nc7sJ47a0jtOeZoTaMxkuqRo9cRhjOdZJXegxYE5FN/xw==}
-    engines: {node: ^14.21.3 || >=16}
-
-  '@noble/hashes@1.8.0':
-    resolution: {integrity: sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A==}
-    engines: {node: ^14.21.3 || >=16}
+  '@noble/curves@2.2.0':
+    resolution: {integrity: sha512-T/BoHgFXirb0ENSPBquzX0rcjXeM6Lo892a2jlYJkqk83LqZx0l1Of7DzlKJ6jkpvMrkHSnAcgb5JegL8SeIkQ==}
+    engines: {node: '>= 20.19.0'}
 
   '@noble/hashes@2.2.0':
     resolution: {integrity: sha512-IYqDGiTXab6FniAgnSdZwgWbomxpy9FtYvLKs7wCUs2a8RkITG+DFGO1DM9cr+E3/RgADRpFjrKVaJ1z6sjtEg==}
@@ -349,6 +345,15 @@ packages:
 
   '@oxc-project/types@0.128.0':
     resolution: {integrity: sha512-huv1Y/LzBJkBVHt3OlC7u0zHBW9qXf1FdD7sGmc1rXc2P1mTwHssYv7jyGx5KAACSCH+9B3Bhn6Z9luHRvf7pQ==}
+
+  '@protobuf-ts/grpcweb-transport@2.11.1':
+    resolution: {integrity: sha512-1W4utDdvOB+RHMFQ0soL4JdnxjXV+ddeGIUg08DvZrA8Ms6k5NN6GBFU2oHZdTOcJVpPrDJ02RJlqtaoCMNBtw==}
+
+  '@protobuf-ts/runtime-rpc@2.11.1':
+    resolution: {integrity: sha512-4CqqUmNA+/uMz00+d3CYKgElXO9VrEbucjnBFEjqI4GuDrEQ32MaI3q+9qPBvIGOlL4PmHXrzM32vBPWRhQKWQ==}
+
+  '@protobuf-ts/runtime@2.11.1':
+    resolution: {integrity: sha512-KuDaT1IfHkugM2pyz+FwiY80ejWrkH1pAtOBOZFuR6SXEFTsnb/jiQWQ1rCIrcKx2BtyxnxW6BWwsVSA/Ie+WQ==}
 
   '@rolldown/binding-android-arm64@1.0.0-rc.18':
     resolution: {integrity: sha512-lIDyUAfD7U3+BWKzdxMbJcsYHuqXqmGz40aeRqvuAm3y5TkJSYTBW2RDrn65DJFPQqVjUAUqq5uz8urzQ8aBdQ==}
@@ -442,17 +447,14 @@ packages:
   '@rolldown/pluginutils@1.0.0-rc.18':
     resolution: {integrity: sha512-CUY5Mnhe64xQBGZEEXQ5WyZwsc1JU3vAZLIxtrsBt3LO6UOb+C8GunVKqe9sT8NeWb4lqSaoJtp2xo6GxT1MNw==}
 
-  '@scure/base@1.2.6':
-    resolution: {integrity: sha512-g/nm5FgUa//MCj1gV09zTJTaM6KBAHqLN907YVQqf7zC49+DcO4B1so4ZX07Ef10Twr6nuqYEH9GEggFXA4Fmg==}
-
   '@scure/base@2.2.0':
     resolution: {integrity: sha512-b8XEupJibegiXV+tDUseI8oLQc8ei3d/4Jkb2RpbHh3MfE054ov3uIz2dhFkB3FI8iwYkEh0gGCApkrYggkPNg==}
 
-  '@scure/bip32@1.7.0':
-    resolution: {integrity: sha512-E4FFX/N3f4B80AKWp5dP6ow+flD1LQZo/w8UnLGYZO674jS6YnYeepycOOksv+vLPSpgN35wgKgy+ybfTb2SMw==}
+  '@scure/bip32@2.2.0':
+    resolution: {integrity: sha512-zFr7t2F+a9+5tB7QbarF2HQNYrgjCNaoLAupZdKkrFMYMozJf5zqH2WJCQibMzm1qQ0QogrxVGO3qXfQDYMaQg==}
 
-  '@scure/bip39@1.6.0':
-    resolution: {integrity: sha512-+lF0BbLiJNwVlev4eKelw1WWLaiKXw7sSl8T6FvBlWkdX+94aGJ4o8XjUdlyhTCjd8c+B3KT3JfS8P0bLRNU6A==}
+  '@scure/bip39@2.2.0':
+    resolution: {integrity: sha512-T/Bj/YvYMNkIPq6EENO6/rcs2e7qTNuyoUXf0KBFDmp0ZDu0H2X4Lq6yC3i0c8PcWkov5EbW+yQZZbdMmk154A==}
 
   '@standard-schema/spec@1.1.0':
     resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
@@ -1082,8 +1084,13 @@ packages:
   uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
 
-  valibot@0.36.0:
-    resolution: {integrity: sha512-CjF1XN4sUce8sBK9TixrDqFM7RwNkuXdJu174/AwmQUB62QbCQADg5lLe8ldBalFgtj1uKj+pKwDJiNo4Mn+eQ==}
+  valibot@1.4.0:
+    resolution: {integrity: sha512-iC/x7fVcSyOwlm/VSt7RlHnzNGLGvR9GnxdifUeWoCJo0q4ZZvrVkIHC6faTlkxG47I2Y4UrFquPuVHCrOnrLg==}
+    peerDependencies:
+      typescript: '>=5'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
 
   vite@8.0.11:
     resolution: {integrity: sha512-Jz1mxtUBR5xTT65VOdJZUUeoyLtqljmFkiUXhPTLZka3RDc9vpi/xXkyrnsdRcm2lIi3l3GPMnAidTsEGIj3Ow==}
@@ -1374,48 +1381,42 @@ snapshots:
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
 
-  '@mysten/bcs@1.8.0':
-    dependencies:
-      '@mysten/utils': 0.2.0
-      '@scure/base': 1.2.6
-
   '@mysten/bcs@2.0.5':
     dependencies:
       '@mysten/utils': 0.3.3
       '@scure/base': 2.2.0
 
-  '@mysten/deepbook-v3@1.3.6(@mysten/sui@1.38.0(typescript@5.6.3))':
+  '@mysten/deepbook-v3@1.3.6(@mysten/sui@2.16.0(typescript@5.6.3))':
     dependencies:
       '@mysten/bcs': 2.0.5
-      '@mysten/sui': 1.38.0(typescript@5.6.3)
+      '@mysten/sui': 2.16.0(typescript@5.6.3)
       '@noble/hashes': 2.2.0
       axios: 1.16.0
       axios-retry: 4.5.0(axios@1.16.0)
     transitivePeerDependencies:
       - debug
 
-  '@mysten/sui@1.38.0(typescript@5.6.3)':
+  '@mysten/sui@2.16.0(typescript@5.6.3)':
     dependencies:
       '@graphql-typed-document-node/core': 3.2.0(graphql@16.14.0)
-      '@mysten/bcs': 1.8.0
-      '@mysten/utils': 0.2.0
-      '@noble/curves': 1.9.7
-      '@noble/hashes': 1.8.0
-      '@scure/base': 1.2.6
-      '@scure/bip32': 1.7.0
-      '@scure/bip39': 1.6.0
+      '@mysten/bcs': 2.0.5
+      '@mysten/utils': 0.3.3
+      '@noble/curves': 2.2.0
+      '@noble/hashes': 2.2.0
+      '@protobuf-ts/grpcweb-transport': 2.11.1
+      '@protobuf-ts/runtime': 2.11.1
+      '@protobuf-ts/runtime-rpc': 2.11.1
+      '@scure/base': 2.2.0
+      '@scure/bip32': 2.2.0
+      '@scure/bip39': 2.2.0
       gql.tada: 1.9.2(graphql@16.14.0)(typescript@5.6.3)
       graphql: 16.14.0
       poseidon-lite: 0.2.1
-      valibot: 0.36.0
+      valibot: 1.4.0(typescript@5.6.3)
     transitivePeerDependencies:
       - '@gql.tada/svelte-support'
       - '@gql.tada/vue-support'
       - typescript
-
-  '@mysten/utils@0.2.0':
-    dependencies:
-      '@scure/base': 1.2.6
 
   '@mysten/utils@0.3.3':
     dependencies:
@@ -1428,15 +1429,24 @@ snapshots:
       '@tybys/wasm-util': 0.10.2
     optional: true
 
-  '@noble/curves@1.9.7':
+  '@noble/curves@2.2.0':
     dependencies:
-      '@noble/hashes': 1.8.0
-
-  '@noble/hashes@1.8.0': {}
+      '@noble/hashes': 2.2.0
 
   '@noble/hashes@2.2.0': {}
 
   '@oxc-project/types@0.128.0': {}
+
+  '@protobuf-ts/grpcweb-transport@2.11.1':
+    dependencies:
+      '@protobuf-ts/runtime': 2.11.1
+      '@protobuf-ts/runtime-rpc': 2.11.1
+
+  '@protobuf-ts/runtime-rpc@2.11.1':
+    dependencies:
+      '@protobuf-ts/runtime': 2.11.1
+
+  '@protobuf-ts/runtime@2.11.1': {}
 
   '@rolldown/binding-android-arm64@1.0.0-rc.18':
     optional: true
@@ -1489,20 +1499,18 @@ snapshots:
 
   '@rolldown/pluginutils@1.0.0-rc.18': {}
 
-  '@scure/base@1.2.6': {}
-
   '@scure/base@2.2.0': {}
 
-  '@scure/bip32@1.7.0':
+  '@scure/bip32@2.2.0':
     dependencies:
-      '@noble/curves': 1.9.7
-      '@noble/hashes': 1.8.0
-      '@scure/base': 1.2.6
+      '@noble/curves': 2.2.0
+      '@noble/hashes': 2.2.0
+      '@scure/base': 2.2.0
 
-  '@scure/bip39@1.6.0':
+  '@scure/bip39@2.2.0':
     dependencies:
-      '@noble/hashes': 1.8.0
-      '@scure/base': 1.2.6
+      '@noble/hashes': 2.2.0
+      '@scure/base': 2.2.0
 
   '@standard-schema/spec@1.1.0': {}
 
@@ -2122,7 +2130,9 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
-  valibot@0.36.0: {}
+  valibot@1.4.0(typescript@5.6.3):
+    optionalDependencies:
+      typescript: 5.6.3
 
   vite@8.0.11(@types/node@22.19.18)(esbuild@0.27.7)(tsx@4.21.0):
     dependencies:

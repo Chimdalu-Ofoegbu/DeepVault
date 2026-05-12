@@ -4,14 +4,14 @@ milestone: v1.1
 milestone_name: milestone
 status: executing
 stopped_at: Completed 03-02-PLAN.md
-last_updated: "2026-05-12T11:56:09.497Z"
+last_updated: "2026-05-12T12:24:44.052Z"
 last_activity: 2026-05-12
 progress:
   total_phases: 7
   completed_phases: 3
   total_plans: 35
-  completed_plans: 28
-  percent: 80
+  completed_plans: 29
+  percent: 83
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 03 (backtest-harness-two-protocol-ptb) — EXECUTING
-Plan: 3 of 9
+Plan: 4 of 9
 Status: Ready to execute
 Next phase: Phase 2 — Vault & Strategy (PLP+Hedge vault, predict_adapter, rebalance); imports parity-gate-protected svi_view::binary_price; depends on Phase 1
 Last activity: 2026-05-12
@@ -81,6 +81,7 @@ Progress: [█████████████████] 100% Phase 1 / 1
 | Phase 02 P09 | 10 | 4 tasks | 7 files |
 | Phase 03 P01 | 24min | 4 tasks | 10 files |
 | Phase 03 P02 | 35min | 3 tasks | 6 files |
+| Phase 03 P03 | 45min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -189,6 +190,9 @@ Recent decisions affecting current work:
 - [Phase ?]: Phase 03-01: Q3 LOCKED plp_yield_bps = 0 in v1 PnL accountant; we BUY hedges not provide PLP. Q5 LOCKED u64-as-string JSON convention for cross-runtime event payloads (avoids JS Number 2^53 precision loss).
 - [Phase ?]: Unit convention: CSV Unix-seconds × 1000 → ts_ms milliseconds; matches Move u64 ms event timestamps.
 - [Phase ?]: @strategy_fn coverage 95% (target 85%); _GatedFrame escape-hatch documented but not load-bearing per Wave 0 Q4 runtime PASS.
+- [Phase ?]: Hoisted @mysten/sui 2.16.0 to root for scripts/* TS module resolution; resolves the @mysten/deepbook-v3 1.3.6 peer dep warning logged in Plan 03-01.
+- [Phase ?]: Mock margin pool uses transfer::public_transfer(collateral, @0x0) as collateral sink (test-only simplification). Plan 03-05/07 tests do not depend on collateral destination.
+- [Phase ?]: FAST_FORWARD=1 wrapper uses non-strict sui move test filters so it survives partial-wave landing — mock_margin_pool 9/9 pass; ptb_capability_test (03-05) and liquidation_test (03-07) report 0 tests until those plans land.
 
 ### Pending Todos
 
@@ -229,6 +233,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-12T11:56:09.483Z
+Last session: 2026-05-12T12:24:00.485Z
 Stopped at: Completed 03-02-PLAN.md
 Resume file: None

@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
 status: executing
-stopped_at: Phase 3 context gathered
-last_updated: "2026-05-12T11:40:03.217Z"
+stopped_at: Completed 03-02-PLAN.md
+last_updated: "2026-05-12T11:56:09.497Z"
 last_activity: 2026-05-12
 progress:
   total_phases: 7
   completed_phases: 3
   total_plans: 35
-  completed_plans: 27
-  percent: 77
+  completed_plans: 28
+  percent: 80
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 03 (backtest-harness-two-protocol-ptb) — EXECUTING
-Plan: 2 of 9
+Plan: 3 of 9
 Status: Ready to execute
 Next phase: Phase 2 — Vault & Strategy (PLP+Hedge vault, predict_adapter, rebalance); imports parity-gate-protected svi_view::binary_price; depends on Phase 1
 Last activity: 2026-05-12
@@ -80,6 +80,7 @@ Progress: [█████████████████] 100% Phase 1 / 1
 | Phase 02 P08 | 22min | 2 tasks | 6 files |
 | Phase 02 P09 | 10 | 4 tasks | 7 files |
 | Phase 03 P01 | 24min | 4 tasks | 10 files |
+| Phase 03 P02 | 35min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -186,6 +187,8 @@ Recent decisions affecting current work:
 - [Phase ?]: Phase 03-01: MARGIN-WHITELIST = UNDETERMINED-FALLBACK-TO-MOCK. deepbook_margin IS deployed on testnet (MARGIN_PACKAGE_ID 0xd6a42f...) but no DUSDC-quoted MarginPool exists; DBUSDC pool exists with different token type. mock_margin_pool fallback per CONTEXT.md D-18. Recheck 2026-06-08.
 - [Phase ?]: Phase 03-01: Runtime budget Q4 PASS (1.33s extrapolated 365-day vs 600s budget, 598.67s headroom). Pitfall 6 escape-hatch not mandatory for v1. nightly-backtest.yml cron slot Q6: 05:00 UTC (cron '0 5 * * *') with timeout-minutes 60.
 - [Phase ?]: Phase 03-01: Q3 LOCKED plp_yield_bps = 0 in v1 PnL accountant; we BUY hedges not provide PLP. Q5 LOCKED u64-as-string JSON convention for cross-runtime event payloads (avoids JS Number 2^53 precision loss).
+- [Phase ?]: Unit convention: CSV Unix-seconds × 1000 → ts_ms milliseconds; matches Move u64 ms event timestamps.
+- [Phase ?]: @strategy_fn coverage 95% (target 85%); _GatedFrame escape-hatch documented but not load-bearing per Wave 0 Q4 runtime PASS.
 
 ### Pending Todos
 
@@ -226,6 +229,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-12T11:40:03.197Z
-Stopped at: Phase 3 context gathered
+Last session: 2026-05-12T11:56:09.483Z
+Stopped at: Completed 03-02-PLAN.md
 Resume file: None

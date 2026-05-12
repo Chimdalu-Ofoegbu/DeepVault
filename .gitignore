@@ -37,6 +37,8 @@ contracts/build/
 # Misc
 *.log
 coverage/
+.coverage
+**/.coverage
 
 # Sui Move build artifacts
 contracts/build/

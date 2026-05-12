@@ -43,12 +43,12 @@ Requirements for the Sui Overflow 2026 submission (target 2026-06-16). Each maps
 
 ### Backtest Harness (Handbook-Required)
 
-- [ ] **BACK-01**: BTC OHLCV data ingestion from CryptoDataDownload Binance (≥30 days hourly, ideally 90+); Deribit IV history if available
+- [x] **BACK-01**: BTC OHLCV data ingestion from CryptoDataDownload Binance (≥30 days hourly, ideally 90+); Deribit IV history if available
 - [ ] **BACK-02**: Python `vault_state` machine mirroring Move semantics bit-for-bit (consumes `strategy.toml` codegen for parameter parity)
-- [ ] **BACK-03**: Replay loop with `@strategy_fn(reads=..., writes=...)` decorator enforcing decision-bar / observation-bar split (no future data leaks into past decisions)
+- [x] **BACK-03**: Replay loop with `@strategy_fn(reads=..., writes=...)` decorator enforcing decision-bar / observation-bar split (no future data leaks into past decisions)
 - [ ] **BACK-04**: Trace-replay parity test: same input trace produces identical NAV/share state in Move (testnet PTB sequence) and Python (within 1 wei)
 - [ ] **BACK-05**: 30+ days of replayed history across normal markets, trending markets, and at least one stress event (-3σ+ BTC move)
-- [ ] **BACK-06**: Lookahead-bias audit harness — assumption ledger as a markdown file, shuffled-label sanity test (must produce ~zero alpha), manual hand-recompute on 3 randomly-sampled trade rows
+- [x] **BACK-06**: Lookahead-bias audit harness — assumption ledger as a markdown file, shuffled-label sanity test (must produce ~zero alpha), manual hand-recompute on 3 randomly-sampled trade rows
 - [ ] **BACK-07**: Walk-forward methodology only; out-of-sample 30% of history held back; no parameter tuning on the held-back set
 - [ ] **BACK-08**: PnL attribution including fees, funding, slippage; separate columns for PLP yield, hedge cost, hedge payoff
 - [ ] **BACK-09**: Drawdown calculator + max-drawdown report; Sharpe and Sortino on out-of-sample
@@ -172,12 +172,12 @@ Phase mapping finalized by gsd-roadmapper on 2026-05-09 against ROADMAP.md. Ever
 | VAULT-09 | Phase 2 | Complete |
 | VAULT-10 | Phase 2 | Complete |
 | VAULT-11 | Phase 2 | Complete |
-| BACK-01 | Phase 3 | Pending |
+| BACK-01 | Phase 3 | Complete |
 | BACK-02 | Phase 3 | Pending |
-| BACK-03 | Phase 3 | Pending |
+| BACK-03 | Phase 3 | Complete |
 | BACK-04 | Phase 3 | Pending |
 | BACK-05 | Phase 3 | Pending |
-| BACK-06 | Phase 3 | Pending |
+| BACK-06 | Phase 3 | Complete |
 | BACK-07 | Phase 3 | Pending |
 | BACK-08 | Phase 3 | Pending |
 | BACK-09 | Phase 3 | Pending |

@@ -27,7 +27,7 @@
 // (Move integration tests) which is hermetic and does not require any
 // of the env vars above.
 
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Transaction } from '@mysten/sui/transactions';
@@ -48,6 +48,55 @@ type DeployJson = {
     predict_registry_id: string;
     dusdc_type_tag: string;
 };
+
+// ============================================================
+// Action-trace JSON capture (Plan 03-06 / BACK-04 / BACK-05).
+//
+// Per CONTEXT.md D-15/D-16: the trace is captured from a LIVE testnet
+// run of this cycle, then consumed by backtest/src/deepvault/replay.py
+// for 1-wei Move<->Python parity verification.
+//
+// Per WAVE0-DECISION.md Q5: all u64 fields are serialized as JSON
+// STRINGS (BigInt cannot round-trip through JSON.stringify natively;
+// strings avoid downstream `BigInt(...)` parsing ambiguity).
+// ============================================================
+
+type SnapshotJson = {
+    balance: string;
+    total_assets: string;
+    total_shares: string;
+};
+
+type Action = {
+    kind: 'supply' | 'hedge_mint' | 'roll' | 'redeem_request' | 'redeem_fulfill';
+    tx_digest: string;
+    ts_ms: number;
+    args: Record<string, string | number>;
+    pre: SnapshotJson;
+    post: SnapshotJson;
+    events: unknown[];
+};
+
+type Trace = {
+    vault_id: string;
+    package_id: string;
+    actions: Action[];
+};
+
+async function snapshotVault(client: SuiClient, vaultId: string): Promise<SnapshotJson> {
+    const obj = await client.getObject({ id: vaultId, options: { showContent: true } });
+    const content = obj.data?.content;
+    // Move object content is { dataType: 'moveObject', fields: {...} }.
+    const fields =
+        content && content.dataType === 'moveObject'
+            ? ((content.fields as Record<string, unknown>) ?? {})
+            : {};
+    return {
+        balance: String(fields.balance ?? '0'),
+        total_assets: String(fields.total_assets ?? '0'),
+        total_shares: String(fields.total_shares_supply ?? '0'),
+    };
+}
 
 const SUPPLY_AMOUNT_MICRO = 100_000_000n; // 100 DUSDC (6 decimals)
 const COOLDOWN_MS = 60 * 60 * 1000 + 1000; // 1h + 1s buffer
@@ -104,6 +153,15 @@ async function main(): Promise<void> {
     const signerAddress = keypair.getPublicKey().toSuiAddress();
     console.log(`==> signer: ${signerAddress}`);
 
+    // Action-trace accumulator (Plan 03-06). Each signAndExecuteTransaction
+    // call below is sandwiched between snapshotVault() calls so trace.actions
+    // carries pre+post for every state transition.
+    const trace: Trace = {
+        vault_id: deploy.vault_id,
+        package_id: deploy.package_id,
+        actions: [],
+    };
+
     // ============================================================
     // 1. supply
     //
@@ -148,6 +206,7 @@ async function main(): Promise<void> {
         ],
     });
 
+    const preSupply = await snapshotVault(client, deploy.vault_id);
     const supplyResult = await client.signAndExecuteTransaction({
         transaction: supplyTx,
         signer: keypair,
@@ -170,6 +229,16 @@ async function main(): Promise<void> {
                 JSON.stringify(supplyResult.events),
         );
     }
+    const postSupply = await snapshotVault(client, deploy.vault_id);
+    trace.actions.push({
+        kind: 'supply',
+        tx_digest: supplyResult.digest,
+        ts_ms: Date.now(),
+        args: { deposit_quote: SUPPLY_AMOUNT_MICRO.toString() },
+        pre: preSupply,
+        post: postSupply,
+        events: supplyResult.events ?? [],
+    });
     console.log('OK: atomic supply + hedge mint succeeded.');
 
     // ============================================================
@@ -204,6 +273,7 @@ async function main(): Promise<void> {
         ],
     });
 
+    const preRequest = await snapshotVault(client, deploy.vault_id);
     const requestResult = await client.signAndExecuteTransaction({
         transaction: requestTx,
         signer: keypair,
@@ -214,7 +284,21 @@ async function main(): Promise<void> {
             `redeem_request failed: ${JSON.stringify(requestResult.effects?.status)}`,
         );
     }
+    const postRequest = await snapshotVault(client, deploy.vault_id);
     const requestedAt = new Date().toISOString();
+    // redeem_request escrows ALL share coins held by the signer into the
+    // per-user RequestSlot — we don't surface the exact share-count arg
+    // because the on-chain call consumes the whole Coin<SHARE>. The
+    // post.total_shares delta captures it for parity replay.
+    trace.actions.push({
+        kind: 'redeem_request',
+        tx_digest: requestResult.digest,
+        ts_ms: Date.now(),
+        args: { user: signerAddress, share_coin_id: shareCoinId },
+        pre: preRequest,
+        post: postRequest,
+        events: requestResult.events ?? [],
+    });
     console.log(`OK: redeem_request submitted at ${requestedAt}`);
 
     // ============================================================
@@ -244,6 +328,7 @@ async function main(): Promise<void> {
         ],
     });
 
+    const preFulfill = await snapshotVault(client, deploy.vault_id);
     const fulfillResult = await client.signAndExecuteTransaction({
         transaction: fulfillTx,
         signer: keypair,
@@ -263,7 +348,31 @@ async function main(): Promise<void> {
                 JSON.stringify(fulfillResult.events),
         );
     }
+    const postFulfill = await snapshotVault(client, deploy.vault_id);
+    trace.actions.push({
+        kind: 'redeem_fulfill',
+        tx_digest: fulfillResult.digest,
+        ts_ms: Date.now(),
+        args: { user: signerAddress },
+        pre: preFulfill,
+        post: postFulfill,
+        events: fulfillResult.events ?? [],
+    });
     console.log('OK: redeem_fulfill succeeded; signer received Coin<DUSDC> payout.');
+
+    // ============================================================
+    // 5. Dump captured trace to backtest/traces/cycle-full.json.
+    //
+    // Path is configurable via TRACE_OUT_PATH so CI can route the
+    // artifact to a known upload location. Per Plan 03-06 acceptance,
+    // the file lands at backtest/traces/cycle-full.json by default.
+    // ============================================================
+    const traceOutPath =
+        process.env.TRACE_OUT_PATH ??
+        resolve(__dirname, '..', 'backtest', 'traces', 'cycle-full.json');
+    mkdirSync(dirname(traceOutPath), { recursive: true });
+    writeFileSync(traceOutPath, JSON.stringify(trace, null, 2));
+    console.log(`==> Trace written to ${traceOutPath} (${trace.actions.length} actions)`);
     console.log('==> e2e-vault-cycle complete.');
 }
 

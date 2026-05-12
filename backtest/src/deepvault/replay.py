@@ -38,10 +38,9 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from functools import wraps
 from pathlib import Path
-from typing import Callable
 
 import pandas as pd
 
@@ -51,7 +50,7 @@ from .vault_state import VaultState
 REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
-class LookaheadViolation(RuntimeError):
+class LookaheadViolation(RuntimeError):  # noqa: N818 — public class name shipped in Plan 03-02; rename would break call sites across vault_state, walk_forward, test_strategy_fn_decorator
     """Raised when a strategy function reads or writes a column not declared in
     the @strategy_fn manifest. Enforces D-08 decision-bar / observation-bar split.
     """
@@ -85,8 +84,7 @@ class _GatedFrame:
         # only column-name string access participates in the declared-reads gate.
         if isinstance(key, str) and key not in self._reads:
             raise LookaheadViolation(
-                f"function read undeclared column {key!r}; "
-                f"declared reads = {sorted(self._reads)}"
+                f"function read undeclared column {key!r}; declared reads = {sorted(self._reads)}"
             )
         return self._df[key]
 
@@ -213,9 +211,7 @@ def replay_trace(trace_path: Path | str, tolerance: int = 1) -> tuple[int, list[
         except AssertionError as e:
             digest = str(action.get("tx_digest", "?"))[:8]
             kind = action.get("kind", "?")
-            errors.append(
-                f"Action[{i}] {kind} (digest={digest}): {e} (tolerance={tolerance})"
-            )
+            errors.append(f"Action[{i}] {kind} (digest={digest}): {e} (tolerance={tolerance})")
     return len(errors), errors
 
 
@@ -309,10 +305,7 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     if mismatches == 0:
-        print(
-            f"PASS: all actions in {trace_path} replayed bit-equal "
-            f"within {args.tolerance} wei"
-        )
+        print(f"PASS: all actions in {trace_path} replayed bit-equal within {args.tolerance} wei")
         return 0
     print(f"FAIL: {mismatches} mismatches in {trace_path}", file=sys.stderr)
     for err in errors:

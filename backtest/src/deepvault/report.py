@@ -22,6 +22,7 @@ able to evaluate the strategy from this file alone.
 
 Reference: 03-RESEARCH.md Pattern 6 (HTML report block).
 """
+
 from __future__ import annotations
 
 import base64
@@ -34,7 +35,6 @@ from typing import Any
 import jinja2
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
-
 
 # REPO_ROOT discovery — backtest/src/deepvault/report.py -> parents[3] is repo root.
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -108,9 +108,7 @@ def render_html(
         # Pitfall 5: inline ONLY on first plot; the rest share the bundle.
         svi_snapshot=svi_snapshot_plot.to_html(include_plotlyjs="inline", full_html=False),
         equity_curve=equity_curve_plot.to_html(include_plotlyjs=False, full_html=False),
-        drawdown_timeline=drawdown_timeline_plot.to_html(
-            include_plotlyjs=False, full_html=False
-        ),
+        drawdown_timeline=drawdown_timeline_plot.to_html(include_plotlyjs=False, full_html=False),
         pnl_histogram_png=matplotlib_to_base64_png(pnl_histogram_fig),
         regime_heatmap_png=matplotlib_to_base64_png(regime_heatmap_fig),
         # W6: optional extension kwargs — template gates with {% if %}.
@@ -160,7 +158,9 @@ def render_html_from_summary(input_path: str | Path, output_path: str | Path) ->
     # Minimal viable plots — the CLI path is for nightly artifacts where the
     # full per-bar replay isn't surfaced. Plot beauty is a v2 polish item.
     fig_surface = _go.Figure(data=_go.Surface(z=[[0.0, 0.0], [0.0, 0.0]]))
-    fig_equity = _go.Figure(data=_go.Scatter(x=[0, 1], y=[1.0, 1.0 + float(summary.get("oos_sharpe", 0.0)) / 100.0]))
+    fig_equity = _go.Figure(
+        data=_go.Scatter(x=[0, 1], y=[1.0, 1.0 + float(summary.get("oos_sharpe", 0.0)) / 100.0])
+    )
     fig_drawdown = _go.Figure(
         data=_go.Scatter(
             x=[0, 1],

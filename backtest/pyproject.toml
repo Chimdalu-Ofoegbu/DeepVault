@@ -46,6 +46,9 @@ target-version = "py312"
 extend-exclude = [
   "src/deepvault/strategy_constants.py",
   "src/deepvault/phi_coefficients.py",
+  # Jupyter notebooks are scratch/audit artifacts (D-07 hand-recompute);
+  # cell-level line-length and import-order rules don't apply.
+  "notebooks/",
 ]
 
 [tool.ruff.lint]

@@ -14,8 +14,6 @@ Tests use monkeypatched requests.get to avoid network calls in CI.
 
 from __future__ import annotations
 
-from io import BytesIO
-
 import pandas as pd
 import pytest
 
@@ -27,8 +25,9 @@ from deepvault.data_ingest import (
     load_window,
 )
 
-# Canonical 3-bar synthetic CSV with the CryptoDataDownload "Disclaimer" prefix line.
-# Header matches the verified format: Unix,Date,Symbol,Open,High,Low,Close,Volume BTC,Volume USDT,tradecount.
+# Canonical 3-bar synthetic CSV with CryptoDataDownload "Disclaimer" prefix line.
+# Header columns: Unix, Date, Symbol, Open, High, Low, Close,
+# Volume BTC, Volume USDT, tradecount (CDD-verified format).
 SAMPLE_CSV = (
     b"Disclaimer line ignored\n"
     b"Unix,Date,Symbol,Open,High,Low,Close,Volume BTC,Volume USDT,tradecount\n"

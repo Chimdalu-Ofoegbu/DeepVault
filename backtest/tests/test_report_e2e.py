@@ -7,6 +7,7 @@ headings AND is non-trivial in size (>=50KB).
 This is the e2e gate that proves the full Plan 03-09 closure pipeline
 (fixture -> simulate -> attribution -> render) produces a usable report.
 """
+
 from __future__ import annotations
 
 import json
@@ -23,7 +24,6 @@ from deepvault.pnl_attribution import compute_attribution
 from deepvault.replay import simulate
 from deepvault.report import render_html
 from deepvault.vault_state import VaultState
-
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 MICRO_FIXTURE = REPO_ROOT / "backtest" / "traces" / "micro-fixture-7d.json"
@@ -84,12 +84,8 @@ def test_e2e_render_micro_fixture(tmp_path):
         },
         pnl_attribution_df=attribution_df,
         drawdown_metrics={"max_drawdown_bps": -200, "underwater_bars": 24},
-        stress_event_narratives=[
-            {"name": "micro-fixture stress", "detail": "synthetic"}
-        ],
-        sensitivity_table_df=pd.DataFrame(
-            {"hedge_ratio": [0.05, 0.10], "oos_sharpe": [1.0, 1.0]}
-        ),
+        stress_event_narratives=[{"name": "micro-fixture stress", "detail": "synthetic"}],
+        sensitivity_table_df=pd.DataFrame({"hedge_ratio": [0.05, 0.10], "oos_sharpe": [1.0, 1.0]}),
         shuffled_label_test={
             "alpha_apy": 0.001,
             "threshold": 0.005,
@@ -108,21 +104,15 @@ def test_e2e_render_micro_fixture(tmp_path):
         svi_snapshot_evolution=[
             {
                 "label": "Start of window",
-                "plot_html": fig_surface.to_html(
-                    include_plotlyjs=False, full_html=False
-                ),
+                "plot_html": fig_surface.to_html(include_plotlyjs=False, full_html=False),
             },
             {
                 "label": "Mid window",
-                "plot_html": fig_surface.to_html(
-                    include_plotlyjs=False, full_html=False
-                ),
+                "plot_html": fig_surface.to_html(include_plotlyjs=False, full_html=False),
             },
             {
                 "label": "End of window",
-                "plot_html": fig_surface.to_html(
-                    include_plotlyjs=False, full_html=False
-                ),
+                "plot_html": fig_surface.to_html(include_plotlyjs=False, full_html=False),
             },
         ],
         output_path=out,
@@ -163,12 +153,8 @@ def test_html_contains_all_11_d13_sections(tmp_path):
         },
         pnl_attribution_df=attribution_df,
         drawdown_metrics={"max_drawdown_bps": -200, "underwater_bars": 24},
-        stress_event_narratives=[
-            {"name": "micro-fixture stress", "detail": "synthetic"}
-        ],
-        sensitivity_table_df=pd.DataFrame(
-            {"hedge_ratio": [0.05, 0.10], "oos_sharpe": [1.0, 1.0]}
-        ),
+        stress_event_narratives=[{"name": "micro-fixture stress", "detail": "synthetic"}],
+        sensitivity_table_df=pd.DataFrame({"hedge_ratio": [0.05, 0.10], "oos_sharpe": [1.0, 1.0]}),
         shuffled_label_test={
             "alpha_apy": 0.001,
             "threshold": 0.005,
@@ -233,12 +219,8 @@ def test_html_size_at_least_50kb(tmp_path):
         },
         pnl_attribution_df=attribution_df,
         drawdown_metrics={"max_drawdown_bps": -200, "underwater_bars": 24},
-        stress_event_narratives=[
-            {"name": "micro-fixture stress", "detail": "synthetic"}
-        ],
-        sensitivity_table_df=pd.DataFrame(
-            {"hedge_ratio": [0.05, 0.10], "oos_sharpe": [1.0, 1.0]}
-        ),
+        stress_event_narratives=[{"name": "micro-fixture stress", "detail": "synthetic"}],
+        sensitivity_table_df=pd.DataFrame({"hedge_ratio": [0.05, 0.10], "oos_sharpe": [1.0, 1.0]}),
         shuffled_label_test={
             "alpha_apy": 0.001,
             "threshold": 0.005,

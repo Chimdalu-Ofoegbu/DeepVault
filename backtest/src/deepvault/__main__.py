@@ -15,6 +15,7 @@ Implementation rationale: closes the BACK-05 nightly-backtest gap that Plan
 CLI in place, the nightly job can invoke
 ``python -m deepvault walk_forward --window-days 365 --out <path>`` directly.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -102,9 +103,7 @@ def _cmd_walk_forward(args) -> int:
             },
         }
         out_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
-        print(
-            f"walk_forward complete: {len(data)} bars (insufficient data); summary -> {out_path}"
-        )
+        print(f"walk_forward complete: {len(data)} bars (insufficient data); summary -> {out_path}")
         return 0
 
     result = run_walk_forward(data, hedge_ratio=0.10)

@@ -4,6 +4,7 @@ Per CONTEXT.md D-12: single self-contained HTML file.
 Per CONTEXT.md D-13: 11 sections in order.
 Per RESEARCH.md Pitfall 5: inline plotlyjs ONLY on first plot; file size < 5 MB.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -27,8 +28,7 @@ def synthetic_inputs():
     return {
         "executive_summary": {"headline_apy": 0.082, "oos_sharpe": 1.15},
         "assumption_ledger": (
-            "# Test Assumption Ledger\n\n"
-            "Test content with available_at semantics."
+            "# Test Assumption Ledger\n\nTest content with available_at semantics."
         ),
         "strategy_description": {
             "allocation_bps": 1000,
@@ -177,11 +177,7 @@ def test_render_html_is_valid_html(tmp_path, synthetic_inputs, synthetic_plots):
     html_text = out.read_text(encoding="utf-8")
     soup = BeautifulSoup(html_text, "html.parser")
     # If parsing didn't raise, the HTML is well-formed enough for browsers.
-    assert (
-        soup.find("html") is not None
-        or soup.find("body") is not None
-        or "<head" in html_text
-    )
+    assert soup.find("html") is not None or soup.find("body") is not None or "<head" in html_text
 
 
 def test_assumption_ledger_embedded_verbatim(tmp_path, synthetic_inputs, synthetic_plots):

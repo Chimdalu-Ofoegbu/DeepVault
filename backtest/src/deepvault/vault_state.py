@@ -24,7 +24,7 @@ trivially satisfies the Move u128 intermediates needed by compute_shares_to_mint
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, List, NamedTuple
+from typing import NamedTuple
 
 from .strategy_constants import (
     ALLOCATION_BPS,
@@ -207,12 +207,12 @@ class VaultState:
     escrow_balance: int = 0
 
     # W1 LOCKED per-user mappings (NAMES MUST NOT CHANGE).
-    request_slots: Dict[str, RequestSlot] = field(default_factory=dict)
-    rate_limiters: Dict[str, PyRateLimiter] = field(default_factory=dict)
+    request_slots: dict[str, RequestSlot] = field(default_factory=dict)
+    rate_limiters: dict[str, PyRateLimiter] = field(default_factory=dict)
 
     # Open-hedge registry (keyed by MarketKey string).
-    hedges: Dict[str, HedgePosition] = field(default_factory=dict)
-    hedge_keys: List[str] = field(default_factory=list)
+    hedges: dict[str, HedgePosition] = field(default_factory=dict)
+    hedge_keys: list[str] = field(default_factory=list)
 
     # NAV math caches (mirror Move's total_shares_supply / total_assets).
     total_shares: int = 0
@@ -236,7 +236,7 @@ class VaultState:
     # ============================================================
 
     @classmethod
-    def new_seeded(cls) -> "VaultState":
+    def new_seeded(cls) -> VaultState:
         """Mirrors vault::create_vault — 10 DUSDC seed + 1M virtual shares burned.
 
         Source: contracts/sources/vault.move:259-323.

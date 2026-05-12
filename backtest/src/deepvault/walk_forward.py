@@ -23,9 +23,11 @@ Trust boundary (PLAN <threat_model> T-03-24/25/26):
     test_oos_never_touched_during_calibration property test.
   - BARS_PER_YEAR=8760 is hardcoded and tested explicitly.
 """
+
 from __future__ import annotations
 
-from typing import Any, Iterable, NamedTuple
+from collections.abc import Iterable
+from typing import Any, NamedTuple
 
 import numpy as np
 import pandas as pd

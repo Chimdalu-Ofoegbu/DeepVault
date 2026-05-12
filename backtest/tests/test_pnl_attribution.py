@@ -11,6 +11,7 @@ Tests confirm:
   - gas_bps assumed model.
   - Empty actions list returns empty DataFrame with the 7 columns.
 """
+
 from __future__ import annotations
 
 import pandas as pd
@@ -22,7 +23,6 @@ from deepvault.pnl_attribution import (
     compute_risk_metrics,
 )
 from deepvault.strategy_constants import ALLOCATION_BPS
-
 
 # --------------------------------------------------------------------- fixtures
 
@@ -181,7 +181,13 @@ def test_redeem_actions_only_pay_gas(synthetic_market_data):
         }
         df = compute_attribution([action], synthetic_market_data)
         assert df.loc[0, "gas_bps"] == 1
-        for col in ("plp_yield_bps", "hedge_cost_bps", "hedge_payoff_bps", "fees_bps", "slippage_bps"):
+        for col in (
+            "plp_yield_bps",
+            "hedge_cost_bps",
+            "hedge_payoff_bps",
+            "fees_bps",
+            "slippage_bps",
+        ):
             assert df.loc[0, col] == 0
 
 
@@ -209,9 +215,7 @@ def test_slippage_uses_next_bar_vwap_minus_open():
 
 
 def test_empty_actions_returns_empty_df():
-    md = pd.DataFrame(
-        {"ts_ms": [], "open": [], "close": [], "volume_btc": [], "volume_usdt": []}
-    )
+    md = pd.DataFrame({"ts_ms": [], "open": [], "close": [], "volume_btc": [], "volume_usdt": []})
     df = compute_attribution([], md)
     expected = set(PNL_COLUMNS) | {"total_bps"}
     assert expected.issubset(set(df.columns))

@@ -7,6 +7,7 @@ Covers CONTEXT.md:
   Claude's Discretion: v1 ratio (ALLOCATION_BPS=1000=10%) is PRESERVED regardless
   of which sensitivity row produces highest Sharpe.
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -16,9 +17,9 @@ import pytest
 from deepvault.strategy_constants import ALLOCATION_BPS
 from deepvault.walk_forward import (
     BARS_PER_YEAR,
-    DrawdownResult,
     OOS_FRACTION,
     SENSITIVITY_RATIOS,
+    DrawdownResult,
     WalkForwardResult,
     compute_drawdown_max_sharpe_sortino,
     run_walk_forward,

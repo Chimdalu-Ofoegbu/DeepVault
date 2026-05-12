@@ -8,6 +8,7 @@ Pure-Python integer math only — no numpy, no float (in the module under test).
 
 Source: contracts/sources/{vault,supply,redeem,ltv}.move + helpers/rate_limiter.move
 """
+
 from __future__ import annotations
 
 import pytest
@@ -27,7 +28,6 @@ from deepvault.vault_state import (
     VaultState,
     VaultStateSnapshot,
 )
-
 
 # === Helpers ===
 

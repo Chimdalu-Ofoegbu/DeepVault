@@ -13,6 +13,7 @@ The full cycle-full.json from a live testnet capture is consumed by the nightly
 backtest workflow (Plan 03-09); this file's parity test runs on the checked-in
 micro-fixture only, so per-push CI stays fast (well under the 600s phase budget).
 """
+
 from __future__ import annotations
 
 import json
@@ -53,8 +54,9 @@ def test_micro_fixture_well_formed():
         # u64 fields as strings per WAVE0-DECISION.md Q5.
         for snap_key in ("pre", "post"):
             for field in ("balance", "total_assets", "total_shares"):
-                assert isinstance(a[snap_key][field], str), (
-                    f"Action[{i}].{snap_key}.{field} must be string (got {type(a[snap_key][field])})"
+                val = a[snap_key][field]
+                assert isinstance(val, str), (
+                    f"Action[{i}].{snap_key}.{field} must be string (got {type(val)})"
                 )
 
 
@@ -118,7 +120,5 @@ def test_replay_cli_exits_0_on_micro_fixture():
         text=True,
         check=False,
     )
-    assert result.returncode == 0, (
-        f"CLI failed:\nstdout: {result.stdout}\nstderr: {result.stderr}"
-    )
+    assert result.returncode == 0, f"CLI failed:\nstdout: {result.stdout}\nstderr: {result.stderr}"
     assert "PASS" in result.stdout

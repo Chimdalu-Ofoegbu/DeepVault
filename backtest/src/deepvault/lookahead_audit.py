@@ -26,7 +26,8 @@ Source: 03-RESEARCH.md Pattern 5 (audit test scaffolding).
 
 from __future__ import annotations
 
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 import numpy as np  # ALLOWED HERE (audit-bound, not parity-bound).
 import pandas as pd

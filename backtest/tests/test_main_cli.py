@@ -5,17 +5,16 @@ invokes ``python -m deepvault walk_forward --window-days 365 --out reports/...``
 this test asserts the CLI surface exists, --help exits 0, and a micro
 walk_forward run produces a valid summary JSON in under 30 seconds.
 """
+
 from __future__ import annotations
 
 import json
 import subprocess
 import sys
 import time
-from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import pytest
 
 from deepvault import __main__ as main_mod
 
@@ -107,9 +106,7 @@ def test_walk_forward_micro_run(tmp_path, monkeypatch):
 
     out_path = tmp_path / "micro.json"
     start = time.perf_counter()
-    rc = main_mod.main(
-        ["walk_forward", "--window-days", "7", "--out", str(out_path)]
-    )
+    rc = main_mod.main(["walk_forward", "--window-days", "7", "--out", str(out_path)])
     elapsed = time.perf_counter() - start
 
     assert rc == 0
@@ -155,9 +152,7 @@ def test_walk_forward_handles_empty_data(tmp_path, monkeypatch):
     monkeypatch.setattr(di, "fetch_btc_hourly", fake_fetch)
 
     out_path = tmp_path / "empty.json"
-    rc = main_mod.main(
-        ["walk_forward", "--window-days", "7", "--out", str(out_path)]
-    )
+    rc = main_mod.main(["walk_forward", "--window-days", "7", "--out", str(out_path)])
     assert rc == 0
     assert out_path.exists()
     summary = json.loads(out_path.read_text(encoding="utf-8"))
@@ -180,9 +175,7 @@ def test_report_subcommand_succeeds_after_plan_03_09(tmp_path):
         encoding="utf-8",
     )
     out_path = tmp_path / "out.html"
-    rc = main_mod.main(
-        ["report", "--input", str(input_path), "--output", str(out_path)]
-    )
+    rc = main_mod.main(["report", "--input", str(input_path), "--output", str(out_path)])
     assert rc == 0
     assert out_path.exists()
     # Sanity-check the rendered HTML contains key section anchors.
@@ -195,9 +188,7 @@ def test_report_subcommand_returns_nonzero_when_input_missing(tmp_path):
     """report subcommand returns non-zero when --input path doesn't exist."""
     missing = tmp_path / "does-not-exist.json"
     out_path = tmp_path / "out.html"
-    rc = main_mod.main(
-        ["report", "--input", str(missing), "--output", str(out_path)]
-    )
+    rc = main_mod.main(["report", "--input", str(missing), "--output", str(out_path)])
     assert rc != 0
     assert not out_path.exists()
 

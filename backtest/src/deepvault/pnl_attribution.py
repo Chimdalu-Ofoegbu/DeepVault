@@ -26,9 +26,10 @@ Type discipline: pnl_attribution is the third pandas-allowed module after
 arb_checker.py + lookahead_audit.py (analytical pipeline, NOT parity-bound).
 Output to int/float at module boundary where it crosses into report.py.
 """
+
 from __future__ import annotations
 
-from typing import Iterable
+from collections.abc import Iterable
 
 import pandas as pd
 
@@ -107,9 +108,7 @@ def _zero_row(ts_ms: int, kind: str) -> dict:
     return row
 
 
-def compute_attribution(
-    actions: Iterable[dict], market_data: pd.DataFrame
-) -> pd.DataFrame:
+def compute_attribution(actions: Iterable[dict], market_data: pd.DataFrame) -> pd.DataFrame:
     """Return a DataFrame with 7 columns: the 6 PnL columns + total_bps.
 
     Each action row records its kind, ts_ms, and the per-column bps figures.
@@ -202,9 +201,7 @@ def compute_risk_metrics(
             if downside_std == 0.0:
                 sortino = 0.0
             else:
-                sortino = float(
-                    (mean_r - rf_per_bar) / downside_std * np.sqrt(bars_per_year)
-                )
+                sortino = float((mean_r - rf_per_bar) / downside_std * np.sqrt(bars_per_year))
 
     # Max drawdown on the equity curve implied by cumulative pnl.
     equity = (1.0 + pd.Series(returns)).cumprod().to_numpy()

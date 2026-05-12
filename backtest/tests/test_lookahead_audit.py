@@ -5,6 +5,7 @@ and the @strategy_fn decorator-introspection helper (D-08).
 
 Source: backtest/src/deepvault/lookahead_audit.py
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -20,7 +21,6 @@ from deepvault.lookahead_audit import (
     shuffled_label_sanity,
 )
 from deepvault.replay import strategy_fn
-
 
 # === pick_hand_recompute_rows ===
 

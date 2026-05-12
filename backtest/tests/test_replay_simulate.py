@@ -14,6 +14,7 @@ VaultState.replay() at 1-wei tolerance is the parity gate this plan ships.
 Per CONTEXT.md D-15: any drift > 1 wei means a real Move<->Python bug, not
 floating-point noise.
 """
+
 from __future__ import annotations
 
 import json
@@ -269,9 +270,7 @@ def test_cli_with_trace_arg_success(synthetic_trace_path: Path):
 def test_cli_with_trace_arg_mismatch(tmp_path: Path, capsys):
     """`python -m deepvault.replay --trace <bad>` exits 1 on mismatch."""
     trace = _synthetic_3_action_trace()
-    trace["actions"][0]["post"]["balance"] = str(
-        int(trace["actions"][0]["post"]["balance"]) + 1000
-    )
+    trace["actions"][0]["post"]["balance"] = str(int(trace["actions"][0]["post"]["balance"]) + 1000)
     path = tmp_path / "bad.json"
     path.write_text(json.dumps(trace, indent=2), encoding="utf-8")
     rc = main(["--trace", str(path)])

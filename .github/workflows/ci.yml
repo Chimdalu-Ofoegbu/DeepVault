@@ -84,13 +84,31 @@ jobs:
         working-directory: contracts
         run: bash tests/coverage_check.sh
 
-      - name: Capability containment grep (VAULT-10 lightweight check)
+      - name: Move tests (Phase 3 -- mock_margin_pool + ptb_capability_test + liquidation_test)
+        # Plan 03-09 W1 sub-task 3b: smoke-checks for Phase 3 Move tests.
+        # Filters are positional in sui CLI 1.71.1 (NOT --filter). Tests
+        # gracefully report 0 cases on plans not yet landed; survives partial-
+        # wave landing per FAST_FORWARD non-strict-filter convention.
+        working-directory: contracts
+        run: |
+          set -euo pipefail
+          sui move test --gas-limit 100000000000 --skip-fetch-latest-git-deps mock_margin_pool
+          sui move test --gas-limit 100000000000 --skip-fetch-latest-git-deps ptb_capability_test
+          sui move test --gas-limit 100000000000 --skip-fetch-latest-git-deps liquidation_test
+          echo "==> Phase 3 Move tests: PTB-04 + PTB-05 + mock_margin_pool PASS"
+
+      - name: Capability containment grep (VAULT-10 + PTB-04 Margin-side extension)
         # W4 lock (Plan 02-07): this grep is the LOAD-BEARING enforcement
         # of the capability-containment property for VAULT-10. The
         # contracts/specs/capability_containment.move file is a
         # documentation_anchor() stub only.
         #
-        # Pattern detail:
+        # Plan 03-09 W1 sub-task 3b extends this step with PTB-04 Margin-side
+        # checks: TradeCap / MarginManager / MockMarginPool must never be
+        # returned from a public production function, and scripts/*.ts must
+        # not extract a free TradeCap binding outside the SDK layer.
+        #
+        # Pattern detail (VAULT-10 base):
         #   - Main regex `\)\s*:\s*\&?(mut )?(TreasuryCap|AdminCap)`
         #     anchors on the return-type position (`)` followed by `:`)
         #     so parameter annotations like `cap: AdminCap` are NOT
@@ -104,14 +122,30 @@ jobs:
         #     fails to match the `file:line:` prefix that grep -n emits).
         run: |
           set -euo pipefail
+          # VAULT-10 base check (Phase 2)
           if grep -nE '\)\s*:\s*\&?(mut )?(TreasuryCap|AdminCap)' \
               contracts/sources/*.move 2>/dev/null \
               | grep -v '_test.move' \
               | grep -vE 'public\(package\) fun'; then
-            echo "::error::Capability containment violated — a public function exposes TreasuryCap or AdminCap by reference. See VAULT-10 in REQUIREMENTS.md."
+            echo "::error::VAULT-10: Capability containment violated — a public function exposes TreasuryCap or AdminCap by reference."
             exit 1
           fi
-          echo "Capability containment OK: no public function returns TreasuryCap or AdminCap."
+          # PTB-04 Margin-side (Phase 3) — TradeCap / MarginManager / MockMarginPool
+          # never returned by value from production sources.
+          if grep -nE '^public fun .*: \&?(mut )?(TradeCap|MarginManager|MockMarginPool)' \
+              contracts/sources/*.move 2>/dev/null \
+              | grep -v '_test.move'; then
+            echo "::error::PTB-04: deepvault production module exposes Margin capability"
+            exit 1
+          fi
+          # PTB-04 TS demo — no free TradeCap binding outside SDK layer.
+          if grep -nE '^\s*(const|let)\s+(tradeCap|trade_cap|withdrawCap)\s*=' \
+              scripts/*.ts 2>/dev/null \
+              | grep -v 'node_modules'; then
+            echo "::error::PTB-04: TS demo extracts Margin capability outside SDK layer"
+            exit 1
+          fi
+          echo "Capability containment OK: no production module exposes TreasuryCap/AdminCap/TradeCap/MarginManager/MockMarginPool."
 
   ts:
     name: TypeScript tests

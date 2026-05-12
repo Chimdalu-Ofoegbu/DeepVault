@@ -1,0 +1,64 @@
+{
+  "vault_id": "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "package_id": "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "actions": [
+    {
+      "kind": "supply",
+      "tx_digest": "0xaaaa01",
+      "ts_ms": 1717545600000,
+      "args": {
+        "deposit_quote": "100000000"
+      },
+      "pre": {
+        "balance": "10000000",
+        "total_assets": "10000000",
+        "total_shares": "1000000"
+      },
+      "post": {
+        "balance": "100000000",
+        "total_assets": "110000000",
+        "total_shares": "20999998"
+      },
+      "events": []
+    },
+    {
+      "kind": "supply",
+      "tx_digest": "0xaaaa02",
+      "ts_ms": 1717549200000,
+      "args": {
+        "deposit_quote": "50000000"
+      },
+      "pre": {
+        "balance": "100000000",
+        "total_assets": "110000000",
+        "total_shares": "20999998"
+      },
+      "post": {
+        "balance": "145000000",
+        "total_assets": "160000000",
+        "total_shares": "30999997"
+      },
+      "events": []
+    },
+    {
+      "kind": "redeem_request",
+      "tx_digest": "0xaaaa03",
+      "ts_ms": 1717552800000,
+      "args": {
+        "user": "0xb2",
+        "shares": "5000000"
+      },
+      "pre": {
+        "balance": "145000000",
+        "total_assets": "160000000",
+        "total_shares": "30999997"
+      },
+      "post": {
+        "balance": "145000000",
+        "total_assets": "160000000",
+        "total_shares": "30999997"
+      },
+      "events": []
+    }
+  ]
+}

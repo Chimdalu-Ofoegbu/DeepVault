@@ -1331,39 +1331,51 @@ fi
 | A9 | The 8,760 bars/year Sharpe annualization (hourly bars over 365 days) matches institutional hedge-fund convention | PnL Attribution + walk_forward | Standard practice. Alternative is 252 trading days × 24 hours but BTC trades 24/7 — 8,760 is correct. |
 | A10 | Plotly's `fig.to_html(include_plotlyjs='inline')` produces an offline-usable HTML page even when reviewer has no internet | Pattern 6 HTML report | Verified by docs (plotly.com/python-api-reference/generated/plotly.io.to_html.html); inline mode embeds full plotly.js bundle. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-**Note (revision iteration 1, 2026-05-11):** Per project convention (Phase 2 precedent), the Open Questions below are resolved at Wave 0 execution time by Plan 03-01's spike, not at plan-check time. This section will be re-edited inline to add `**RESOLVED:**` annotations under each of Q1-Q6 when Plan 03-01 Task 4 ships. The heading will be renamed to `## Open Questions (RESOLVED)` at that time.
+**Note (revision iteration 1, 2026-05-11):** Per project convention (Phase 2 precedent), the Open Questions below are resolved at Wave 0 execution time by Plan 03-01's spike, not at plan-check time. **Plan 03-01 (executed 2026-05-12) LANDED the resolutions inline below.** The canonical decision record is [WAVE0-DECISION.md](./WAVE0-DECISION.md).
+
+### RESOLVED — Wave 0 spike results (2026-05-12)
+
+Per Plan 03-01 execution. Each Q below carries an inline `**RESOLVED:**` annotation
+immediately under the question prompt. Full evidence + citations: WAVE0-DECISION.md
+and MARGIN-WHITELIST-DECISION.md.
 
 1. **Does Margin testnet have a DUSDC margin pool that can be borrowed against?**
    - What we know: CLAUDE.md does not list one; the vendored DeepBookV3 contracts don't specify testnet pool IDs.
    - What's unclear: whether Mysten has bootstrapped any pools on Margin testnet at all (Margin is a separate package from Predict; its testnet launch state is undocumented in our research surface).
    - Recommendation: Plan 03-01 Wave 0 spike runs `sui client object` against the Margin registry (verify the object ID can be found via predict-server REST or Mysten Discord); document result.
+   - **RESOLVED:** See [MARGIN-WHITELIST-DECISION.md](./MARGIN-WHITELIST-DECISION.md) for the dated `**Result:**` line (one of `WHITELISTED-LIVE` / `NOT-WHITELISTED-FALLBACK-TO-MOCK` / `UNDETERMINED-FALLBACK-TO-MOCK`). The 5-call PTB shape is locked regardless of outcome; the mock_margin_pool fallback (CONTEXT.md D-18) ships in lockstep.
 
 2. **Does the @mysten/deepbook-v3 SDK at v0.17.0 expose `MarginPoolContract` with `borrow_quote` / `withdraw` / `deposit` builders?**
    - What we know: CLAUDE.md pins 0.17.0 with note "Margin Manager TS SDK"; npm registry shows latest is 1.3.6.
    - What's unclear: whether 0.17.0 is the version where `MarginPoolContract` was first added or whether it's older and lacks builders.
    - Recommendation: Plan 03-01 Wave 0 spike installs 0.17.0, imports `MarginPoolContract`, and runs `console.log(Object.keys(MarginPoolContract.prototype))` to enumerate. If builders missing, upgrade to 1.x with explicit risk note.
+   - **RESOLVED:** See WAVE0-DECISION.md `## SDK introspection evidence` section for the pinned version + Object.keys output. Decision logic: pin 0.17.0 if it exposes builders; else try 1.3.6 + document deviation; else fall back to raw `tx.moveCall`. Plan 03-05's two-protocol-ptb-demo.ts uses whichever path WAVE0-DECISION.md locks.
 
 3. **What's the exact Predict per-block PLP yield rate? Should `plp_yield_bps` model anything non-zero in v1?**
    - What we know: We BUY hedges via `predict::mint`, not provide PLP via `predict::supply`. So our `total_assets` change between bars only reflects (a) realized hedge settlements, (b) gas spent, and (c) supply/redeem flows.
    - What's unclear: whether holding a binary position (Coin<PLP>?) accrues per-block yield to the holder — this is Predict-internal behavior we'd need to confirm by reading vendored `predict.move` mint+resolve flow.
    - Recommendation: Plan 03-01 doc spike on `predict.move:219-310` (mint, resolve, redeem); update PnL attribution v1 model based on findings.
+   - **RESOLVED:** v1 model = **`plp_yield_bps = 0`**. We are a hedge BUYER, not a PLP provider. The six-column accountant reserves the column for v2 STRAT-V2-01 expansion (where holding a Coin<PLP> would accrue per-block yield) but emits identically zero in v1. Documented in `backtest/src/deepvault/pnl_attribution.py` docstring as Assumption A3. See WAVE0-DECISION.md Q3 section.
 
 4. **Will the 365-day backtest run complete in <10 min in CI?**
    - What we know: hourly bars × 365 days = 8,760 bars; each bar is a few @strategy_fn calls + a few state updates.
    - What's unclear: whether `@strategy_fn`'s wrapper overhead pushes runtime over the nightly-CI budget.
    - Recommendation: Plan 03-02 timing micro-benchmark on a 7-day fixture; extrapolate to 365 days; if > 10 min, apply Pitfall 6 escape hatch.
+   - **RESOLVED:** See WAVE0-DECISION.md `## Runtime budget micro-benchmark` for the verdict (`PASS` / `CONDITIONAL PASS` / `FAIL`) with measured 7-day elapsed and 365-day extrapolated numbers. Escape-hatch requirement (Pitfall 6 mitigation) flagged per the conditional-pass branch.
 
 5. **Does the e2e-vault-cycle.ts capture full event payloads in a format Python can parse?**
    - What we know: `result.events[i].parsedJson` is BCS-decoded by @mysten/sui; type information is in `result.events[i].type`.
    - What's unclear: whether MarketKey (a u8-vector-keyed struct) round-trips cleanly through JSON.
    - Recommendation: Plan 03-03 micro-test: capture one trace, parse in Python, assert all events round-trip.
+   - **RESOLVED:** See WAVE0-DECISION.md `## Event JSON round-trip check`. Pinned convention: **u64 fields as strings**, IDs as hex strings, direction as u8 int. Plan 03-05 (PTB demo) and Plan 03-06 (replay parity) emit/consume the same shape.
 
 6. **Does the testnet `cycle-full.json` trace capture take longer than the CI nightly window?**
    - What we know: The cycle requires a 1h real-time wait per D-01 redeem cooldown; CI timeout-minutes for the existing nightly-e2e-vault.yml is 90.
    - What's unclear: whether Phase 3's full cycle (which includes the five-call PTB lead-in) fits.
    - Recommendation: Plan 03-04 sequences capture as: (a) per-push CI uses FAST_FORWARD=1 against integration_test.move (no real wait), (b) nightly job runs the full real-time capture and updates `cycle-full.json` as a workflow artifact. The trace is the ARTIFACT, not a checked-in file (committed only at Phase 3 closure).
+   - **RESOLVED:** See WAVE0-DECISION.md `## Nightly schedule slot`. **nightly-backtest.yml: 05:00 UTC (`cron: '0 5 * * *'`)**, one hour past nightly-e2e-vault (04:00 UTC) and two hours past nightly-prover (03:00 UTC). `timeout-minutes: 60` budget. Avoids GHA runner-pool + testnet RPC contention.
 
 ## Environment Availability
 

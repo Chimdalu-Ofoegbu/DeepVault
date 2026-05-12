@@ -125,7 +125,7 @@ Drop in this order, never reverse:
   4. The 30+ day backtest report renders an institutional-grade HTML/PDF with assumption ledger, max drawdown, Sharpe/Sortino on out-of-sample 30%, and PnL attribution split into PLP yield / hedge cost / hedge payoff — and the shuffled-label sanity test produces ~zero alpha (proving no lookahead leak).
   5. Capability-flow tests prove `TradeCap` never leaves the user's BalanceManager and `TreasuryCap<VAULT_SHARE>` never leaves the shared Vault, and the -30% NAV shock liquidation property test passes against the worst-case Predict outcome.
 **Plans**: 9 plans
-- [ ] 03-01-PLAN.md (Wave 0) - Spike: 5-call PTB shape lock + DUSDC margin pool discovery + SDK version pin + runtime budget + 6 open questions resolved -> WAVE0-DECISION.md + CONTEXT.md D-17 amendment + MARGIN-WHITELIST-DECISION.md
+- [x] 03-01-PLAN.md (Wave 0) - Spike: 5-call PTB shape lock + DUSDC margin pool discovery + SDK version pin + runtime budget + 6 open questions resolved -> WAVE0-DECISION.md + CONTEXT.md D-17 amendment + MARGIN-WHITELIST-DECISION.md
 - [ ] 03-02-PLAN.md (Wave 1, Track B) - data_ingest.py + replay.py @strategy_fn decorator + .planning/backtest-assumptions.md (BACK-01, BACK-03 foundation, BACK-06 foundation)
 - [ ] 03-03-PLAN.md (Wave 1, Track A) - scripts/two-protocol-ptb-demo.{ts,sh} skeleton + contracts/tests/mock_margin_pool.move (PTB-01, PTB-02)
 - [ ] 03-04-PLAN.md (Wave 2, Track B, TDD) - vault_state.py + lookahead_audit.py + tests; bit-equal Move parity + shuffled-label/hand-recompute machinery (BACK-02, BACK-06)

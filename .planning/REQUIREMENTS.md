@@ -56,8 +56,8 @@ Requirements for the Sui Overflow 2026 submission (target 2026-06-16). Each maps
 
 ### Composability — Two-Protocol PTB
 
-- [ ] **PTB-01**: DeepBook Margin BalanceManager + TradeCap setup with TradeCap retained inside user's BalanceManager (capability never leaks)
-- [ ] **PTB-02**: VAULT_SHARE-as-Margin-collateral whitelist verification spike completed; if whitelisted, register and demo; if not, demote to documented-future and demo borrows quote-only — decision recorded with date
+- [x] **PTB-01**: DeepBook Margin BalanceManager + TradeCap setup with TradeCap retained inside user's BalanceManager (capability never leaks)
+- [x] **PTB-02**: VAULT_SHARE-as-Margin-collateral whitelist verification spike completed; if whitelisted, register and demo; if not, demote to documented-future and demo borrows quote-only — decision recorded with date
 - [ ] **PTB-03**: Single PTB opener: `Margin::borrow_quote` → `vault::supply::deposit` → `vault::rebalance::buy_hedge_for_deposit`, atomic rollback on any failure
 - [ ] **PTB-04**: Capability-flow tests proving TradeCap and TreasuryCap<VAULT_SHARE> never escape their owners
 - [ ] **PTB-05**: Liquidation simulation property test: -30% NAV shock against worst-case Predict outcome triggers Margin liquidation path correctly
@@ -182,8 +182,8 @@ Phase mapping finalized by gsd-roadmapper on 2026-05-09 against ROADMAP.md. Ever
 | BACK-08 | Phase 3 | Pending |
 | BACK-09 | Phase 3 | Pending |
 | BACK-10 | Phase 3 | Pending |
-| PTB-01 | Phase 3 | Pending |
-| PTB-02 | Phase 3 | Pending |
+| PTB-01 | Phase 3 | Complete |
+| PTB-02 | Phase 3 | Complete |
 | PTB-03 | Phase 3 | Pending |
 | PTB-04 | Phase 3 | Pending |
 | PTB-05 | Phase 3 | Pending |

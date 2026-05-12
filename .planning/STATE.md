@@ -4,14 +4,14 @@ milestone: v1.1
 milestone_name: milestone
 status: executing
 stopped_at: Phase 3 context gathered
-last_updated: "2026-05-11T04:02:38.380Z"
-last_activity: 2026-05-11 -- Phase 03 planning complete
+last_updated: "2026-05-12T11:40:03.217Z"
+last_activity: 2026-05-12
 progress:
   total_phases: 7
   completed_phases: 3
   total_plans: 35
-  completed_plans: 26
-  percent: 74
+  completed_plans: 27
+  percent: 77
 ---
 
 # Project State
@@ -21,15 +21,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-08)
 
 **Core value:** A working PLP+Hedge vault on DeepBook Predict with a credible, auditable risk dashboard, deployed on mainnet by 2026-06-16. Quality of vault math, backtest, and dashboard polish > component count.
-**Current focus:** Phase 02 — vault-move-package-testnet-deploy
+**Current focus:** Phase 03 — backtest-harness-two-protocol-ptb
 
 ## Current Position
 
-Phase: 02 (vault-move-package-testnet-deploy) — EXECUTING
-Plan: 9 of 9
+Phase: 03 (backtest-harness-two-protocol-ptb) — EXECUTING
+Plan: 2 of 9
 Status: Ready to execute
 Next phase: Phase 2 — Vault & Strategy (PLP+Hedge vault, predict_adapter, rebalance); imports parity-gate-protected svi_view::binary_price; depends on Phase 1
-Last activity: 2026-05-11 -- Phase 03 planning complete
+Last activity: 2026-05-12
 
 Progress: [█████████████████] 100% Phase 1 / 100% milestone
 
@@ -79,6 +79,7 @@ Progress: [█████████████████] 100% Phase 1 / 1
 | Phase 02 P07 | 25min | 3 tasks | 5 files |
 | Phase 02 P08 | 22min | 2 tasks | 6 files |
 | Phase 02 P09 | 10 | 4 tasks | 7 files |
+| Phase 03 P01 | 24min | 4 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -180,6 +181,11 @@ Recent decisions affecting current work:
 - [Phase ?]: VAULT-11 closed: per-push CI runs hermetic Move integration suite (FAST_FORWARD=1); nightly cron runs live testnet PTB cycle (FAST_FORWARD=0) including the real 1h cooldown wait.
 - [Phase ?]: TESTNET-DEPLOY.json is canonical handle: deploy script writes, cycle script reads, dashboard (Phase 4) consumes; placeholder ships with status=pending_first_deploy so per-push CI never fails pre-deploy.
 - [Phase ?]: ci.yml matrix grew 5 to 6 jobs (+e2e-vault); Plans 02-07/02-08 'matrix unchanged' invariant was protecting against ACCIDENTAL additions; deliberate VAULT-11 addition documented in file header.
+- [Phase ?]: Phase 03-01: 5-call PTB shape locked (margin_manager::deposit -> borrow_quote -> withdraw -> vault::supply::supply -> optional VAULT_SHARE re-deposit); CONTEXT.md D-17 amended inline; replaces non-compilable 3-call shape.
+- [Phase ?]: Phase 03-01: @mysten/deepbook-v3 pinned to 1.3.6 (latest), deviation from CLAUDE.md 0.17.0; 0.17.0 has zero Margin builders, 1.3.6 exposes MarginPoolContract + MarginManagerContract + testnetMarginPools dict with live testnet pool IDs.
+- [Phase ?]: Phase 03-01: MARGIN-WHITELIST = UNDETERMINED-FALLBACK-TO-MOCK. deepbook_margin IS deployed on testnet (MARGIN_PACKAGE_ID 0xd6a42f...) but no DUSDC-quoted MarginPool exists; DBUSDC pool exists with different token type. mock_margin_pool fallback per CONTEXT.md D-18. Recheck 2026-06-08.
+- [Phase ?]: Phase 03-01: Runtime budget Q4 PASS (1.33s extrapolated 365-day vs 600s budget, 598.67s headroom). Pitfall 6 escape-hatch not mandatory for v1. nightly-backtest.yml cron slot Q6: 05:00 UTC (cron '0 5 * * *') with timeout-minutes 60.
+- [Phase ?]: Phase 03-01: Q3 LOCKED plp_yield_bps = 0 in v1 PnL accountant; we BUY hedges not provide PLP. Q5 LOCKED u64-as-string JSON convention for cross-runtime event payloads (avoids JS Number 2^53 precision loss).
 
 ### Pending Todos
 
@@ -220,6 +226,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-11T02:31:40.620Z
+Last session: 2026-05-12T11:40:03.197Z
 Stopped at: Phase 3 context gathered
-Resume file: .planning/phases/03-backtest-harness-two-protocol-ptb/03-CONTEXT.md
+Resume file: None

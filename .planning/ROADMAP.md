@@ -145,7 +145,14 @@ Drop in this order, never reverse:
   3. A user can connect their Sui wallet via dApp Kit, click deposit, sign a PTB, and see the resulting vault share + hedge position reflected in the position viewer with PnL attribution split (PLP yield / hedge cost / hedge payoff / net).
   4. Killing the WebSocket connection mid-recording produces an auto-reconnect with no white screen, no stale state, and the staleness indicator on every panel turns red when "last updated" exceeds 30s.
   5. The what-if simulator computes ±5σ joint spot+vol shocked PnL client-side using the shared TS SVI library — sliding the controls produces sub-100ms updates with no relay round-trip.
-**Plans**: TBD
+**Plans**: 7 plans
+- [ ] 04-01-PLAN.md (Wave 0) — Monorepo scaffold: dashboard Vite+React+dApp Kit+Plotly+Recharts install, shadcn init (new-york/slate), provider stack (Pitfall 10), indexer pkg shell, vitest extension
+- [ ] 04-02-PLAN.md (Wave 1) — Node.js relay: queryEvents 2s polling + per-stream cursor + decodeI64 (is_negative correction) + snapshot ring buffer 100/1h + ws server with replay-on-connect + healthz (DASH-01, DASH-02, DASH-03, DASH-13 server side)
+- [ ] 04-03-PLAN.md (Wave 2) — Dashboard shell + WsClient (exp backoff + jitter) + useWebSocket state machine + StalenessPill + Header with ConnectButton (DASH-10, DASH-13 client side)
+- [ ] 04-04-PLAN.md (Wave 3) — SurfacePanel (Plotly type=surface, useMemo+revision) + ArbCheckerPanel (full 200-point g(k) Recharts curve) (DASH-04, DASH-05)
+- [ ] 04-05-PLAN.md (Wave 3) — VaultPanel + BucketGauge + ExposurePanel (Recharts 2D + Table) (DASH-06, DASH-07, DASH-08)
+- [ ] 04-06-PLAN.md (Wave 4) — WhatIfSimulator: spot ±5σ + vol ±2σ sliders, client-side shockedPnL via Phase 1 binaryPrice (DASH-09)
+- [ ] 04-07-PLAN.md (Wave 5) — DepositWithdrawPanel (3-step PTB flow) + PositionViewer (PnL split) + CI extension + Vercel/Render configs + DASH-13 demo checklist (DASH-11, DASH-12, DASH-13 e2e) [contains checkpoint]
 **UI hint**: yes
 
 ### Phase 5: Mainnet Redeploy + Smoke Test

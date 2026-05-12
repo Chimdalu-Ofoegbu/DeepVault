@@ -15,5 +15,11 @@
     "paths": { "@/*": ["./src/*"] },
     "types": ["vitest/globals", "@testing-library/jest-dom"]
   },
-  "include": ["src", "vite.config.ts", "vitest.config.ts", "vitest.setup.ts"]
+  "include": [
+    "src",
+    "vite.config.ts",
+    "vitest.config.ts",
+    "vitest.setup.ts",
+    "../.planning/phases/02-vault-move-package-testnet-deploy/TESTNET-DEPLOY.json"
+  ]
 }

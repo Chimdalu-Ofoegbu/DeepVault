@@ -25,12 +25,15 @@
 import { Header } from './components/layout/Header';
 import { ArbCheckerPanel } from './components/panels/ArbCheckerPanel';
 import { BucketGauge } from './components/panels/BucketGauge';
+import { DepositWithdrawPanel } from './components/panels/DepositWithdrawPanel';
 import { ExposurePanel } from './components/panels/ExposurePanel';
+import { PositionViewer } from './components/panels/PositionViewer';
 import { SurfacePanel } from './components/panels/SurfacePanel';
 import { VaultPanel } from './components/panels/VaultPanel';
 import { WhatIfSimulator } from './components/panels/WhatIfSimulator';
 import { env } from './env';
 import { useExposure } from './hooks/useExposure';
+import { usePositions } from './hooks/usePositions';
 import { useSigmaEstimates } from './hooks/useSigmaEstimates';
 import { useSurfaceSnapshot } from './hooks/useSurfaceSnapshot';
 import { useVaultState } from './hooks/useVaultState';
@@ -42,6 +45,7 @@ export function App() {
   const vaultView = useVaultState(snapshot);
   const hedges = useExposure(snapshot);
   const sigma = useSigmaEstimates(snapshot);
+  const positions = usePositions(snapshot);
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
@@ -81,8 +85,12 @@ export function App() {
         <section data-section="what-if">
           <WhatIfSimulator hedges={hedges} surface={surface} sigma={sigma} />
         </section>
-        <section data-section="deposit-withdraw" />
-        <section data-section="position-viewer" />
+        <section data-section="deposit-withdraw">
+          <DepositWithdrawPanel vaultView={vaultView} />
+        </section>
+        <section data-section="position-viewer">
+          <PositionViewer positions={positions} vault={snapshot?.vault ?? null} />
+        </section>
       </main>
     </div>
   );

@@ -43,3 +43,6 @@ contracts/build/
 contracts/Move.lock
 contracts/.coverage_map.mvcov
 contracts/traces/
+
+# Phase 3 backtest cache (gitignored — large parquet, fetched on demand)
+backtest/data/

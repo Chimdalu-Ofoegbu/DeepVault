@@ -33,8 +33,17 @@ from pathlib import Path
 from typing import Any
 
 import jinja2
-import matplotlib.pyplot as plt
-import plotly.graph_objects as go
+
+# Set matplotlib's backend BEFORE importing pyplot. On a headless Linux CI
+# runner (no DISPLAY), the default TkAgg backend fails at first figure() call.
+# Once pyplot is imported, the backend selection is locked, so this must come
+# first. test_report.py also sets Agg, but module-load order makes report.py
+# the actual lock site.
+import matplotlib
+
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt  # noqa: E402 — backend setup above must precede pyplot import
+import plotly.graph_objects as go  # noqa: E402
 
 # REPO_ROOT discovery — backtest/src/deepvault/report.py -> parents[3] is repo root.
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -244,6 +253,12 @@ def render_html_from_summary(input_path: str | Path, output_path: str | Path) ->
         regime_heatmap_fig=fig_regime,
         output_path=output_path,
     )
+
+    # Close matplotlib figures to avoid the "20+ figures opened" warning
+    # tripping CI memory limits or the runner's figure.max_open_warning.
+    _plt.close(fig_pnl_hist)
+    _plt.close(fig_regime)
+    _plt.close("all")
 
     print(f"report -> {output_path} ({output_path.stat().st_size} bytes)")
     return 0

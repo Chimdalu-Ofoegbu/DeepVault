@@ -88,8 +88,21 @@ separate top-level rebalance call.** Verified empirically by reading vendored so
 
 ### Q1 (DUSDC margin pool exists on testnet?)
 
-See [MARGIN-WHITELIST-DECISION.md](./MARGIN-WHITELIST-DECISION.md) for the dated decision
-and evidence. Result: see that file's `**Result:**` line.
+**Result:** UNDETERMINED-FALLBACK-TO-MOCK (2026-05-12)
+
+The `deepbook_margin` package is not detectably deployed on Sui testnet at the addresses
+our research surface knows about. The Predict registry shared object (`0x43af14fed5480c20ff77e2263d5f794c35b9fab7e2212903127062f4fe2a6e64`)
+exposes only `oracle_ids` and `predict_id` — no margin pool references. Vendored
+`scripts/deepbookv3/packages/deepbook_margin/Move.toml` carries `deepbook_predict = "0x0"`,
+matching "not yet bootstrapped." Predict server REST reachable but returns empty bodies
+on probed paths.
+
+Plans 03-03 + 03-05 ship the **mock_margin_pool fallback** per CONTEXT.md D-18 (three
+artifacts: PROJECT.md scope note, whitepaper slide stub, integration test). The 5-call
+PTB shape is locked regardless.
+
+Full evidence (commands + outputs verbatim): [MARGIN-WHITELIST-DECISION.md](./MARGIN-WHITELIST-DECISION.md).
+Recheck date: 2026-06-08. PTB-02 satisfied via the dated decision in that file.
 
 ### Q2 (Does `@mysten/deepbook-v3@0.17.0` expose MarginPoolContract with borrow_quote/withdraw/deposit builders?)
 

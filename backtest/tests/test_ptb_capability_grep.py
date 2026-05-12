@@ -151,11 +151,7 @@ def test_no_ts_demo_lets_extract_tradecap_outside_sdk_layer():
     #   - scripts/deepbookv3/ (vendored Mysten subtree; their example TS
     #     transactions legitimately use `const tradeCap = ...` — not our
     #     capability-discipline concern)
-    leaks = [
-        m
-        for m in matches
-        if "node_modules" not in m and "deepbookv3" not in m
-    ]
+    leaks = [m for m in matches if "node_modules" not in m and "deepbookv3" not in m]
     assert not leaks, (
         "TS demo extracts capability outside SDK layer:\n"
         + "\n".join(leaks)

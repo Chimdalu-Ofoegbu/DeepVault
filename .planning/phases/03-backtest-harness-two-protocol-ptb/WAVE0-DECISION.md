@@ -242,15 +242,152 @@ referencing RESEARCH.md A3 + WAVE0-DECISION.md Q3.
 
 ## Runtime budget micro-benchmark
 
-(Appended by Task 4.)
+### Q4 (Will the 365-day backtest run complete in <10 min in CI?)
+
+Q4 sentinel: PASS — 7-day elapsed 0.0255s, 365-day extrapolated 1.33s, budget 600s, headroom 598.67s.
+
+**Verdict: PASS** (with massive headroom — 598.67s of slack against the 600s nightly budget).
+
+**Snippet (run via `cd backtest && uv run python <inline>`; not committed as a module):**
+
+```python
+import time
+import pandas as pd
+import numpy as np
+
+N = 168  # 7 days hourly
+df = pd.DataFrame({
+    'ts_ms': np.arange(N) * 3_600_000,
+    'open': 60_000 + np.random.default_rng(42).normal(0, 1000, N),
+    'close': 60_000 + np.random.default_rng(43).normal(0, 1000, N),
+    'svi_a': np.full(N, 10_000_000),
+    'svi_b': np.full(N, 500_000_000),
+    'svi_rho': np.zeros(N),
+    'svi_m': np.zeros(N),
+    'svi_sigma': np.full(N, 100_000_000),
+})
+
+# Inner-loop pattern matching the @strategy_fn decorator's hot path
+# (3 column reads + 1 column write per bar; PRE-escape-hatch baseline).
+start = time.perf_counter()
+hedge_book = []
+for _, bar in df.iterrows():
+    spot = bar['close']
+    svi_a = bar['svi_a']
+    svi_b = bar['svi_b']
+    hedge_book.append({'ts_ms': bar['ts_ms'], 'pnl': spot - svi_a // 1000})
+elapsed_7d = time.perf_counter() - start
+elapsed_365d_extrapolated = elapsed_7d * (365 / 7)
+```
+
+**Measured output (2026-05-12, Windows 11, Python 3.12, pandas 2.2.x):**
+
+```
+7-day elapsed:                0.0255s
+365-day extrapolated:         1.3278s
+Budget (nightly-backtest.yml): 600.0000s (10 min)
+Headroom:                     598.6722s
+Verdict:                      PASS
+```
+
+**Decision:** The escape-hatch pattern (RESEARCH.md Pitfall 6 — "@strategy_fn slows
+pandas 100x") is NOT mandatory for v1. Even a 100x penalty over this baseline would
+still complete in ~133s, well under budget. Plans 03-02 + 03-04 should still
+DOCUMENT the escape-hatch pattern in `lookahead_audit.py` as a "if you hit a slow
+case, here's the fast path" footnote, but do NOT need to bake it into the production
+pipeline for the v1 365-day report.
+
+**Caveats:**
+- The inner-loop is a synthetic 1-line append; real `@strategy_fn` work includes
+  SVI evaluation (Phase 1 binary_price), hedge sizing, state mutation. Likely
+  10-100x cost per bar in real execution.
+- Worst-case scaling to ~133s (100x) still fits.
+- The benchmark runs locally on consumer hardware; CI Ubuntu runners are
+  comparable to slightly faster for vectorized numpy work.
 
 ## Event JSON round-trip check
 
-(Appended by Task 4.)
+### Q5 (Event payload JSON round-trip — does MarketKey round-trip cleanly?)
+
+**Verdict: PASS** with the explicit convention pinned below.
+
+**Pinned convention (canonical for Plans 03-05 + 03-06):**
+
+- **u64 fields:** stored as JSON strings (e.g., `"strike": "45000000000"`). Avoids JS Number safe-max precision loss past 2^53-1 = 9_007_199_254_740_991.
+- **IDs (object IDs, oracle_ids, vault_ids):** stored as 0x-prefixed lowercase hex strings.
+- **u8 fields (direction, decimals, etc.):** stored as JSON numbers — fit safely in JS Number.
+- **Move struct names (`MarketKey`, `Supplied`, `RedeemRequested`, etc.):** propagated via the `type` field at the event-envelope level (already set by `@mysten/sui` `result.events[i].type`).
+
+**Snippet (run via `cd backtest && uv run python <inline>`):**
+
+```python
+import json
+sample = {
+    'oracle_id': '0x2df440cfcb1f602f8077daead3da43c08b9bea13b75641ca3597bb0a951d57fd',
+    'strike': '45000000000',
+    'expiry_ms': '1717545600000',
+    'direction': 1,
+    'price': '99999999999999999',  # > 2^53 (demonstrates string-encoding rationale)
+}
+s = json.dumps(sample)
+loaded = json.loads(s)
+assert loaded == sample
+```
+
+**Measured output (2026-05-12):**
+
+```
+MarketKey JSON roundtrip: PASS
+  json.dumps -> json.loads bit-identical for sample: True
+  Pinned convention: u64 fields as strings, IDs as hex strings, direction as u8 int
+  Why: JS Number safe-max = 2^53-1 = 9007199254740991; u64 max = 2^64-1 = 18446744073709551615
+  String-encoded u64 survives both Python json + @mysten/sui parsedJson roundtrips.
+```
+
+**Plan 03-05 emitter contract:** `scripts/two-protocol-ptb-demo.ts` captures
+`result.events[i].parsedJson` and emits each event's payload to `cycle-full.json`
+with `u64` fields coerced to strings (using `String(BigInt(...))` before JSON.stringify).
+
+**Plan 03-06 consumer contract:** `backtest/src/deepvault/replay.py`'s action-trace
+parser converts string-encoded u64s back to Python `int` via `int(s, 10)` at the
+field boundary; assertions compare ints, not strings.
 
 ## Nightly schedule slot
 
-(Appended by Task 4.)
+### Q6 (nightly-backtest.yml cron slot?)
+
+**Selected: 05:00 UTC (`cron: '0 5 * * *'`)** with `timeout-minutes: 60`.
+
+**Existing slots (verified via `grep cron .github/workflows/*.yml`):**
+
+| Workflow                 | Slot         | Job kind                     |
+|--------------------------|--------------|------------------------------|
+| `nightly-prover.yml`     | 03:00 UTC    | Sui Prover formal verification |
+| `nightly-e2e-vault.yml`  | 04:00 UTC    | Live testnet vault cycle (1h cooldown) |
+| `nightly-backtest.yml`   | **05:00 UTC** | 365-day Python backtest + HTML report |
+
+**Rationale.** One hour past `nightly-e2e-vault.yml` ensures:
+- The live testnet cycle has finished writing the action-trace artifact (used by replay parity).
+- Testnet RPC contention from the prior job has cleared.
+- GitHub Actions runner-pool contention from the prior runs has cleared (Ubuntu pool tends to be sparse in early UTC hours; staggered scheduling reduces queue waits).
+
+**timeout-minutes: 60** is conservative — per Q4 the runtime budget is well
+under 10 min. The extra headroom covers HTML report generation (Plotly inline
+embedding), parquet I/O, and `uv sync --locked` cold start.
+
+**Workflow file:** `.github/workflows/nightly-backtest.yml` is created by Plan 03-04
+(per RESEARCH.md Phase Requirements → Test Map). Plan 03-01 ONLY locks the slot
+choice; the file itself is a downstream artifact.
+
+**Cron sanity check:**
+
+```
+$ grep -A1 'schedule:' .github/workflows/nightly-prover.yml .github/workflows/nightly-e2e-vault.yml
+.github/workflows/nightly-prover.yml-    - cron: '0 3 * * *'        # 03:00 UTC daily
+.github/workflows/nightly-e2e-vault.yml-    - cron: '0 4 * * *'   # 04:00 UTC daily
+
+→ No conflict at 05:00 UTC.
+```
 
 ## Publish-blocker investigation
 

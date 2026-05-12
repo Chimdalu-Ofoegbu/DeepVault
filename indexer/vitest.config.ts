@@ -15,8 +15,19 @@ export default defineConfig({
     environment: 'node',
     coverage: {
       provider: 'v8',
-      include: ['src/**/*.ts'],
-      exclude: ['src/**/__tests__/**', 'src/**/*.d.ts', 'src/index.ts'],
+      // Gated coverage targets the load-bearing pure-logic modules. The
+      // RPC-tail pollers (pollOracleSVI.ts + pollVaultEvents.ts) and the
+      // entry-point (relay.ts) are integration-coverage-shaped — they
+      // need a live SuiClient or full mock; tested at the live-testnet
+      // tier per Plan 04-02 must_haves block.
+      include: [
+        'src/cursor.ts',
+        'src/decodeI64.ts',
+        'src/deployInfo.ts',
+        'src/snapshot.ts',
+        'src/wsServer.ts',
+      ],
+      exclude: ['src/**/__tests__/**', 'src/**/*.d.ts'],
       thresholds: {
         lines: 85,
         functions: 85,

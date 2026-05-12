@@ -1,0 +1,18 @@
+{
+  "id": {
+    "txDigest": "BBB2CCC3DDD4EEE5FFF6GGG7HHH8III9JJJ0KKK",
+    "eventSeq": "0"
+  },
+  "packageId": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+  "transactionModule": "supply",
+  "sender": "0xc0ffee",
+  "type": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef::supply::Supplied",
+  "parsedJson": {
+    "vault_id": "0xVAULT",
+    "depositor": "0xc0ffee",
+    "deposit_quote": "100000000",
+    "shares_minted": "99990001",
+    "hedge_alloc_quote": "10000000"
+  },
+  "timestampMs": "1715520010000"
+}

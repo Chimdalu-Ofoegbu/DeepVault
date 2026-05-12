@@ -1,0 +1,17 @@
+{
+  "id": {
+    "txDigest": "CCC3DDD4EEE5FFF6GGG7HHH8III9JJJ0KKK1LLL",
+    "eventSeq": "0"
+  },
+  "packageId": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+  "transactionModule": "redeem",
+  "sender": "0xc0ffee",
+  "type": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef::redeem::RedeemRequested",
+  "parsedJson": {
+    "vault_id": "0xVAULT",
+    "user": "0xc0ffee",
+    "shares": "50000000",
+    "timestamp_ms": "1715520020000"
+  },
+  "timestampMs": "1715520020000"
+}

@@ -1,0 +1,24 @@
+{
+  "id": {
+    "txDigest": "EEE5FFF6GGG7HHH8III9JJJ0KKK1LLL2MMM3NNN",
+    "eventSeq": "0"
+  },
+  "packageId": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+  "transactionModule": "rebalance",
+  "sender": "0xc0ffee",
+  "type": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef::rebalance::HedgeMinted",
+  "parsedJson": {
+    "vault_id": "0xVAULT",
+    "market_key": {
+      "oracle_id": "0xORACLE_BTC_USD",
+      "expiry_ms": "1716724800000",
+      "strike": "85000000000000",
+      "is_down": true
+    },
+    "quantity": "1000000000",
+    "cost_basis_quote": "10000000",
+    "strike": "85000000000000",
+    "expiry_ms": "1716724800000"
+  },
+  "timestampMs": "1715520010000"
+}

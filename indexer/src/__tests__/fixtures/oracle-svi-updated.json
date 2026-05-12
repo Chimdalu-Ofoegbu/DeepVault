@@ -1,0 +1,20 @@
+{
+  "id": {
+    "txDigest": "AAA1BBB2CCC3DDD4EEE5FFF6GGG7HHH8III9JJJ",
+    "eventSeq": "0"
+  },
+  "packageId": "0xf5ea2b3749c65d6e56507cc35388719aadb28f9cab873696a2f8687f5c785138",
+  "transactionModule": "oracle",
+  "sender": "0xdeadbeef",
+  "type": "0xf5ea2b3749c65d6e56507cc35388719aadb28f9cab873696a2f8687f5c785138::oracle::OracleSVIUpdated",
+  "parsedJson": {
+    "oracle_id": "0xORACLE_BTC_USD",
+    "a": "1500000000",
+    "b": "200000000",
+    "rho": { "magnitude": "300000000", "is_negative": true },
+    "m": { "magnitude": "100000000", "is_negative": false },
+    "sigma": "400000000",
+    "timestamp_ms": "1715520000000"
+  },
+  "timestampMs": "1715520000000"
+}

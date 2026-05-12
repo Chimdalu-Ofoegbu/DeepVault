@@ -132,7 +132,113 @@ the convention.
 
 ## SDK introspection evidence
 
-(Appended by Task 3.)
+### Q2 (Does @mysten/deepbook-v3@0.17.0 expose MarginPoolContract with borrow_quote/withdraw/deposit builders?)
+
+**Selected SDK version pin:** `@mysten/deepbook-v3@1.3.6` (exact, via `pnpm add -w @mysten/deepbook-v3@1.3.6 --save-exact`).
+
+**Deviation from CLAUDE.md:** CLAUDE.md pins `0.17.0` ("Margin Manager TS SDK"). Empirical
+introspection (2026-05-12) shows 0.17.0 does NOT expose Margin builders. Upgraded to
+`1.3.6` (latest npm) with the rationale below.
+
+**Step 1 — 0.17.0 introspection:**
+
+```
+$ pnpm add -w @mysten/deepbook-v3@0.17.0 --save-exact
+$ node -e "const p=require('@mysten/deepbook-v3'); console.log(Object.keys(p).sort().join('\\n'))"
+Account
+BalanceManagerContract
+Balances
+DeepBookAdminContract
+DeepBookClient
+DeepBookConfig
+DeepBookContract
+FlashLoanContract
+GovernanceContract
+Order
+OrderDeepPrice
+VecSet
+
+→ Neither MarginPoolContract nor MarginManagerContract found at top level.
+```
+
+0.17.0 ships only the core DeepBook surface — no Margin Manager exports. The CLAUDE.md
+pin reflects what was current at the time of writing; the Margin builders landed in a
+later release.
+
+**Step 2 — 1.3.6 introspection:**
+
+```
+$ pnpm add -w @mysten/deepbook-v3@1.3.6 --save-exact
+$ node -e "const p=require('@mysten/deepbook-v3'); console.log(Object.keys(p).sort().join('\\n'))"
+Account, BalanceManagerContract, Balances, ConfigurationError, DEEP_SCALAR,
+DeepBookAdminContract, DeepBookClient, DeepBookConfig, DeepBookContract,
+DeepBookError, ErrorMessages, FLOAT_SCALAR, FlashLoanContract, GAS_BUDGET,
+GovernanceContract, MAX_TIMESTAMP, MarginAdminContract, MarginMaintainerContract,
+MarginManagerContract, MarginPoolContract, MarginTPSLContract, Order, OrderDeepPrice,
+OrderType, POOL_CREATION_FEE_DEEP, PRICE_INFO_OBJECT_MAX_AGE_MS, PoolProxyContract,
+ResourceNotFoundError, SelfMatchingOptions, SuiPriceServiceConnection, SuiPythClient,
+ValidationError, VecSet, deepbook, mainnetCoins, mainnetMarginPools, mainnetPackageIds,
+mainnetPools, mainnetPythConfigs, testnetCoins, testnetMarginPools, testnetPackageIds,
+testnetPools, testnetPythConfigs, validateAddress, validateNonEmptyArray,
+validateNonNegativeNumber, validatePositiveNumber, validateRange, validateRequired
+
+→ MarginPoolContract (constructor exposed)
+→ MarginManagerContract (constructor exposed)
+→ testnetMarginPools (SUI, DBUSDC, DEEP, DBTC pool addresses + types)
+→ testnetPackageIds.MARGIN_PACKAGE_ID + MARGIN_REGISTRY_ID
+```
+
+**Decision logic outcome:** 1.3.6 exposes `MarginPoolContract` AND `MarginManagerContract`
+AND a `testnetMarginPools` dictionary mapping pool symbols to live shared object IDs.
+Pinning 1.3.6 is the correct path. **Risk note:** 1.3.6's MarginPoolContract surface
+exposes only `constructor` via `Object.getOwnPropertyNames(prototype)` — the actual
+builder methods may be defined on instances. Plan 03-05's `scripts/two-protocol-ptb-demo.ts`
+will construct an instance and either use the SDK builders or fall back to raw
+`tx.moveCall` if instance methods don't match the 5-call shape (PATTERNS.md Pattern 1
+shows the raw-moveCall version which is the safest path regardless).
+
+**Peer dependency warning:** 1.3.6 declares `@mysten/sui@^2.16.2` as a peer; this repo
+has `@mysten/sui@1.38.0` (from Phase 0). Warning logged but install succeeded. Plan 03-05
+will resolve via `@mysten/sui@2.16.0+` upgrade in lockstep when the demo script needs to
+run.
+
+**Files updated:** `package.json` (`@mysten/deepbook-v3: 1.3.6`), `pnpm-lock.yaml` (lock
+entries for 1.3.6 + its 30 transitive deps).
+
+**Live margin pool inventory (testnet, 2026-05-12):**
+
+| Token  | MarginPool ID                                                       | Type                                                      |
+|--------|---------------------------------------------------------------------|-----------------------------------------------------------|
+| SUI    | `0xcdbbe6a72e639b647296788e2e4b1cac5cea4246028ba388ba1332ff9a382eea` | `0x2::sui::SUI`                                           |
+| DBUSDC | `0xf08568da93834e1ee04f09902ac7b1e78d3fdf113ab4d2106c7265e95318b14d` | `0xf7152c05...::DBUSDC::DBUSDC`                            |
+| DEEP   | `0x610640613f21d9e688d6f8103d17df22315c32e0c80590ce64951a1991378b55` | `0x36dbef86...::deep::DEEP`                                |
+| DBTC   | `0xf3440b4aafcc8b12fc4b242e9590c52873b8238a0d0e52fbf9dae61d2970796a` | `0x6502dae8...::dbtc::DBTC`                                |
+
+Note: DBUSDC ≠ DUSDC (different token types). See MARGIN-WHITELIST-DECISION.md
+"Crucial caveat" for impact analysis.
+
+### Q3 (Predict per-block PLP yield rate for v1 PnL attribution?)
+
+Q3 resolution sentinel: `plp_yield_bps = 0` in v1 (model documented below; cited in pnl_attribution.py docstring).
+
+**Locked v1 model: `plp_yield_bps = 0`.**
+
+We BUY hedges via `predict::mint` (`predict_adapter::mint` → vendored `predict.move`'s mint path),
+not provide PLP via `predict::supply`. The six-column PnL accountant
+(`backtest/src/deepvault/pnl_attribution.py`) per CONTEXT.md D-09:
+
+| Column          | v1 value          | v2 (STRAT-V2-01)          |
+|-----------------|-------------------|---------------------------|
+| `plp_yield_bps` | identically 0     | per-block accrual on Coin<PLP> if held |
+| `hedge_cost_bps`  | sum of premiums paid | unchanged                              |
+| `hedge_payoff_bps` | sum of binary settlements | unchanged                              |
+| `fees_bps`        | 0 (v1)            | strategy-level fees                    |
+| `slippage_bps`    | next-bar VWAP − open | unchanged                              |
+| `gas_bps`         | SUI gas at testnet | mainnet rates                          |
+
+The `plp_yield_bps` column is RESERVED for v2 expansion; v1 implementation MUST emit
+identically zero. Cite this resolution inline in `pnl_attribution.py` docstring
+referencing RESEARCH.md A3 + WAVE0-DECISION.md Q3.
 
 ## Runtime budget micro-benchmark
 

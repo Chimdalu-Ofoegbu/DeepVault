@@ -81,17 +81,64 @@ Predict `Registry` content fields (queried in Step 1 (d)(i)): `[id, oracle_ids, 
 
 Not reachable — Step 1 + Step 2 both indicate the `deepbook_margin` package is not bootstrapped on Sui testnet at the addresses our research surface knows about (CLAUDE.md, vendored Move.toml, predict server, Sui RPC canonical entries). The DUSDC `MarginPool<DUSDC>` shared object cannot be discovered.
 
+### Step 4 (added by Task 3 SDK introspection, 2026-05-12): @mysten/deepbook-v3@1.3.6 exports
+
+After Task 3 installed `@mysten/deepbook-v3@1.3.6` (the latest npm, replacing CLAUDE.md's 0.17.0 pin per the SDK introspection result in WAVE0-DECISION.md "SDK introspection evidence" section), the SDK exposes:
+
+```javascript
+testnetPackageIds.MARGIN_PACKAGE_ID  = "0xd6a42f4df4db73d68cbeb52be66698d2fe6a9464f45ad113ca52b0c6ebd918b6"
+testnetPackageIds.MARGIN_REGISTRY_ID = "0x48d7640dfae2c6e9ceeada197a7a1643984b5a24c55a0c6c023dac77e0339f75"
+
+testnetMarginPools.DBUSDC = {
+  address: "0xf08568da93834e1ee04f09902ac7b1e78d3fdf113ab4d2106c7265e95318b14d",
+  type:    "0xf7152c05930480cd740d7311b5b8b45c6f488e3a53a11c3f74a6fac36a52e0d7::DBUSDC::DBUSDC"
+}
+testnetMarginPools.SUI   = { address: "0xcdbbe6a72e639b647296788e2e4b1cac5cea4246028ba388ba1332ff9a382eea", type: "0x2::sui::SUI" }
+testnetMarginPools.DEEP  = { ... }
+testnetMarginPools.DBTC  = { address: "0xf3440b4aafcc8b12fc4b242e9590c52873b8238a0d0e52fbf9dae61d2970796a", type: "0x6502dae8...::dbtc::DBTC" }
+```
+
+Verified live via Sui RPC `sui_getObject` on the DBUSDC margin pool address:
+
+```
+TYPE: 0xb8620c24c9ea1a4a41e79613d2b3d1d93648d1bb6f6b789a7c8f261c94110e4b::margin_pool::MarginPool<0xf7152c05...::DBUSDC::DBUSDC>
+CONTENT_FIELDS: allowed_deepbook_pools, config, extra_fields, id, positions, protocol_fees, rate_limiter, state, vault
+```
+
+The live MarginPool shared object exists. Note the wrapper package `0xb8620c24...`
+differs from the SDK's `MARGIN_PACKAGE_ID` `0xd6a42f...` — likely an upgrade-cap'd
+version of the package; both refer to the same logical module.
+
+**Crucial caveat:** the live testnet margin pool uses token type `DBUSDC = 0xf7152c05...::DBUSDC::DBUSDC`, which is DIFFERENT from DeepVault's quote token `DUSDC = 0xe95040085976bfd54a1a07225cd46c8a2b4e8e2b6732f140a0fc49850ba73e1a::dusdc::DUSDC` (set in `config/testnet.toml` `[assets].quote_type_tag`). The live pool cannot be used directly without either:
+
+(i) **Adapter route:** swap DUSDC → DBUSDC inside the PTB before the borrow step. This adds two more moveCalls and a Cetus dependency — out of scope for v1.
+
+(ii) **Token migration:** re-deploy the vault using DBUSDC as quote. Touches the Phase 2 vault parameterization (Plan 02-03's `[assets]` block + redeploy). Could be done in Plan 03-09 closeout but is non-trivial.
+
+(iii) **Mock fallback (selected):** keep DUSDC as the vault quote; ship the
+mock_margin_pool integration test that exercises the 5-call shape locally with the
+same token semantics. Live demo on testnet is documented-future.
+
 ## Decision
 
 **Result:** UNDETERMINED-FALLBACK-TO-MOCK
 
-(One of `WHITELISTED-LIVE | NOT-WHITELISTED-FALLBACK-TO-MOCK | UNDETERMINED-FALLBACK-TO-MOCK`.
-The `UNDETERMINED` qualifier is appropriate because we could not even locate the
-`deepbook_margin` package on testnet — distinct from "located it but VAULT_SHARE not
-whitelisted." Per the planner's W2 amendment to Plan 03-01, the
-`EVIDENCE-BLOCKED-NO-NETWORK` sentinel does NOT apply because we DID reach the network
-and got empirically-empty responses — the network is reachable; deepbook_margin is
-absent.)
+(Selected from `WHITELISTED-LIVE | NOT-WHITELISTED-FALLBACK-TO-MOCK | UNDETERMINED-FALLBACK-TO-MOCK`.)
+
+**Rationale.** `deepbook_margin` IS deployed on testnet (MARGIN_PACKAGE_ID `0xd6a42f...`,
+MARGIN_REGISTRY_ID `0x48d7640d...`), with live MarginPools for SUI / DBUSDC / DEEP /
+DBTC. **However, no MarginPool exists for our DeepVault quote token `DUSDC`
+(`0xe95040085976bfd54a1a07225cd46c8a2b4e8e2b6732f140a0fc49850ba73e1a::dusdc::DUSDC`)**.
+The closest available pool, DBUSDC, uses a different token type
+(`0xf7152c05...::DBUSDC::DBUSDC`). DeepVault cannot borrow DUSDC from any testnet
+margin pool today. The decision falls back to `UNDETERMINED-FALLBACK-TO-MOCK` — we
+are NOT blocked by the network (we reached it and confirmed pool inventory), but the
+specific pool we need does not exist. This is qualitatively different from a
+straightforward "VAULT_SHARE not whitelisted" verdict because no DUSDC-quoted
+borrow path exists for ANY collateral, not just VAULT_SHARE.
+
+The planner's W2 sentinel `EVIDENCE-BLOCKED-NO-NETWORK` does NOT apply
+(network reachable; evidence collected; pool inventory enumerated empirically).
 
 ## Implications for Track A
 

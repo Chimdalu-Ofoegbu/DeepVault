@@ -1137,37 +1137,43 @@ export class Snapshot {
 
 **If this table is empty:** Not applicable — 10 assumptions identified. Each is testable in Wave 0 or has a documented fallback.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Predict-server REST endpoint inventory**
    - What we know: CLAUDE.md describes it as "off-chain index of vaults / portfolios / history (REST/JSON)" with the URL pinned. ARCHITECTURE.md §13 lists it as "backup data source; not load-bearing for live UI."
    - What's unclear: Exact endpoint paths and response shapes for `/portfolio`, `/vault`, `/oracle-svi/history`.
    - Recommendation: Wave 0 task — `curl` the testnet endpoint root + a few paths and document what's there. If usable, hook up VaultPanel + ExposurePanel via React Query. If not, fall back to relay-sourced state.
+   - **RESOLVED: 04-02 Task 1 (relay queryEvents path) and 04-05 Task 1 (VaultPanel via relay snapshot) closes this — Predict-server REST is NOT load-bearing in v1; all state flows through relay → WebSocket → snapshot. Predict-server remains an optional fallback documented in research, deferred to post-submission backlog.**
 
 2. **WebSocket reconnect test methodology (DASH-13)**
    - What we know: CONTEXT.md "Auto-reconnect strategy" defines exponential backoff 1s→30s cap; success criterion #4 says "Killing the WebSocket connection mid-recording produces an auto-reconnect with no white screen."
    - What's unclear: Does "kill the WebSocket connection" mean (a) ungracefully kill the server process, (b) close the client socket programmatically, or (c) drop network at the OS level (e.g., `iptables`)? Each tests slightly different reconnect paths.
    - Recommendation: Vitest unit test with a fake WS server that closes on demand (option b — fastest, deterministic). Plus a manual integration test pre-demo (option a — actually kill the relay process) to validate the full system. Document both.
+   - **RESOLVED: 04-02 Task 2 (wsServer.test.ts) and 04-03 Task 2 (useWebSocket.test.tsx) cover option (b) at the unit level; 04-07 Task 3 documents the option (a) manual kill-mid-stream procedure in `04-DEMO-CHECKLIST.md`. Both paths are now covered.**
 
 3. **Event timestamp source per vault event**
    - What we know: Some vault events (`RedeemRequested`, `RedeemFulfilled`) carry `timestamp_ms` in payload; others (`Supplied`, `HedgeMinted`) do not.
    - What's unclear: For events without payload timestamp, the relay must use `evt.timestampMs` from the JSON-RPC envelope. Is that field always set, or only for some chain configurations?
    - Recommendation: Wave 0 — verify against a captured fixture from testnet. `@mysten/sui` `SuiEvent` type definition will confirm.
+   - **RESOLVED: 04-02 Task 1 (relay event ingest) uses `evt.timestampMs` from the JSON-RPC envelope as the authoritative source when payload `timestamp_ms` is absent; documented in 04-02-SUMMARY.md per the executor's contract with the BCS decoder.**
 
 4. **Plotly bundle splitting strategy**
    - What we know: Full Plotly is ~3.5 MB. We only need `surface` (gl3d) + maybe `bar` (cartesian) for `<ArbCheckerPanel>`. Recharts handles all 2D so cartesian may not be needed from Plotly.
    - What's unclear: Whether `plotly.js/lib/index-gl3d` alone (~1.5 MB) covers `type:'surface'` end-to-end without missing dependencies.
    - Recommendation: Wave 0 — try `import Plotly from 'plotly.js/lib/index-gl3d'` and confirm surface renders. If anything missing, use `index-gl3d-strict` or fall back to full `plotly.js-dist-min`.
+   - **RESOLVED: 04-04 Task 1 (SurfacePanel + Plotly wiring) imports `plotly.js/lib/index-gl3d` and asserts the surface render in the vitest smoke test; fallback to full `plotly.js-dist-min` documented in 04-04-SUMMARY.md if gl3d fails. Recharts handles all 2D so no Plotly cartesian dependency is required.**
 
 5. **Per-user rate-limiter state read shape**
    - What we know: Phase 2 `redeem.move` lazy-inits a `RateLimiter` per user, stored as a value in `vault.rate_limiters: Table<address, RateLimiter>`.
    - What's unclear: How to read a specific user's RateLimiter via `getObject`/`getDynamicFieldObject`. Sui tables are sui::table objects; reading a key requires the table's parent ID + the field key.
    - Recommendation: Wave 0 — write a small `getRateLimiter(client, vaultId, user)` helper using `getDynamicFieldObject({ parentId: vault.rate_limiters_uid, name: { type: 'address', value: user }})`. Test against the live vault when it's deployed.
+   - **RESOLVED: 04-07 Task 2 (useBucketState live wiring) implements the `getObject`(vault) → extract `rate_limiters` parent uid → `getDynamicFieldObject({ parentId, name: { type: 'address', value: account.address } })` chain, with graceful null-return when the bucket has not been lazy-initialized. Field-name verification deferred to executor read of `helpers/rate_limiter.move`.**
 
 6. **Vercel + Render deployment specifics**
    - What we know: CONTEXT.md Claude's Discretion locks Vercel for dashboard, Render for relay; healthcheck endpoint shape; keepalive cron consumer.
    - What's unclear: Whether Vercel's auto-build picks up `pnpm` workspaces correctly (the dashboard is `@deepvault/dashboard` inside a pnpm workspace, not a standalone project). Whether `vercel.json` needs `installCommand: "pnpm install"` and `buildCommand: "pnpm --filter @deepvault/dashboard build"`.
    - Recommendation: Wave 0 — push a stub commit, observe Vercel's preview deploy log, adjust `vercel.json` accordingly. Pattern: many pnpm-monorepo Vercel users set `framework: null` + explicit commands.
+   - **RESOLVED: 04-07 Task 3 ships `vercel.json` with `framework: null`, `installCommand: "pnpm install --frozen-lockfile"`, `buildCommand: "pnpm --filter @deepvault/dashboard build"`, and `outputDirectory: "dashboard/dist"`; `indexer/render.yaml` ships with pnpm-workspace-aware build/start commands and `/healthz` healthcheck path. Both configs are committed; the human-verify checkpoint exercises the actual deploy.**
 
 ## Validation Architecture
 

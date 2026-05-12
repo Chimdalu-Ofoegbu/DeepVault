@@ -1,28 +1,34 @@
 // dashboard/src/App.tsx — Layout shell wired with the WebSocket relay client
-// (Plan 04-03 Task 3). Section order is LOCKED per UI-SPEC D-05:
+// (Plan 04-03 Task 3) and the Wave 3 hero panels (Plan 04-04). Section order
+// is LOCKED per UI-SPEC D-05:
 //
-//   1. Hero (SurfacePanel — Plan 04)
-//   2. ArbCheckerPanel (Plan 04)
-//   3. VaultPanel + BucketGauge (Plan 05)
-//   4. ExposurePanel (Plan 05)
-//   5. WhatIfSimulator (Plan 06)
-//   6. DepositWithdrawPanel (Plan 07)
-//   7. PositionViewer (Plan 07)
-//
-// Sections are empty `<section data-section="...">` placeholders so downstream
-// plans can inject panels without touching this shell.
+//   1. Hero (SurfacePanel)             — Plan 04-04 (this plan)
+//   2. ArbCheckerPanel                  — Plan 04-04 (this plan)
+//   3. VaultPanel + BucketGauge         — Plan 05
+//   4. ExposurePanel                    — Plan 05
+//   5. WhatIfSimulator                  — Plan 06
+//   6. DepositWithdrawPanel             — Plan 07
+//   7. PositionViewer                   — Plan 07
 //
 // The Header (sticky, contains ConnectButton + GlobalStalenessPill +
 // RelayStatusPill) consumes the WS state machine. When the relay is down for
 // >=60s, an inline alert appears above the section grid per UI-SPEC §WebSocket
 // reconnect "RELAY DOWN body inline alert".
+//
+// Surface flows: useWebSocket -> snapshot -> useSurfaceSnapshot -> SurfacePanel
+// + ArbCheckerPanel. The same SurfaceView projection feeds both hero panels so
+// downstream Plans 04-05+ can compose additional consumers from the same hook.
 
 import { Header } from './components/layout/Header';
-import { useWebSocket } from './hooks/useWebSocket';
+import { ArbCheckerPanel } from './components/panels/ArbCheckerPanel';
+import { SurfacePanel } from './components/panels/SurfacePanel';
 import { env } from './env';
+import { useSurfaceSnapshot } from './hooks/useSurfaceSnapshot';
+import { useWebSocket } from './hooks/useWebSocket';
 
 export function App() {
   const { state, snapshot } = useWebSocket(env.relayWsUrl);
+  const surface = useSurfaceSnapshot(snapshot);
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
@@ -43,8 +49,12 @@ export function App() {
             </p>
           </div>
         )}
-        <section data-section="hero" />
-        <section data-section="arb-checker" />
+        <section data-section="hero">
+          <SurfacePanel surface={surface} />
+        </section>
+        <section data-section="arb-checker">
+          <ArbCheckerPanel surface={surface} />
+        </section>
         <section data-section="vault-bucket" />
         <section data-section="exposure" />
         <section data-section="what-if" />

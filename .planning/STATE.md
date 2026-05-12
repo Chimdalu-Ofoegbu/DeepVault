@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-02-PLAN.md
-last_updated: "2026-05-12T12:41:34.465Z"
+stopped_at: Completed 03-05-PLAN.md
+last_updated: "2026-05-12T13:04:21.915Z"
 last_activity: 2026-05-12
 progress:
   total_phases: 7
   completed_phases: 3
   total_plans: 35
-  completed_plans: 30
-  percent: 86
+  completed_plans: 31
+  percent: 89
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 03 (backtest-harness-two-protocol-ptb) — EXECUTING
-Plan: 5 of 9
+Plan: 6 of 9
 Status: Ready to execute
 Next phase: Phase 2 — Vault & Strategy (PLP+Hedge vault, predict_adapter, rebalance); imports parity-gate-protected svi_view::binary_price; depends on Phase 1
 Last activity: 2026-05-12
@@ -83,6 +83,7 @@ Progress: [█████████████████] 100% Phase 1 / 1
 | Phase 03 P02 | 35min | 3 tasks | 6 files |
 | Phase 03 P03 | 45min | 3 tasks | 4 files |
 | Phase 03 P04 | 25min | 2 tasks | 5 files |
+| Phase 03 P05 | 30min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -197,6 +198,10 @@ Recent decisions affecting current work:
 - [Phase ?]: Plan 03-04: VaultState Python state machine mirrors Move bit-for-bit; W3 LOCK PyRateLimiter ports per-user time-decay token bucket so Plan 03-06 trace replay does not diverge on repeat redeems by the same user
 - [Phase ?]: Plan 03-04: lookahead_audit.py is the second numpy-allowed module after arb_checker (ALLOWED HERE pattern); shuffled_label_sanity returns dict alpha+p_value; Plan 03-08 wires |alpha|<=0.005 as hard CI gate (D-06)
 - [Phase ?]: Plan 03-04: redeem_fulfill uses ceiling division on shares_consumed to mirror Move math::mul_div_round_up (redeem.move:149-153) preserving round-down-in-vault-favor (Pitfall 12)
+- [Phase ?]: Phase 03-05: Complete 5-call PTB driver lands in scripts/two-protocol-ptb-demo.ts; closes PTB-03 + PTB-06
+- [Phase ?]: Phase 03-05: Three-layer capability enforcement live — Move type system + ptb_capability_test.move (4/4 PASS) + test_ptb_capability_grep.py (5/5 PASS); closes PTB-04
+- [Phase ?]: Phase 03-05 Rule 3 deviation: MockMarginPool disposal uses sui::test_utils::destroy (not transfer::transfer) — pool is key-only; cross-module transfer is rejected by E02009
+- [Phase ?]: Phase 03-05 scope: CI wiring for test_ptb_capability_grep.py DEFERRED to Plan 03-09 per plan body 'this plan ships the test only'
 
 ### Pending Todos
 
@@ -237,6 +242,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-12T12:40:35.126Z
-Stopped at: Completed 03-02-PLAN.md
+Last session: 2026-05-12T13:04:21.901Z
+Stopped at: Completed 03-05-PLAN.md
 Resume file: None

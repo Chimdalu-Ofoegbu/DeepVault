@@ -86,15 +86,16 @@ jobs:
 
       - name: Move tests (Phase 3 -- mock_margin_pool + ptb_capability_test + liquidation_test)
         # Plan 03-09 W1 sub-task 3b: smoke-checks for Phase 3 Move tests.
-        # Filters are positional in sui CLI 1.71.1 (NOT --filter). Tests
-        # gracefully report 0 cases on plans not yet landed; survives partial-
-        # wave landing per FAST_FORWARD non-strict-filter convention.
+        # Filter is positional in sui CLI 1.71.1 (NOT --filter). Tests gracefully
+        # report 0 cases on plans not yet landed; survives partial-wave landing.
+        # --skip-fetch-latest-git-deps was removed in Sui CLI 1.71.1 (fetch is
+        # automatic); regression caught post-Plan-03-09 and dropped here.
         working-directory: contracts
         run: |
           set -euo pipefail
-          sui move test --gas-limit 100000000000 --skip-fetch-latest-git-deps mock_margin_pool
-          sui move test --gas-limit 100000000000 --skip-fetch-latest-git-deps ptb_capability_test
-          sui move test --gas-limit 100000000000 --skip-fetch-latest-git-deps liquidation_test
+          sui move test --gas-limit 100000000000 mock_margin_pool
+          sui move test --gas-limit 100000000000 ptb_capability_test
+          sui move test --gas-limit 100000000000 liquidation_test
           echo "==> Phase 3 Move tests: PTB-04 + PTB-05 + mock_margin_pool PASS"
 
       - name: Capability containment grep (VAULT-10 + PTB-04 Margin-side extension)

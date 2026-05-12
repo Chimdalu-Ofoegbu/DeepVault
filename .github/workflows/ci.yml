@@ -208,23 +208,24 @@ jobs:
         run: uv run ruff format --check .
 
       - name: Test
-        # -v surfaces failing test names; --tb=short keeps logs readable;
-        # on failure, dump pytest output to GITHUB_STEP_SUMMARY so the
-        # public Actions UI shows failing tests without needing log auth.
+        # -v surfaces failing test names; on failure, emit `::error::`
+        # markers per FAILED line so the check-run annotations API
+        # picks them up (visible without log-read auth).
         run: |
-          set -o pipefail
-          uv run pytest -v --tb=short 2>&1 | tee /tmp/pytest.log || EXIT=$?
-          if [[ -n "${EXIT:-}" ]]; then
-            echo "## Pytest failures" >> "$GITHUB_STEP_SUMMARY"
-            echo '```' >> "$GITHUB_STEP_SUMMARY"
-            grep -E "^FAILED|^ERROR|^E " /tmp/pytest.log | head -50 >> "$GITHUB_STEP_SUMMARY"
-            echo '```' >> "$GITHUB_STEP_SUMMARY"
-            echo "## Last 60 lines" >> "$GITHUB_STEP_SUMMARY"
-            echo '```' >> "$GITHUB_STEP_SUMMARY"
-            tail -60 /tmp/pytest.log >> "$GITHUB_STEP_SUMMARY"
-            echo '```' >> "$GITHUB_STEP_SUMMARY"
-            exit "$EXIT"
+          set +e
+          uv run pytest -v --tb=short 2>&1 | tee /tmp/pytest.log
+          EXIT=${PIPESTATUS[0]}
+          if [ "$EXIT" -ne 0 ]; then
+            echo "::group::Pytest failure summary"
+            grep -E "^FAILED|^ERROR" /tmp/pytest.log | head -30 | while IFS= read -r line; do
+              echo "::error::$line"
+            done
+            echo "::endgroup::"
+            echo "::group::Last 80 lines of pytest output"
+            tail -80 /tmp/pytest.log
+            echo "::endgroup::"
           fi
+          exit "$EXIT"
 
       - name: 7-day micro-fixture replay parity (BACK-04 per-push gate)
         # Plan 03-09 W1 sub-task 3a: explicit log step for the 7-day micro-

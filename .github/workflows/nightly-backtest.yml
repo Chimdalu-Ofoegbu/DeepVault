@@ -1,0 +1,103 @@
+# .github/workflows/nightly-backtest.yml
+# Nightly 365-day backtest workflow.
+#
+# Runs the full handbook-grade backtest:
+#   - data_ingest: fetch BTC OHLCV from CryptoDataDownload (cached after first run)
+#   - walk_forward: monthly calibration loop over 365 days
+#   - pnl_attribution: six-column accountant
+#   - lookahead_audit: shuffled-label test (BACK-06 gate)
+#   - report: HTML institutional report
+#
+# Cron offset (05:00 UTC) is intentionally one hour past nightly-e2e-vault.yml
+# (04:00 UTC) and two hours past nightly-prover.yml (03:00 UTC) so the three
+# nightlies do not contend for the same runner pool or testnet RPC window.
+# Per WAVE0-DECISION.md Q6.
+#
+# Per CONTEXT.md Claude's Discretion (CI cost budget):
+#   - Per-push CI uses backtest/traces/micro-fixture-7d.json (fast)
+#   - This nightly workflow runs the full 365-day backtest + uploads
+#     backtest/reports/full-365d-* as workflow artifacts
+#
+# Plan 03-09 W4 part 2 amendment: invokes the REAL CLI
+# `python -m deepvault walk_forward --window-days 365 ...` (shipped by Plan
+# 03-08 __main__.py). The prior masking-fallback shell idiom is REMOVED so
+# the job actually fails when the CLI breaks, instead of producing a
+# misleading PASS.
+
+name: Nightly backtest (full 365-day)
+
+on:
+  schedule:
+    - cron: '0 5 * * *'   # 05:00 UTC daily (per WAVE0-DECISION.md Q6)
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  backtest:
+    name: 365-day backtest + HTML report
+    runs-on: ubuntu-latest
+    timeout-minutes: 60     # per WAVE0-DECISION.md Q6 budget (Q4 measured 1.33s extrapolated)
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install uv
+        # Pinned to exact v8.1.0 — astral-sh/setup-uv doesn't publish a
+        # floating v8 major tag, so `@v8` fails to resolve at runner setup.
+        # Matches ci.yml python job pin.
+        uses: astral-sh/setup-uv@v8.1.0
+        with:
+          version: 'latest'
+          enable-cache: true
+          cache-dependency-glob: 'backtest/uv.lock'
+
+      - name: Install Python deps
+        working-directory: backtest
+        run: uv sync --locked --all-extras --dev
+
+      - name: 7-day micro-fixture parity (smoke check before full run)
+        working-directory: backtest
+        run: |
+          set -euo pipefail
+          uv run pytest tests/test_replay_parity.py -x
+
+      - name: Run full 365-day backtest
+        # Plan 03-09 W4 part 2 lock: real CLI invocation. NO masking
+        # fallback — let the job fail loudly if the CLI breaks.
+        working-directory: backtest
+        run: |
+          set -euo pipefail
+          mkdir -p reports
+          uv run python -m deepvault walk_forward --window-days 365 --out reports/full-365d-backtest.json
+
+      - name: Render full HTML report
+        working-directory: backtest
+        run: |
+          set -euo pipefail
+          uv run python -m deepvault report --input reports/full-365d-backtest.json --output reports/full-365d-report.html
+
+      - name: Upload full-365d artifacts
+        # Plan 03-09 W4 part 2 acceptance: retention-days: 30, error if no
+        # files found so a silent rename catches in CI rather than
+        # post-mortem.
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-365d-backtest
+          path: |
+            backtest/reports/full-365d-backtest.json
+            backtest/reports/full-365d-report.html
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Backtest summary
+        if: success()
+        run: |
+          echo "Nightly backtest complete (365-day window)"
+          echo "Artifacts uploaded as: full-365d-backtest"
+          echo "  - backtest/reports/full-365d-backtest.json"
+          echo "  - backtest/reports/full-365d-report.html"

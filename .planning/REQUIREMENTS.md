@@ -52,7 +52,7 @@ Requirements for the Sui Overflow 2026 submission (target 2026-06-16). Each maps
 - [x] **BACK-07**: Walk-forward methodology only; out-of-sample 30% of history held back; no parameter tuning on the held-back set
 - [x] **BACK-08**: PnL attribution including fees, funding, slippage; separate columns for PLP yield, hedge cost, hedge payoff
 - [x] **BACK-09**: Drawdown calculator + max-drawdown report; Sharpe and Sortino on out-of-sample
-- [ ] **BACK-10**: Exportable institutional-grade report (HTML or PDF) with assumption ledger, charts, and tables — passes the cold-read test
+- [x] **BACK-10**: Exportable institutional-grade report (HTML or PDF) with assumption ledger, charts, and tables — passes the cold-read test
 
 ### Composability — Two-Protocol PTB
 
@@ -181,7 +181,7 @@ Phase mapping finalized by gsd-roadmapper on 2026-05-09 against ROADMAP.md. Ever
 | BACK-07 | Phase 3 | Complete |
 | BACK-08 | Phase 3 | Complete |
 | BACK-09 | Phase 3 | Complete |
-| BACK-10 | Phase 3 | Pending |
+| BACK-10 | Phase 3 | Complete |
 | PTB-01 | Phase 3 | Complete |
 | PTB-02 | Phase 3 | Complete |
 | PTB-03 | Phase 3 | Complete |

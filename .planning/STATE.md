@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
-status: executing
-stopped_at: Completed 03-07-PLAN.md
-last_updated: "2026-05-12T14:04:08.137Z"
+status: verifying
+stopped_at: Completed 03-09-PLAN.md (Phase 3 CLOSED)
+last_updated: "2026-05-12T14:37:29.361Z"
 last_activity: 2026-05-12
 progress:
   total_phases: 7
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 35
-  completed_plans: 34
-  percent: 97
+  completed_plans: 35
+  percent: 100
 ---
 
 # Project State
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 
 Phase: 03 (backtest-harness-two-protocol-ptb) — EXECUTING
 Plan: 9 of 9
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Next phase: Phase 2 — Vault & Strategy (PLP+Hedge vault, predict_adapter, rebalance); imports parity-gate-protected svi_view::binary_price; depends on Phase 1
 Last activity: 2026-05-12
 
@@ -87,6 +87,7 @@ Progress: [█████████████████] 100% Phase 1 / 1
 | Phase 03 P06 | 35min | 3 tasks | 5 files |
 | Phase 03 P07 | 35min | 2 tasks | 2 files |
 | Phase 03 P08 | 50min | 3 tasks | 6 files |
+| Phase 03 P09 | 30min | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -212,6 +213,7 @@ Recent decisions affecting current work:
 - [Phase ?]: Phase 03-08: BACK-07/08/09 wired — walk_forward + sensitivity_table + six-column PnL accountant; v1 ratio LOCKED at ALLOCATION_BPS=1000 regardless of sensitivity findings (no retrospective tuning); BARS_PER_YEAR=8760; rf=0; gas=1bp/PTB; slippage=(next-bar VWAP - next-bar open)/open × 10000
 - [Phase ?]: Phase 03-08: WalkForwardResult shipped with equity_curve + actions fields (9 total, not 7) so Plan 03-09 HTML report renderer + __main__.py CLI both have a stable contract
 - [Phase ?]: Phase 03-08: __main__.py CLI W4 lock closes BACK-05 gap — Plan 03-09 nightly-backtest.yml can drop '|| echo' fallback and invoke python -m deepvault walk_forward --window-days 365 --out reports/full-365d.json directly
+- [Phase ?]: [Phase 03]: Plan 03-09 PHASE 3 CLOSED — BACK-10 institutional HTML report ships at 95% coverage; nightly-backtest.yml invokes real 365-day CLI (W4 lock — no masking fallback); 6-job ci.yml matrix names preserved; capability containment grep extended to TradeCap/MarginManager/MockMarginPool + TS demo no-free-binding; W6 template extension adds per-trade table + IV surface evolution; W5 e2e test loads micro-fixture-7d.json + asserts 11 D-13 anchors + HTML >= 50 KB; D-07 hand-recompute notebook ships 9 cells with to-the-wei asserts
 
 ### Pending Todos
 
@@ -252,6 +254,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-12T14:04:08.118Z
-Stopped at: Completed 03-07-PLAN.md
+Last session: 2026-05-12T14:37:29.333Z
+Stopped at: Completed 03-09-PLAN.md (Phase 3 CLOSED)
 Resume file: None

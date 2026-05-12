@@ -133,7 +133,7 @@ Drop in this order, never reverse:
 - [x] 03-06-PLAN.md (Wave 3, Track B) - replay.py simulate() + replay_trace() CLI + e2e-vault-cycle.ts trace dump + 7-day micro-fixture + 1-wei parity test (BACK-04, BACK-05 trace capture)
 - [x] 03-07-PLAN.md (Wave 3, Track A) - liquidation_test.move at -30% NAV shock + Python test_liquidation_parity.py cross-asserting worst_case_nav at 1-wei (PTB-05)
 - [x] 03-08-PLAN.md (Wave 4, Track B) - walk_forward.py + pnl_attribution.py with 6-column accountant + Sharpe/Sortino/drawdown on OOS (BACK-07, BACK-08, BACK-09)
-- [ ] 03-09-PLAN.md (Wave 5, Track B + closure) - report.py + report.html.j2 + hand-recompute.ipynb + ci.yml per-push micro-fixture + nightly-backtest.yml + Margin-side capability grep (BACK-05 closure, BACK-09, BACK-10, PTB-04 grep gate)
+- [x] 03-09-PLAN.md (Wave 5, Track B + closure) - report.py + report.html.j2 + hand-recompute.ipynb + ci.yml per-push micro-fixture + nightly-backtest.yml + Margin-side capability grep (BACK-05 closure, BACK-09, BACK-10, PTB-04 grep gate)
 
 ### Phase 4: PLP Risk Studio Dashboard + Relay
 **Goal**: A live React dashboard streaming SVI surface updates from a Node.js event relay, with vault panels, arbitrage checker, what-if simulator, and dApp Kit deposit/withdraw flows — running end-to-end against the testnet vault.

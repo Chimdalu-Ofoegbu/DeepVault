@@ -165,17 +165,41 @@ def test_walk_forward_handles_empty_data(tmp_path, monkeypatch):
     assert summary["oos_sharpe"] == 0.0
 
 
-def test_report_subcommand_returns_1_when_module_missing(tmp_path):
-    """report subcommand returns 1 when deepvault.report is not yet installed
-    (Plan 03-09 wires the body)."""
+def test_report_subcommand_succeeds_after_plan_03_09(tmp_path):
+    """report subcommand returns 0 and writes HTML when given a valid summary
+    JSON. Plan 03-09 wired deepvault.report.render_html_from_summary; before
+    Plan 03-09 this returned 1 with an "module not installed" stderr message.
+    """
     input_path = tmp_path / "in.json"
-    input_path.write_text("{}", encoding="utf-8")
+    # Minimal walk_forward summary shape (matches __main__.py output schema).
+    input_path.write_text(
+        '{"window_days": 7, "bars": 168, "oos_sharpe": 1.0, "oos_sortino": 1.2,'
+        ' "oos_max_drawdown_bps": -200, "oos_underwater_bars": 12,'
+        ' "sensitivity_table": [], "pnl_attribution_summary":'
+        ' {"total_bps_mean": 0.0, "total_bps_min": 0.0, "total_bps_max": 0.0}}',
+        encoding="utf-8",
+    )
     out_path = tmp_path / "out.html"
     rc = main_mod.main(
         ["report", "--input", str(input_path), "--output", str(out_path)]
     )
-    # Module not yet installed -> rc == 1.
-    assert rc == 1
+    assert rc == 0
+    assert out_path.exists()
+    # Sanity-check the rendered HTML contains key section anchors.
+    html = out_path.read_text(encoding="utf-8")
+    assert "Executive Summary" in html
+    assert "Hand Recompute" in html
+
+
+def test_report_subcommand_returns_nonzero_when_input_missing(tmp_path):
+    """report subcommand returns non-zero when --input path doesn't exist."""
+    missing = tmp_path / "does-not-exist.json"
+    out_path = tmp_path / "out.html"
+    rc = main_mod.main(
+        ["report", "--input", str(missing), "--output", str(out_path)]
+    )
+    assert rc != 0
+    assert not out_path.exists()
 
 
 def test_missing_subcommand_exits_nonzero():

@@ -4,14 +4,14 @@ milestone: v1.1
 milestone_name: milestone
 status: executing
 stopped_at: Completed 03-07-PLAN.md
-last_updated: "2026-05-12T13:45:46.878Z"
+last_updated: "2026-05-12T14:04:08.137Z"
 last_activity: 2026-05-12
 progress:
   total_phases: 7
   completed_phases: 3
   total_plans: 35
-  completed_plans: 33
-  percent: 94
+  completed_plans: 34
+  percent: 97
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 03 (backtest-harness-two-protocol-ptb) — EXECUTING
-Plan: 8 of 9
+Plan: 9 of 9
 Status: Ready to execute
 Next phase: Phase 2 — Vault & Strategy (PLP+Hedge vault, predict_adapter, rebalance); imports parity-gate-protected svi_view::binary_price; depends on Phase 1
 Last activity: 2026-05-12
@@ -86,6 +86,7 @@ Progress: [█████████████████] 100% Phase 1 / 1
 | Phase 03 P05 | 30min | 3 tasks | 4 files |
 | Phase 03 P06 | 35min | 3 tasks | 5 files |
 | Phase 03 P07 | 35min | 2 tasks | 2 files |
+| Phase 03 P08 | 50min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -208,6 +209,9 @@ Recent decisions affecting current work:
 - [Phase ?]: Phase 03-07: PTB-05 closed — Move liquidation_test.move (3 tests) + Python test_liquidation_parity.py (11 tests) cross-assert worst_case_nav at 1-wei tolerance under -30% shock anchor (wcn_pre=9_009_900_990, wcn_post=6_306_930_693)
 - [Phase ?]: Phase 03-07: Compound -60% shock model adopted for the integration test — pure -30% balance shock at 50% LTV-open does not algebraically cross 1.15 risk gate; D-20's 'binary expires worthless AND vault collateral drops 30%' compounds to -60% effective magnitude on liquid balance
 - [Phase ?]: Phase 03-07: expected_failure cross-module pattern locked — abort_code = 603, location = deepvault::mock_margin_pool (mirrors integration_test.move:216 pattern for EPredictMisquote)
+- [Phase ?]: Phase 03-08: BACK-07/08/09 wired — walk_forward + sensitivity_table + six-column PnL accountant; v1 ratio LOCKED at ALLOCATION_BPS=1000 regardless of sensitivity findings (no retrospective tuning); BARS_PER_YEAR=8760; rf=0; gas=1bp/PTB; slippage=(next-bar VWAP - next-bar open)/open × 10000
+- [Phase ?]: Phase 03-08: WalkForwardResult shipped with equity_curve + actions fields (9 total, not 7) so Plan 03-09 HTML report renderer + __main__.py CLI both have a stable contract
+- [Phase ?]: Phase 03-08: __main__.py CLI W4 lock closes BACK-05 gap — Plan 03-09 nightly-backtest.yml can drop '|| echo' fallback and invoke python -m deepvault walk_forward --window-days 365 --out reports/full-365d.json directly
 
 ### Pending Todos
 
@@ -248,6 +252,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-12T13:45:46.858Z
+Last session: 2026-05-12T14:04:08.118Z
 Stopped at: Completed 03-07-PLAN.md
 Resume file: None

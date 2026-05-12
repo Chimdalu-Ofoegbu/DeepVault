@@ -66,9 +66,19 @@ Six columns sum to total return per bar:
 - `hedge_payoff_bps`: Settlement payoffs received per bar.
 - `fees_bps`: Strategy-level fees. **v1 = 0 per Phase 2 D-13.**
 - `slippage_bps`: Next-bar VWAP minus next-bar open (BACK-08 pessimistic fills).
-- `gas_bps`: Sui gas at testnet prices. **Assumption: 1 bp per supply, 0.5 bp
-  per roll, 0 bp on non-tx bars.** Calibrated against `result.effects.gasUsed`
-  in Plan 03-08.
+- `gas_bps`: Sui gas at testnet prices. **Assumption: 1 bp per PTB** (supply,
+  hedge_mint, roll, redeem_request, redeem_fulfill, redeem_cancel — every
+  state-mutating action contributes 1 bp; non-tx bars contribute 0).
+  Documented because real gas is signer-dependent and varies bar-to-bar; the
+  deterministic model is calibrated against `result.effects.gasUsed` once the
+  full 365-day cycle-full.json artifact lands (Plan 03-09 cross-check).
+  Implemented in `backtest/src/deepvault/pnl_attribution.py` Plan 03-08.
+- `slippage_bps`: **Defined as `(next-bar VWAP − next-bar open) / next-bar open
+  × 10_000`** (BACK-08 pessimistic-fill convention). Slippage is negative when
+  next-bar opens above its VWAP — the bar's intra-bar prints walked DOWN, so
+  the supply's market fill was worse than the next bar's open. When no next
+  bar exists (the action lands on the last bar of the window) or next-bar
+  volume is zero, slippage is recorded as 0. Implemented in Plan 03-08.
 
 ## Sharpe / Sortino / Drawdown (D-10 / BACK-09)
 

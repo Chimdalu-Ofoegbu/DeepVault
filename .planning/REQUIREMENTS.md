@@ -49,9 +49,9 @@ Requirements for the Sui Overflow 2026 submission (target 2026-06-16). Each maps
 - [x] **BACK-04**: Trace-replay parity test: same input trace produces identical NAV/share state in Move (testnet PTB sequence) and Python (within 1 wei)
 - [x] **BACK-05**: 30+ days of replayed history across normal markets, trending markets, and at least one stress event (-3σ+ BTC move)
 - [x] **BACK-06**: Lookahead-bias audit harness — assumption ledger as a markdown file, shuffled-label sanity test (must produce ~zero alpha), manual hand-recompute on 3 randomly-sampled trade rows
-- [ ] **BACK-07**: Walk-forward methodology only; out-of-sample 30% of history held back; no parameter tuning on the held-back set
-- [ ] **BACK-08**: PnL attribution including fees, funding, slippage; separate columns for PLP yield, hedge cost, hedge payoff
-- [ ] **BACK-09**: Drawdown calculator + max-drawdown report; Sharpe and Sortino on out-of-sample
+- [x] **BACK-07**: Walk-forward methodology only; out-of-sample 30% of history held back; no parameter tuning on the held-back set
+- [x] **BACK-08**: PnL attribution including fees, funding, slippage; separate columns for PLP yield, hedge cost, hedge payoff
+- [x] **BACK-09**: Drawdown calculator + max-drawdown report; Sharpe and Sortino on out-of-sample
 - [ ] **BACK-10**: Exportable institutional-grade report (HTML or PDF) with assumption ledger, charts, and tables — passes the cold-read test
 
 ### Composability — Two-Protocol PTB
@@ -178,9 +178,9 @@ Phase mapping finalized by gsd-roadmapper on 2026-05-09 against ROADMAP.md. Ever
 | BACK-04 | Phase 3 | Complete |
 | BACK-05 | Phase 3 | Complete |
 | BACK-06 | Phase 3 | Complete |
-| BACK-07 | Phase 3 | Pending |
-| BACK-08 | Phase 3 | Pending |
-| BACK-09 | Phase 3 | Pending |
+| BACK-07 | Phase 3 | Complete |
+| BACK-08 | Phase 3 | Complete |
+| BACK-09 | Phase 3 | Complete |
 | BACK-10 | Phase 3 | Pending |
 | PTB-01 | Phase 3 | Complete |
 | PTB-02 | Phase 3 | Complete |

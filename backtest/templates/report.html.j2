@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DeepVault Backtest Report</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 2em auto;
+            padding: 0 1em;
+            color: #222;
+            line-height: 1.5;
+        }
+        h1 {
+            border-bottom: 3px solid #0066cc;
+            padding-bottom: 0.3em;
+        }
+        h2 {
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 0.2em;
+            margin-top: 2em;
+        }
+        h3 {
+            margin-top: 1.5em;
+            color: #444;
+        }
+        table.six-col,
+        table.sensitivity,
+        table.per-trade {
+            border-collapse: collapse;
+            margin: 1em 0;
+            font-size: 0.9em;
+        }
+        table.six-col th,
+        table.six-col td,
+        table.sensitivity th,
+        table.sensitivity td,
+        table.per-trade th,
+        table.per-trade td {
+            border: 1px solid #ccc;
+            padding: 0.4em 0.8em;
+            text-align: right;
+        }
+        table.six-col th,
+        table.sensitivity th,
+        table.per-trade th {
+            background: #f0f0f0;
+        }
+        .caption {
+            font-style: italic;
+            color: #666;
+            margin: 0.5em 0;
+        }
+        pre {
+            background: #f6f8fa;
+            padding: 1em;
+            border-radius: 4px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        img { max-width: 100%; height: auto; }
+        code {
+            background: #f6f8fa;
+            padding: 0.1em 0.4em;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+
+<h1>DeepVault Backtest Report</h1>
+<p class="caption">Institutional cold-read report per CONTEXT.md D-12 / D-13. Self-contained
+  (offline-usable). Generated from <code>walk_forward</code> + <code>pnl_attribution</code>
+  + assumption-ledger outputs by <code>deepvault.report.render_html</code> (BACK-10).</p>
+
+<!-- ====================================================================== -->
+<!-- 1. Executive Summary                                                   -->
+<!-- ====================================================================== -->
+<h2>1. Executive Summary</h2>
+<p>Headline APY: <strong>{{ (executive_summary.headline_apy * 100) | round(2) }}%</strong>;
+   OOS Sharpe: <strong>{{ executive_summary.oos_sharpe | round(3) }}</strong></p>
+<p class="caption">Headline numbers are computed on the OOS holdback (most recent 30%
+  of the window). v1 ratio (10%) is preserved regardless of sensitivity-table peak
+  (no retrospective re-tuning per PITFALLS Pitfall 2).</p>
+
+<!-- ====================================================================== -->
+<!-- 2. Assumption Ledger                                                   -->
+<!-- ====================================================================== -->
+<h2>2. Assumption Ledger</h2>
+<p class="caption">Loaded from <code>.planning/backtest-assumptions.md</code>. Every
+  load-bearing assumption — data sources, <code>available_at</code> semantics, gas model,
+  strategy parameters — is enumerated here per D-05.</p>
+<pre>{{ assumption_ledger }}</pre>
+
+<!-- ====================================================================== -->
+<!-- 3. Strategy Description                                                -->
+<!-- ====================================================================== -->
+<h2>3. Strategy Description</h2>
+<p>DeepVault sells PLP-style hedged exposure: each supply allocates
+  <strong>{{ strategy.allocation_bps / 100 }}%</strong> of the deposit to a single
+  SVI-priced binary hedge at <strong>{{ strategy.strike_otm_bps / 100 }}% OTM</strong>
+  with <strong>{{ strategy.tenor_seconds / 86400 }} days</strong> tenor.
+  The remaining {{ (10_000 - strategy.allocation_bps) / 100 }}% sits as deposited
+  quote liquidity inside the vault. Locked parameters per Phase 0 D-01..D-05.</p>
+<p class="caption">Hedge sizing is fixed-ratio in v1; dynamic policy is STRAT-V2-01 territory.</p>
+
+<!-- ====================================================================== -->
+<!-- 4. Data Ledger                                                         -->
+<!-- ====================================================================== -->
+<h2>4. Data Ledger</h2>
+<p>Window: <strong>{{ data_ledger.window_start }}</strong> to
+  <strong>{{ data_ledger.window_end }}</strong>
+  (<strong>{{ data_ledger.bars }} hourly bars</strong>).
+  Source: CryptoDataDownload Binance BTCUSDT 1h CSV.
+  Gap policy: <code>load_window</code> raises on any consecutive gap exceeding 1h + 60s slack.</p>
+
+<!-- ====================================================================== -->
+<!-- 5. Walk-Forward Methodology + OOS Results                              -->
+<!-- ====================================================================== -->
+<h2>5. Walk-Forward Methodology</h2>
+<p>OOS = most recent 30% of bars (D-03). Monthly cadence: calibrate on month N
+  (training data ≤ N-1), deploy on month N+1, never look at N+1 during calibration (D-04).</p>
+<p>OOS Sharpe: <strong>{{ walk_forward.oos_sharpe | round(3) }}</strong>;
+   OOS Sortino: <strong>{{ walk_forward.oos_sortino | round(3) }}</strong>;
+   OOS Max Drawdown: <strong>{{ walk_forward.oos_max_drawdown_bps }} bps</strong>.</p>
+<div>{{ equity_curve | safe }}</div>
+<p class="caption">Figure: Equity curve over the OOS holdback. Annualized using
+  8,760 bars/year (BTC trades 24/7); risk-free rate = 0 (hackathon convention; D-10).</p>
+
+<!-- ====================================================================== -->
+<!-- 6. PnL Attribution                                                     -->
+<!-- ====================================================================== -->
+<h2>6. PnL Attribution</h2>
+<p>Six columns per CONTEXT.md D-09 sum to total return per bar.
+  <code>plp_yield_bps</code> is identically zero in v1 (we BUY hedges via
+  <code>predict::mint</code>, not provide PLP).</p>
+{{ pnl_attribution | safe }}
+<div><img src="{{ pnl_histogram_png }}" alt="PnL distribution histogram"></div>
+<p class="caption">Figure: PnL distribution per bar. Negative tail reflects hedge-cost
+  bleed; positive tail concentrates on payoff bars at stress events.</p>
+
+<!-- W6: Per-trade table appendix (D-11 chart 5) -->
+<h3>6.1 Per-trade PnL appendix (trade-table)</h3>
+<p class="caption">Every action's six-column attribution + total. Sourced from
+  <code>pnl_attribution_df</code>. Transparent breakdown for institutional cold-read review.</p>
+{% if per_trade_table %}
+<table class="per-trade trade-table">
+  <thead>
+    <tr>
+      <th>timestamp_ms</th><th>action</th>
+      <th>plp_yield_bps</th><th>hedge_cost_bps</th><th>hedge_payoff_bps</th>
+      <th>fees_bps</th><th>slippage_bps</th><th>gas_bps</th><th>total_bps</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for row in per_trade_table %}
+    <tr>
+      <td>{{ row.ts_ms }}</td><td>{{ row.kind }}</td>
+      <td>{{ row.plp_yield_bps }}</td><td>{{ row.hedge_cost_bps }}</td><td>{{ row.hedge_payoff_bps }}</td>
+      <td>{{ row.fees_bps }}</td><td>{{ row.slippage_bps }}</td><td>{{ row.gas_bps }}</td><td>{{ row.total_bps }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="caption">per-trade table unavailable for this run (caller did not pass
+  <code>per_trade_table</code>).</p>
+{% endif %}
+
+<!-- ====================================================================== -->
+<!-- 7. Drawdown + Risk Metrics                                             -->
+<!-- ====================================================================== -->
+<h2>7. Drawdown + Risk Metrics</h2>
+<p>Max drawdown: <strong>{{ drawdown.max_drawdown_bps }} bps</strong>;
+   underwater duration: <strong>{{ drawdown.underwater_bars }} bars</strong>.</p>
+<div>{{ drawdown_timeline | safe }}</div>
+<p class="caption">Figure: Drawdown timeline (depth + duration). Underwater duration =
+  longest consecutive run of drawdown &lt; 0.</p>
+
+<!-- ====================================================================== -->
+<!-- 8. Stress Event Narrative                                              -->
+<!-- ====================================================================== -->
+<h2>8. Stress Event Narrative</h2>
+<p>Two stress events per CONTEXT.md D-02. At least one must be in the OOS holdout.</p>
+{% for event in stress_events %}
+<h3>{{ event.name }}</h3>
+<p>{{ event.detail }}</p>
+{% endfor %}
+
+<!-- W6: IV surface EVOLUTION (D-11 chart — "surface evolution") -->
+<h3>8.1 Surface 3D evolution (surface-evolution)</h3>
+<p class="caption">SVI surface at three representative moments. Per-tick evolution is
+  v2 work; v1 ships 3 representative snapshots (start, mid, end of stress window).</p>
+{% if svi_snapshot_evolution %}
+  {% for snap in svi_snapshot_evolution %}
+    <h4>{{ snap.label }}</h4>
+    <div>{{ snap.plot_html | safe }}</div>
+  {% endfor %}
+{% else %}
+  <div>{{ svi_snapshot | safe }}</div>
+  <p class="caption">v1: single snapshot (caller did not pass <code>svi_snapshot_evolution</code>).
+    Plan 03-09 evolution wiring may use 3 representative snapshots in subsequent revisions.</p>
+{% endif %}
+
+<!-- ====================================================================== -->
+<!-- 9. Sensitivity Table                                                   -->
+<!-- ====================================================================== -->
+<h2>9. Sensitivity Table</h2>
+<p>Hedge ratio sensitivity across [0.05, 0.10, 0.15, 0.20, 0.30]:</p>
+{{ sensitivity_table | safe }}
+<p class="caption">v1 ratio (0.10) is preserved regardless of which row produces highest
+  Sharpe (no retrospective tuning per CONTEXT.md Claude's Discretion / PITFALLS Pitfall 2).
+  A robust strategy is FLAT across this range; an overfit one peaks.</p>
+
+<!-- ====================================================================== -->
+<!-- 10. Shuffled-Label Sanity Test                                         -->
+<!-- ====================================================================== -->
+<h2>10. Shuffled-Label Sanity Test</h2>
+<p>Per D-06: |alpha_apy| ≤ 0.5% APY required.</p>
+<p>Result: <strong>alpha_apy = {{ (shuffled_label.alpha_apy * 100) | round(4) }}%</strong>;
+   threshold = {{ (shuffled_label.threshold * 100) | round(4) }}%;
+   passed: <strong>{{ shuffled_label.passed }}</strong>.</p>
+<div><img src="{{ regime_heatmap_png }}" alt="Regime heatmap"></div>
+<p class="caption">Figure: Regime heatmap across the backtest window. Shuffled-label
+  alpha above 0.5% APY would flag a leak (PITFALLS Pitfall 1 mitigation #3).</p>
+
+<!-- ====================================================================== -->
+<!-- 11. Hand Recompute Appendix                                            -->
+<!-- ====================================================================== -->
+<h2>11. Hand Recompute Appendix</h2>
+<p>Per D-07: 3 random trade rows (seed=42) manually computed in
+   <code>backtest/notebooks/hand-recompute.ipynb</code>. Rows: <strong>{{ hand_recompute.rows }}</strong>.</p>
+<p>All match harness output to the wei: <strong>{{ hand_recompute.all_match_to_wei }}</strong>.</p>
+<p class="caption">Re-runnable by reviewers via <code>uv run jupyter nbconvert --to notebook
+  --execute backtest/notebooks/hand-recompute.ipynb</code>.</p>
+
+<hr>
+<p class="caption">DeepVault backtest report. Phase 3 closure (Plan 03-09 BACK-10).
+  Per D-11 + D-13 + W6 (per-trade table + IV surface evolution).</p>
+
+</body>
+</html>

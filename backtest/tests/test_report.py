@@ -215,3 +215,106 @@ def test_render_html_returns_output_path(tmp_path, synthetic_inputs, synthetic_p
         output_path=out,
     )
     assert result == out
+
+
+def test_render_html_with_per_trade_table(tmp_path, synthetic_inputs, synthetic_plots):
+    """W6: per_trade_table kwarg populates Section 6.1 trade-table block."""
+    surf, eq, dd, ph, rh = synthetic_plots
+    out = tmp_path / "report.html"
+    per_trade = [
+        {
+            "ts_ms": 1_700_000_000_000,
+            "kind": "supply",
+            "plp_yield_bps": 0,
+            "hedge_cost_bps": -100,
+            "hedge_payoff_bps": 0,
+            "fees_bps": 0,
+            "slippage_bps": -10,
+            "gas_bps": -1,
+            "total_bps": -111,
+        }
+    ]
+    render_html(
+        **synthetic_inputs,
+        svi_snapshot_plot=surf,
+        equity_curve_plot=eq,
+        drawdown_timeline_plot=dd,
+        pnl_histogram_fig=ph,
+        regime_heatmap_fig=rh,
+        per_trade_table=per_trade,
+        output_path=out,
+    )
+    html = out.read_text(encoding="utf-8")
+    assert "trade-table" in html
+    assert "1700000000000" in html
+    assert "supply" in html
+
+
+def test_render_html_with_svi_evolution(tmp_path, synthetic_inputs, synthetic_plots):
+    """W6: svi_snapshot_evolution kwarg populates Section 8.1 surface-evolution block."""
+    surf, eq, dd, ph, rh = synthetic_plots
+    out = tmp_path / "report.html"
+    evolution = [
+        {"label": "Start of window", "plot_html": "<div>start-snapshot</div>"},
+        {"label": "Mid window", "plot_html": "<div>mid-snapshot</div>"},
+        {"label": "End of window", "plot_html": "<div>end-snapshot</div>"},
+    ]
+    render_html(
+        **synthetic_inputs,
+        svi_snapshot_plot=surf,
+        equity_curve_plot=eq,
+        drawdown_timeline_plot=dd,
+        pnl_histogram_fig=ph,
+        regime_heatmap_fig=rh,
+        svi_snapshot_evolution=evolution,
+        output_path=out,
+    )
+    html = out.read_text(encoding="utf-8")
+    assert "Start of window" in html
+    assert "Mid window" in html
+    assert "End of window" in html
+    assert "start-snapshot" in html
+
+
+def test_render_html_from_summary(tmp_path):
+    """CLI-helper path: writes a real HTML report from a walk_forward summary JSON."""
+    from deepvault.report import render_html_from_summary
+
+    summary = {
+        "window_days": 7,
+        "bars": 168,
+        "oos_sharpe": 1.15,
+        "oos_sortino": 1.40,
+        "oos_max_drawdown_bps": -300,
+        "oos_underwater_bars": 12,
+        "sensitivity_table": [
+            {"hedge_ratio": 0.05, "oos_sharpe": 1.0},
+            {"hedge_ratio": 0.10, "oos_sharpe": 1.15},
+        ],
+        "pnl_attribution_summary": {
+            "total_bps_mean": -5.2,
+            "total_bps_min": -100.0,
+            "total_bps_max": 80.0,
+        },
+    }
+    input_json = tmp_path / "summary.json"
+    input_json.write_text(__import__("json").dumps(summary), encoding="utf-8")
+    output_html = tmp_path / "report-from-summary.html"
+
+    rc = render_html_from_summary(input_json, output_html)
+    assert rc == 0
+    assert output_html.exists()
+    html = output_html.read_text(encoding="utf-8")
+    assert "Executive Summary" in html
+    assert "Hand Recompute" in html
+
+
+def test_render_html_from_summary_missing_input(tmp_path):
+    """render_html_from_summary returns non-zero when input JSON missing."""
+    from deepvault.report import render_html_from_summary
+
+    missing = tmp_path / "does-not-exist.json"
+    out = tmp_path / "report.html"
+    rc = render_html_from_summary(missing, out)
+    assert rc != 0
+    assert not out.exists()

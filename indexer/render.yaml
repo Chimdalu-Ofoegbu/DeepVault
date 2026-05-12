@@ -1,0 +1,62 @@
+# Render free-tier blueprint for the DeepVault event relay.
+#
+# Source: Plan 04-07 Task 3 (DASH-13). Pairs with vercel.json (dashboard)
+# at the repo root. See .planning/phases/04-plp-risk-studio-dashboard-relay/04-DEMO-CHECKLIST.md
+# for the human deploy-day runbook.
+#
+# Phase 0 D-15: Render free-tier instances sleep after 15 minutes of
+# idleness. The keepalive cron in .github/workflows/keepalive-relay.yml
+# pings /healthz every 14 minutes during the demo window. Free-tier
+# instances also have an EPHEMERAL filesystem (no persistent disk on
+# the free plan). The indexer's cursor.json is therefore reset on every
+# cold-boot — this is acceptable for v1 because:
+#   1. queryEvents resumes gracefully from cursor=null (full backfill of
+#      the most recent window; see indexer/src/cursor.ts).
+#   2. The dashboard re-derives state from the ring-buffer snapshot on
+#      WS connect, so a relay cold-boot is invisible to UI users beyond
+#      a brief RECONNECTING pill.
+# If persistence is needed pre-mainnet, upgrade to the Render paid tier
+# (Disk add-on) and mount /var/data; the cursor.json path is already
+# configurable via the indexer's `cursorPath` constructor argument.
+#
+# pnpm workspace caveat: Render's blueprint runs commands from the
+# service's `rootDir`. The indexer needs the monorepo's pnpm-lock.yaml
+# so its build references the repo root. We chain `cd .. &&` into the
+# pnpm-workspace command to install + filter the indexer package.
+#
+# Runtime caveat: the indexer runs `tsx src/relay.ts` (NOT a transpiled
+# dist/), so `tsx` from devDependencies MUST be installed in production.
+# Render defaults to NODE_ENV=production which makes pnpm skip devDeps,
+# so we pass `--prod=false` to force devDep install. The start command
+# uses NODE_ENV=production for application-layer behavior (logger
+# verbosity, etc.) but the dependency tree includes tsx.
+
+services:
+  - type: web
+    name: deepvault-relay
+    env: node
+    plan: free
+    rootDir: indexer
+    # `cd ..` walks from indexer/ to the repo root where pnpm-workspace.yaml
+    # lives. --prod=false ensures tsx (devDep, needed at runtime) is installed
+    # despite Render's NODE_ENV=production default.
+    buildCommand: cd .. && pnpm install --frozen-lockfile --prod=false && pnpm --filter @deepvault/indexer build
+    startCommand: cd .. && pnpm --filter @deepvault/indexer start
+    healthCheckPath: /healthz
+    # Optional but recommended on free tier: auto-deploy on every push to master.
+    autoDeploy: true
+    envVars:
+      - key: SUI_RPC_URL
+        value: https://fullnode.testnet.sui.io
+      - key: PORT
+        value: "8080"
+      - key: LOG_LEVEL
+        value: info
+      - key: DEPLOY_JSON_PATH
+        value: .planning/phases/02-vault-move-package-testnet-deploy/TESTNET-DEPLOY.json
+      - key: NODE_ENV
+        value: production
+      # Pin Node 22 LTS — relay.ts uses node:fs/promises with top-level await
+      # plus globalThis.fetch native, both require Node 22+.
+      - key: NODE_VERSION
+        value: "22"

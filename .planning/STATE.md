@@ -4,14 +4,14 @@ milestone: v1.1
 milestone_name: milestone
 status: executing
 stopped_at: Completed 03-05-PLAN.md
-last_updated: "2026-05-12T13:04:21.915Z"
+last_updated: "2026-05-12T13:25:18.697Z"
 last_activity: 2026-05-12
 progress:
   total_phases: 7
   completed_phases: 3
   total_plans: 35
-  completed_plans: 31
-  percent: 89
+  completed_plans: 32
+  percent: 91
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 03 (backtest-harness-two-protocol-ptb) — EXECUTING
-Plan: 6 of 9
+Plan: 7 of 9
 Status: Ready to execute
 Next phase: Phase 2 — Vault & Strategy (PLP+Hedge vault, predict_adapter, rebalance); imports parity-gate-protected svi_view::binary_price; depends on Phase 1
 Last activity: 2026-05-12
@@ -84,6 +84,7 @@ Progress: [█████████████████] 100% Phase 1 / 1
 | Phase 03 P03 | 45min | 3 tasks | 4 files |
 | Phase 03 P04 | 25min | 2 tasks | 5 files |
 | Phase 03 P05 | 30min | 3 tasks | 4 files |
+| Phase 03 P06 | 35min | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -202,6 +203,7 @@ Recent decisions affecting current work:
 - [Phase ?]: Phase 03-05: Three-layer capability enforcement live — Move type system + ptb_capability_test.move (4/4 PASS) + test_ptb_capability_grep.py (5/5 PASS); closes PTB-04
 - [Phase ?]: Phase 03-05 Rule 3 deviation: MockMarginPool disposal uses sui::test_utils::destroy (not transfer::transfer) — pool is key-only; cross-module transfer is rejected by E02009
 - [Phase ?]: Phase 03-05 scope: CI wiring for test_ptb_capability_grep.py DEFERRED to Plan 03-09 per plan body 'this plan ships the test only'
+- [Phase ?]: Plan 03-06: trace-replay parity at 1-wei tolerance — replay.py simulate/replay_trace/main + micro-fixture-7d.json + 22 new tests; coverage on deepvault.replay = 96%
 
 ### Pending Todos
 
@@ -242,6 +244,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-12T13:04:21.901Z
+Last session: 2026-05-12T13:25:09.563Z
 Stopped at: Completed 03-05-PLAN.md
 Resume file: None

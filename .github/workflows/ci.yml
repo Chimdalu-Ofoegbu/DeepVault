@@ -175,6 +175,26 @@ jobs:
       - name: Test
         run: uv run pytest
 
+      - name: 7-day micro-fixture replay parity (BACK-04 per-push gate)
+        # Plan 03-09 W1 sub-task 3a: explicit log step for the 7-day micro-
+        # fixture trace-replay parity check. `uv run pytest` (above) already
+        # exercises the same test as part of the full suite; this step makes
+        # the planner-critical per-push gate readable in the CI log.
+        run: |
+          set -euo pipefail
+          uv run pytest tests/test_replay_parity.py -x --tb=short
+          echo "==> 7-day micro-fixture parity: BACK-04 gate PASS"
+
+      - name: PTB capability grep (Phase 3 PTB-04 cross-language)
+        # Plan 03-09 W1 sub-task 3a: wires Plan 03-05's deferred grep gate
+        # into per-push CI. Cross-language assertion that no TradeCap /
+        # MarginManager / MockMarginPool capability escapes from production
+        # Move OR scripts/*.ts surfaces.
+        run: |
+          set -euo pipefail
+          uv run pytest tests/test_ptb_capability_grep.py -x --tb=short
+          echo "==> PTB capability grep: PTB-04 gate PASS"
+
   codegen-drift:
     name: Codegen drift check
     runs-on: ubuntu-latest

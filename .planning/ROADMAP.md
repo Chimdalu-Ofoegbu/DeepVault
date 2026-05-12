@@ -128,7 +128,7 @@ Drop in this order, never reverse:
 - [x] 03-01-PLAN.md (Wave 0) - Spike: 5-call PTB shape lock + DUSDC margin pool discovery + SDK version pin + runtime budget + 6 open questions resolved -> WAVE0-DECISION.md + CONTEXT.md D-17 amendment + MARGIN-WHITELIST-DECISION.md
 - [x] 03-02-PLAN.md (Wave 1, Track B) - data_ingest.py + replay.py @strategy_fn decorator + .planning/backtest-assumptions.md (BACK-01, BACK-03 foundation, BACK-06 foundation)
 - [x] 03-03-PLAN.md (Wave 1, Track A) - scripts/two-protocol-ptb-demo.{ts,sh} skeleton + contracts/tests/mock_margin_pool.move (PTB-01, PTB-02)
-- [ ] 03-04-PLAN.md (Wave 2, Track B, TDD) - vault_state.py + lookahead_audit.py + tests; bit-equal Move parity + shuffled-label/hand-recompute machinery (BACK-02, BACK-06)
+- [x] 03-04-PLAN.md (Wave 2, Track B, TDD) - vault_state.py + lookahead_audit.py + tests; bit-equal Move parity + shuffled-label/hand-recompute machinery (BACK-02, BACK-06)
 - [ ] 03-05-PLAN.md (Wave 2, Track A) - Complete 5-call PTB body + Move ptb_capability_test.move + Python test_ptb_capability_grep.py (PTB-03, PTB-04, PTB-06)
 - [ ] 03-06-PLAN.md (Wave 3, Track B) - replay.py simulate() + replay_trace() CLI + e2e-vault-cycle.ts trace dump + 7-day micro-fixture + 1-wei parity test (BACK-04, BACK-05 trace capture)
 - [ ] 03-07-PLAN.md (Wave 3, Track A) - liquidation_test.move at -30% NAV shock + Python test_liquidation_parity.py cross-asserting worst_case_nav at 1-wei (PTB-05)
@@ -183,7 +183,7 @@ Decimal phases (e.g., 2.1) reserved for urgent insertions and execute between th
 | 0. Setup & Ground Rules | 8/8 | Complete-with-checkpoints | 2026-05-09 |
 | 1. Math Foundation (SVI Parity Gate) | 6/8 | In progress | - |
 | 2. Vault Move Package + Testnet Deploy | 0/9 | Not started | - |
-| 3. Backtest Harness + Two-Protocol PTB | 0/TBD | Not started | - |
+| 3. Backtest Harness + Two-Protocol PTB | 4/9 | In Progress|  |
 | 4. PLP Risk Studio Dashboard + Relay | 0/TBD | Not started | - |
 | 5. Mainnet Redeploy + Smoke Test | 0/TBD | Not started | - |
 | 6. Submission Package | 0/TBD | Not started | - |

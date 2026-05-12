@@ -4,14 +4,14 @@ milestone: v1.1
 milestone_name: milestone
 status: executing
 stopped_at: Completed 03-02-PLAN.md
-last_updated: "2026-05-12T12:24:44.052Z"
+last_updated: "2026-05-12T12:41:34.465Z"
 last_activity: 2026-05-12
 progress:
   total_phases: 7
   completed_phases: 3
   total_plans: 35
-  completed_plans: 29
-  percent: 83
+  completed_plans: 30
+  percent: 86
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 03 (backtest-harness-two-protocol-ptb) — EXECUTING
-Plan: 4 of 9
+Plan: 5 of 9
 Status: Ready to execute
 Next phase: Phase 2 — Vault & Strategy (PLP+Hedge vault, predict_adapter, rebalance); imports parity-gate-protected svi_view::binary_price; depends on Phase 1
 Last activity: 2026-05-12
@@ -82,6 +82,7 @@ Progress: [█████████████████] 100% Phase 1 / 1
 | Phase 03 P01 | 24min | 4 tasks | 10 files |
 | Phase 03 P02 | 35min | 3 tasks | 6 files |
 | Phase 03 P03 | 45min | 3 tasks | 4 files |
+| Phase 03 P04 | 25min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -193,6 +194,9 @@ Recent decisions affecting current work:
 - [Phase ?]: Hoisted @mysten/sui 2.16.0 to root for scripts/* TS module resolution; resolves the @mysten/deepbook-v3 1.3.6 peer dep warning logged in Plan 03-01.
 - [Phase ?]: Mock margin pool uses transfer::public_transfer(collateral, @0x0) as collateral sink (test-only simplification). Plan 03-05/07 tests do not depend on collateral destination.
 - [Phase ?]: FAST_FORWARD=1 wrapper uses non-strict sui move test filters so it survives partial-wave landing — mock_margin_pool 9/9 pass; ptb_capability_test (03-05) and liquidation_test (03-07) report 0 tests until those plans land.
+- [Phase ?]: Plan 03-04: VaultState Python state machine mirrors Move bit-for-bit; W3 LOCK PyRateLimiter ports per-user time-decay token bucket so Plan 03-06 trace replay does not diverge on repeat redeems by the same user
+- [Phase ?]: Plan 03-04: lookahead_audit.py is the second numpy-allowed module after arb_checker (ALLOWED HERE pattern); shuffled_label_sanity returns dict alpha+p_value; Plan 03-08 wires |alpha|<=0.005 as hard CI gate (D-06)
+- [Phase ?]: Plan 03-04: redeem_fulfill uses ceiling division on shares_consumed to mirror Move math::mul_div_round_up (redeem.move:149-153) preserving round-down-in-vault-favor (Pitfall 12)
 
 ### Pending Todos
 
@@ -233,6 +237,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-12T12:24:00.485Z
+Last session: 2026-05-12T12:40:35.126Z
 Stopped at: Completed 03-02-PLAN.md
 Resume file: None

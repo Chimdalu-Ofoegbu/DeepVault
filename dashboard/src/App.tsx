@@ -54,12 +54,24 @@ export function App() {
         className="mx-auto max-w-[1280px] px-6 py-12 space-y-8"
         data-testid="dashboard-main"
       >
-        {state === 'down' && (
+        {(state === 'reconnecting' || state === 'down') && (
           <div
-            className="rounded-md border border-rose-600/40 bg-rose-600/10 p-4 text-sm"
+            className={
+              state === 'down'
+                ? 'rounded-md border border-rose-600/40 bg-rose-600/10 p-4 text-sm'
+                : 'rounded-md border border-amber-500/40 bg-amber-500/10 p-4 text-sm'
+            }
             role="alert"
           >
-            <p className="font-semibold text-rose-300">Relay disconnected</p>
+            <p
+              className={
+                state === 'down'
+                  ? 'font-semibold text-rose-300'
+                  : 'font-semibold text-amber-300'
+              }
+            >
+              {state === 'down' ? 'Relay disconnected' : 'Reconnecting to relay'}
+            </p>
             <p className="mt-1 text-slate-300">
               Live updates paused. On-chain state still readable via direct RPC.
               Reconnecting automatically.

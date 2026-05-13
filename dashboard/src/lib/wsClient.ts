@@ -19,6 +19,14 @@ import type { WsMessage } from './types';
 
 type Handler = (msg: WsMessage) => void;
 
+/** Connection lifecycle events — emitted on the actual WebSocket `onopen` /
+ *  `onclose` callbacks, NOT inferred from heartbeat staleness. Subscribers
+ *  (useWebSocket) flip the relay-state machine to 'reconnecting' the moment
+ *  'closed' fires, giving the UI sub-second response to a crashed relay
+ *  instead of the 30s heartbeat-staleness lag. */
+export type WsConnectionStatus = 'open' | 'closed';
+type StatusHandler = (status: WsConnectionStatus) => void;
+
 export interface WsClientOptions {
   /** If false, the constructor will NOT call connect() — useful for unit-testing
    *  scheduleReconnect math without a real socket. Default true. */
@@ -30,6 +38,7 @@ export class WsClient {
   private attempts = 0;
   private timer: ReturnType<typeof setTimeout> | undefined;
   private handlers = new Set<Handler>();
+  private statusHandlers = new Set<StatusHandler>();
   private disposed = false;
 
   constructor(
@@ -46,6 +55,20 @@ export class WsClient {
     return () => {
       this.handlers.delete(handler);
     };
+  }
+
+  /** Subscribe to connection lifecycle events ('open' / 'closed'). Returns an
+   *  unsubscribe function. Lets consumers (useWebSocket) flip UI state on the
+   *  actual TCP lifecycle instead of heartbeat-staleness inference. */
+  onStatus(handler: StatusHandler): () => void {
+    this.statusHandlers.add(handler);
+    return () => {
+      this.statusHandlers.delete(handler);
+    };
+  }
+
+  private emitStatus(status: WsConnectionStatus): void {
+    for (const h of this.statusHandlers) h(status);
   }
 
   /** Test-only / diagnostic — current reconnect-attempt counter. */
@@ -78,6 +101,7 @@ export class WsClient {
 
     this.ws.onopen = () => {
       this.attempts = 0;
+      this.emitStatus('open');
     };
     this.ws.onmessage = (e: MessageEvent) => {
       try {
@@ -87,7 +111,10 @@ export class WsClient {
         // Malformed JSON — drop silently. T-04-03-02 mitigation.
       }
     };
-    this.ws.onclose = () => this.scheduleReconnect();
+    this.ws.onclose = () => {
+      this.emitStatus('closed');
+      this.scheduleReconnect();
+    };
     this.ws.onerror = () => {
       // Close triggers onclose → reconnect. Never schedule directly from here
       // so we don't double-fire (onerror is almost always followed by onclose).
@@ -124,5 +151,6 @@ export class WsClient {
       // already closing
     }
     this.handlers.clear();
+    this.statusHandlers.clear();
   }
 }

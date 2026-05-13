@@ -55,7 +55,61 @@ import type { SigmaEstimates } from '@/hooks/useSigmaEstimates';
 import type { SurfaceView } from '@/hooks/useSurfaceSnapshot';
 import { FALLBACK_FORWARD_PRICE_DUSDC } from '@/lib/dashboard_constants';
 import { formatDusdc } from '@/lib/format';
+import type { SVIParams } from '@/lib/svi';
 import { shockedPnL } from '@/lib/whatIf';
+
+// Synthetic SVI surface used in Preview mode (when no live oracle snapshot has
+// arrived — e.g. snapshot-only relay mode while TESTNET-DEPLOY.json is still
+// `pending_first_deploy`). Values chosen to produce a non-degenerate
+// arbitrage-free smile on the slider range:
+//   a = 1.5 (base variance)
+//   b = 0.2 (slope)
+//   rho = -0.3 (typical BTC put-skew)
+//   m = 0.1 (slightly OTM-centered)
+//   sigma = 0.4 (curvature)
+// Encoded at the FLOAT_SCALING used throughout Phase 1 (10^9).
+const PREVIEW_SVI: SVIParams = {
+  a: 1_500_000_000n,
+  b: 200_000_000n,
+  rho: -300_000_000n,
+  m: 100_000_000n,
+  sigma: 400_000_000n,
+};
+
+// Synthetic surface — wraps PREVIEW_SVI to match the SurfaceView shape.
+const PREVIEW_SURFACE: SurfaceView = {
+  raw: {
+    oracle_id: 'preview-synthetic',
+    a: '1500000000',
+    b: '200000000',
+    rho_signed: '-300000000',
+    m_signed: '100000000',
+    sigma: '400000000',
+    timestamp_ms: '0',
+    last_updated_ms: '0',
+  },
+  svi: PREVIEW_SVI,
+  lastUpdatedMs: 0,
+};
+
+// Synthetic hedge for Preview mode — single BTC put at 100k strike, 30-day
+// expiry, 50k DUSDC notional. Real PnL math runs against this; the hedge is
+// just demo data. The Preview banner is unmistakable so judges/users know
+// they're seeing a demo, not their actual position.
+function buildPreviewHedge(): Hedge {
+  const expiryMs = Date.now() + 30 * 24 * 60 * 60 * 1000;
+  return {
+    marketKey: 'preview-synthetic|100000000000000|preview|down',
+    oracleId: 'preview-synthetic',
+    strike: 100_000n * 1_000_000_000n,
+    strikeDisplay: '100000.00',
+    expiryMs,
+    expiryDisplay: new Date(expiryMs).toISOString().slice(0, 16).replace('T', ' '),
+    direction: 'down',
+    notionalQuote: 50_000n * 1_000_000n,
+    premiumQuote: 0n,
+  };
+}
 
 type Props = {
   hedges: Hedge[];
@@ -74,7 +128,17 @@ const THETA_MAX_BPS = 4_000; // ±2σ at bootstrap fallback 20% σ_θ
 export function WhatIfSimulator({ hedges, surface, sigma, forwardPrice }: Props) {
   const [thetaShockBps, setThetaShockBps] = useState(0);
   const [spotShockBps, setSpotShockBps] = useState(0);
+  // Preview mode — when no live hedges exist (TESTNET-DEPLOY.json pending or
+  // wallet not connected with deposits), the user can click "Preview with
+  // synthetic hedge" to exercise the simulator against demo data. PnL math
+  // is real; only the hedge + surface are synthetic.
+  const [previewMode, setPreviewMode] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
+
+  // When previewMode is active, swap in synthetic surface + hedge.
+  const previewHedge = useMemo(() => buildPreviewHedge(), []);
+  const effectiveHedges = previewMode ? [previewHedge] : hedges;
+  const effectiveSurface = previewMode ? PREVIEW_SURFACE : surface;
 
   const isSyntheticForward = forwardPrice === undefined;
   const fwd = forwardPrice ?? FALLBACK_FORWARD_PRICE_DUSDC;
@@ -83,11 +147,11 @@ export function WhatIfSimulator({ hedges, surface, sigma, forwardPrice }: Props)
   // sub-100ms contract). hedges/surface ref-stability comes from useExposure /
   // useSurfaceSnapshot upstream memoization.
   const quotes = useMemo(() => {
-    if (!surface || hedges.length === 0) return [];
-    return hedges.map((h) =>
+    if (!effectiveSurface || effectiveHedges.length === 0) return [];
+    return effectiveHedges.map((h) =>
       shockedPnL({
         hedgeKey: h.marketKey,
-        svi: surface.svi,
+        svi: effectiveSurface.svi,
         forward: fwd,
         strike: h.strike,
         notionalQuote: h.notionalQuote,
@@ -95,7 +159,7 @@ export function WhatIfSimulator({ hedges, surface, sigma, forwardPrice }: Props)
         spotShockBps,
       }),
     );
-  }, [hedges, surface, fwd, thetaShockBps, spotShockBps]);
+  }, [effectiveHedges, effectiveSurface, fwd, thetaShockBps, spotShockBps]);
 
   const totalPnl = useMemo(
     () => quotes.reduce((acc, q) => acc + q.pnlQuote, 0n),
@@ -105,13 +169,13 @@ export function WhatIfSimulator({ hedges, surface, sigma, forwardPrice }: Props)
   const chartData = useMemo(() => {
     const rows = quotes.map((q) => ({
       name:
-        hedges.find((h) => h.marketKey === q.hedgeKey)?.strikeDisplay ??
+        effectiveHedges.find((h) => h.marketKey === q.hedgeKey)?.strikeDisplay ??
         q.hedgeKey,
       pnl: Number(q.pnlQuote) / 1e6, // DUSDC display (6 decimals)
     }));
     rows.push({ name: 'Total', pnl: Number(totalPnl) / 1e6 });
     return rows;
-  }, [quotes, hedges, totalPnl]);
+  }, [quotes, effectiveHedges, totalPnl]);
 
   const onReset = useCallback(() => {
     setThetaShockBps(0);
@@ -125,7 +189,10 @@ export function WhatIfSimulator({ hedges, surface, sigma, forwardPrice }: Props)
     [onReset],
   );
 
-  if (hedges.length === 0) {
+  // Empty state — no live hedges AND user hasn't opted into Preview mode.
+  // Offer a single CTA to enter Preview mode so judges/users can exercise
+  // the simulator before any real deposits exist.
+  if (hedges.length === 0 && !previewMode) {
     return (
       <Card>
         <CardHeader>
@@ -142,6 +209,21 @@ export function WhatIfSimulator({ hedges, surface, sigma, forwardPrice }: Props)
             Sliders shock your open hedges by spot ±5σ and vol ±2σ. PnL is
             recomputed in your browser.
           </p>
+          <div className="mt-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPreviewMode(true)}
+              aria-label="Preview with synthetic hedge"
+            >
+              Preview with synthetic hedge
+            </Button>
+            <p className="mt-2 text-xs text-slate-500">
+              Demo mode: exercises sliders against a synthetic BTC put @ 100k
+              strike, 30-day expiry, 50k DUSDC notional. PnL math is real;
+              the hedge is demo data.
+            </p>
+          </div>
         </CardContent>
       </Card>
     );
@@ -159,8 +241,16 @@ export function WhatIfSimulator({ hedges, surface, sigma, forwardPrice }: Props)
           <CardDescription>
             Joint spot + vol shocks on your open hedges. Client-side compute;
             sub-100ms response per slider tick.
-            {(sigma.isBootstrap || isSyntheticForward) && (
+            {(previewMode || sigma.isBootstrap || isSyntheticForward) && (
               <span className="mt-2 flex flex-wrap gap-2">
+                {previewMode && (
+                  <Badge
+                    variant="amber"
+                    title="Preview mode: simulator is exercising a synthetic BTC put @ 100k strike against a demo SVI surface. Connect wallet and deposit to see real positions."
+                  >
+                    Preview mode — synthetic hedge
+                  </Badge>
+                )}
                 {sigma.isBootstrap && (
                   <Badge variant="amber" title={thetaBootstrapTooltip}>
                     Bootstrap σ
@@ -175,14 +265,29 @@ export function WhatIfSimulator({ hedges, surface, sigma, forwardPrice }: Props)
             )}
           </CardDescription>
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onReset}
-          aria-label="Reset sliders"
-        >
-          Reset to current
-        </Button>
+        <div className="flex flex-col items-end gap-2">
+          {previewMode && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setPreviewMode(false);
+                onReset();
+              }}
+              aria-label="Exit preview mode"
+            >
+              Exit preview
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onReset}
+            aria-label="Reset sliders"
+          >
+            Reset to current
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <div

@@ -125,6 +125,68 @@ describe('WhatIfSimulator', () => {
     ).toBeInTheDocument();
   });
 
+  it('empty state: offers a Preview-mode CTA so judges can exercise the simulator without real hedges', () => {
+    render(
+      <WhatIfSimulator
+        hedges={[]}
+        surface={SURFACE_FIXTURE}
+        sigma={BOOTSTRAP_SIGMA}
+      />,
+    );
+    expect(
+      screen.getByRole('button', { name: /Preview with synthetic hedge/i }),
+    ).toBeInTheDocument();
+  });
+
+  it('preview mode: clicking the CTA swaps in a synthetic hedge + surface; sliders render', () => {
+    render(
+      <WhatIfSimulator
+        hedges={[]}
+        surface={null}
+        sigma={BOOTSTRAP_SIGMA}
+      />,
+    );
+    // Click the preview CTA.
+    fireEvent.click(
+      screen.getByRole('button', { name: /Preview with synthetic hedge/i }),
+    );
+    // Sliders now visible (Radix renders role=slider per Thumb).
+    const sliders = screen.getAllByRole('slider');
+    expect(sliders.length).toBeGreaterThanOrEqual(2);
+    // Preview-mode amber Badge is rendered.
+    expect(screen.getByText('Preview mode — synthetic hedge')).toBeInTheDocument();
+    // Exit-preview button is rendered alongside Reset.
+    expect(
+      screen.getByRole('button', { name: /Exit preview mode/i }),
+    ).toBeInTheDocument();
+    // Chart container present (Recharts ResponsiveContainer wrapper).
+    expect(screen.getByTestId('pnl-chart')).toBeInTheDocument();
+  });
+
+  it('preview mode: Exit preview returns to empty state', () => {
+    render(
+      <WhatIfSimulator
+        hedges={[]}
+        surface={null}
+        sigma={BOOTSTRAP_SIGMA}
+      />,
+    );
+    fireEvent.click(
+      screen.getByRole('button', { name: /Preview with synthetic hedge/i }),
+    );
+    // We're now in preview mode — sliders are visible.
+    expect(screen.getAllByRole('slider').length).toBeGreaterThanOrEqual(2);
+    // Click Exit preview.
+    fireEvent.click(
+      screen.getByRole('button', { name: /Exit preview mode/i }),
+    );
+    // Back to empty state — the CTA is visible again.
+    expect(
+      screen.getByRole('button', { name: /Preview with synthetic hedge/i }),
+    ).toBeInTheDocument();
+    expect(screen.queryAllByRole('slider')).toHaveLength(0);
+  });
+
   it('populated: renders sliders + PnL chart + Total PnL row', () => {
     render(
       <WhatIfSimulator

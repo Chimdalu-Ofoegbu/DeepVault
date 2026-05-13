@@ -199,6 +199,38 @@ describe('useWebSocket (DASH-13 state machine + reconnect)', () => {
     unmount();
   }, 10_000);
 
+  it("flips state to 'reconnecting' immediately on socket close (not 30s later)", async () => {
+    // Real-bug regression test: prior implementation derived 'reconnecting'
+    // from heartbeat-staleness only (>=30s threshold), so the UI stayed on
+    // LIVE for ~30 seconds after the relay died. The fix binds the state
+    // machine to WsClient's actual 'closed' lifecycle event — flip should
+    // happen within one React render tick, well under 2s.
+    const srv = await spawnServer({ snapshotAt: 1_234_567_890 });
+    const port = srv.port;
+    const { result, unmount } = renderHook(() =>
+      useWebSocket(`ws://localhost:${port}`),
+    );
+
+    await waitFor(() => expect(result.current.state).toBe('live'));
+    const liveAt = Date.now();
+
+    await srv.stop();
+
+    await waitFor(
+      () => expect(result.current.state).toBe('reconnecting'),
+      { timeout: 2_000, interval: 50 },
+    );
+    const reconnectAt = Date.now();
+
+    // Must transition in well under the old 30s heartbeat threshold.
+    expect(reconnectAt - liveAt).toBeLessThan(2_000);
+
+    // And the snapshot is still there — no white screen.
+    expect(result.current.snapshot?.served_at_ms).toBe('1234567890');
+
+    unmount();
+  }, 10_000);
+
   it('reconnects to a fresh server on the same port and re-enters live', async () => {
     const srv1 = await spawnServer({ snapshotAt: 1_111_111_111 });
     const port = srv1.port;

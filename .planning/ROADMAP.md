@@ -165,7 +165,13 @@ Drop in this order, never reverse:
   3. By 2026-06-12 (day 36), a real $50 USDsui deposit → hedge mint → withdrawal-request → redeem cycle completes successfully on mainnet, with NAV-per-share post-cycle within tolerance of pre-cycle.
   4. The mainnet redeploy contingency is documented: if Predict mainnet does not ship by 2026-06-09, the fallback (vault + Margin path on mainnet, testnet-only Predict path) is executed with written rationale.
   5. Mainnet contract addresses and the deployer wallet tx digests for vault creation are recorded in `config/mainnet.toml` and the README, ready for verification by judges.
-**Plans**: TBD
+**Plans**: 6 plans
+- [ ] 05-01-PLAN.md — Preflight Script: 15 named assertions including 60-USDsui balance gate, contingency-aware TBD scan, codegen-drift check (Wave 1; DEPLOY-01)
+- [ ] 05-02-PLAN.md — Predict-Mainnet Contingency: scripts/predict-mainnet-check.sh + .github/workflows/predict-mainnet-check.yml cron '0 9 9 6 *' + name-only ABI match (Wave 1; DEPLOY-09)
+- [ ] 05-03-PLAN.md — Mainnet Deploy Script: scripts/mainnet-deploy.sh fork of e2e-vault-deploy.sh with 7 mainnet divergences + MAINNET-DEPLOY.json dual-naming (quote_type_tag + dusdc_type_tag) + AdminCap owner assertion (Wave 2; DEPLOY-02, DEPLOY-03)
+- [ ] 05-04-PLAN.md — Smoke Test Scripts: scripts/mainnet-smoke-test.{sh,ts} staged 5-gate cycle with dual ±10 bps assertion (per-depositor + vault NAV) + 1h cooldown via codegen + partial-fulfill retry (Wave 3; DEPLOY-04)
+- [ ] 05-05-PLAN.md — Strategy.toml Cooldown + Codegen Extension: [redemption].cooldown_ms = 3_600_000 + emit to Move/Python/TS (Wave 1; DEPLOY-04 enabler)
+- [ ] 05-06-PLAN.md — Docs Mainnet Record: docs/MAINNET-FUNDING.md 0->0 correction + Mainnet Deploy Record + Smoke Test Receipts + Contingency Status template sections + README.md Phase 5 closure (Wave 4; DEPLOY-02 + DEPLOY-04 traceability)
 
 ### Phase 6: Submission Package
 **Goal**: A polished Devpost submission package — demo video recorded against mainnet, README/architecture diagram/strategy whitepaper rendered, backtest report exported, all bundled by 2026-06-16.
@@ -192,7 +198,7 @@ Decimal phases (e.g., 2.1) reserved for urgent insertions and execute between th
 | 2. Vault Move Package + Testnet Deploy | 0/9 | Not started | - |
 | 3. Backtest Harness + Two-Protocol PTB | 4/9 | In Progress|  |
 | 4. PLP Risk Studio Dashboard + Relay | 0/TBD | Not started | - |
-| 5. Mainnet Redeploy + Smoke Test | 0/TBD | Not started | - |
+| 5. Mainnet Redeploy + Smoke Test | 0/6 | Not started | - |
 | 6. Submission Package | 0/TBD | Not started | - |
 
 ## Coverage

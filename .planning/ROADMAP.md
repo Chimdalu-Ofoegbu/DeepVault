@@ -170,7 +170,7 @@ Drop in this order, never reverse:
 - [x] 05-01-PLAN.md — Mainnet-Readiness Preflight + Predict-Mainnet Check: scripts/preflight.sh (write but don't execute) + scripts/predict-mainnet-check.sh (manual tool, no cron) — both lint-clean, dry-run-clean against current TBD state (Wave 1; DEPLOY-01)
 - [ ] 05-02-PLAN.md — Mainnet-Readiness Deploy + Smoke Test Toolkit: scripts/mainnet-deploy.sh + scripts/mainnet-smoke-test.sh + scripts/mainnet-smoke-test.ts + MAINNET-DEPLOY.json placeholder ({"status":"not_deployed","reason":"Predict mainnet pending"}); written but not executed (Wave 2; DEPLOY-02, DEPLOY-03)
 - [ ] 05-03-PLAN.md — Testnet Smoke Test Harness (judge-facing): scripts/testnet-smoke-test.sh + .ts forked from e2e-vault-cycle with staged checkpoints + dual ±10 bps NAV gate + STRATEGY_CONSTANTS.REDEMPTION_COOLDOWN_MS import (Wave 2; DEPLOY-04)
-- [ ] 05-04-PLAN.md — Strategy.toml Cooldown + Codegen Extension: [redemption].cooldown_ms = 3_600_000 + emit to Move/Python/TS (Wave 1; DEPLOY-04 enabler)
+- [x] 05-04-PLAN.md — Strategy.toml Cooldown + Codegen Extension: [redemption].cooldown_ms = 3_600_000 + emit to Move/Python/TS (Wave 1; DEPLOY-04 enabler)
 - [ ] 05-05-PLAN.md — Mainnet-Readiness Docs + README Hardening + make demo: rename docs/MAINNET-FUNDING.md → docs/MAINNET-READINESS.md; document ≤30-min post-submission deploy procedure; README laypitch + testnet addresses + Phase 5 closure; wire `make demo` Makefile target to testnet-smoke-test.sh (Wave 3; DEPLOY-09)
 
 ### Phase 6: Submission Package
@@ -199,7 +199,7 @@ Decimal phases (e.g., 2.1) reserved for urgent insertions and execute between th
 | 2. Vault Move Package + Testnet Deploy | 0/9 | Not started | - |
 | 3. Backtest Harness + Two-Protocol PTB | 4/9 | In Progress|  |
 | 4. PLP Risk Studio Dashboard + Relay | 0/TBD | Not started | - |
-| 5. Testnet Demo Hardening + Mainnet-Readiness Toolkit | 0/5 | Not started | - |
+| 5. Testnet Demo Hardening + Mainnet-Readiness Toolkit | 2/5 | In progress | - |
 | 6. Submission Package | 0/TBD | Not started | - |
 
 ## Coverage

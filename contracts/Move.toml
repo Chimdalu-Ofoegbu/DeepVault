@@ -22,7 +22,13 @@ deepbook = { git = "https://github.com/MystenLabs/deepbookv3.git", subdir = "pac
 # and contracts/tests/_spike/predict_manager_owner_spike_test.move resolve.
 # Plan 02-01 Rule-3 auto-fix: Phase 1 added the import but not the dep, so
 # `sui move build` would have failed in CI on first run.
-deepbook_predict = { git = "https://github.com/MystenLabs/deepbookv3.git", subdir = "packages/predict", rev = "1159d79af33c70e09e406310e1d8f067832ede9d" }
+#
+# published-at MUST be set so Sui CLI knows Predict is already deployed on testnet
+# and treats this as a linked-not-published dep. Without it, `sui client publish`
+# refuses with "Unpublished dependencies: deepbook_predict". This is the testnet
+# package id from CLAUDE.md Stack Pins (mirrors the `predict` named-address below).
+# Phase 5 mainnet-deploy.sh swaps in the mainnet address when Predict ships.
+deepbook_predict = { git = "https://github.com/MystenLabs/deepbookv3.git", subdir = "packages/predict", rev = "1159d79af33c70e09e406310e1d8f067832ede9d", published-at = "0xf5ea2b3749c65d6e56507cc35388719aadb28f9cab873696a2f8687f5c785138" }
 
 [addresses]
 deepvault = "0x0"

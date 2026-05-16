@@ -15,20 +15,34 @@ MoveStdlib = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/s
 # DeepBookV3 — predict-testnet-4-16 branch SHA-pinned per Pitfall 0-A.
 # Bump only after a Monday Predict sweep triages the diff (see scripts/predict-diff.sh, Plan 05).
 # SHA captured 2026-05-09 from `git ls-remote https://github.com/MystenLabs/deepbookv3.git predict-testnet-4-16`.
-deepbook = { git = "https://github.com/MystenLabs/deepbookv3.git", subdir = "packages/deepbook", rev = "1159d79af33c70e09e406310e1d8f067832ede9d" }
+# override=true tells Sui to use this git-cached deepbook copy and ignore the
+# transitive `deepbook = { local = "../deepbook" }` declaration inside the
+# local-vendored predict (see deepbook_predict below). Both copies are
+# byte-identical (vendored subtree == cache contents at this SHA), but Sui
+# requires the explicit override to deduplicate.
+deepbook = { git = "https://github.com/MystenLabs/deepbookv3.git", subdir = "packages/deepbook", rev = "1159d79af33c70e09e406310e1d8f067832ede9d", override = true }
 
-# DeepBook Predict — same SHA, different subdir.
-# Required so contracts/sources/svi_view.move (`use deepbook_predict::oracle`)
-# and contracts/tests/_spike/predict_manager_owner_spike_test.move resolve.
-# Plan 02-01 Rule-3 auto-fix: Phase 1 added the import but not the dep, so
-# `sui move build` would have failed in CI on first run.
+# DeepBook Predict — same SHA, vendored locally because upstream
+# packages/predict/ at SHA 1159d79a is missing Published.toml (sibling packages
+# deepbook/, deepbook_margin/, margin_liquidation/ all ship theirs). Without
+# Published.toml in the resolved dep root, `sui client publish` refuses with
+# "Unpublished dependencies: deepbook_predict" because Sui Move 2024 edition
+# uses Published.toml — not Move.toml's `published-at` directive — to map
+# (package, chain-id) -> on-chain address.
 #
-# published-at MUST be set so Sui CLI knows Predict is already deployed on testnet
-# and treats this as a linked-not-published dep. Without it, `sui client publish`
-# refuses with "Unpublished dependencies: deepbook_predict". This is the testnet
-# package id from CLAUDE.md Stack Pins (mirrors the `predict` named-address below).
-# Phase 5 mainnet-deploy.sh swaps in the mainnet address when Predict ships.
-deepbook_predict = { git = "https://github.com/MystenLabs/deepbookv3.git", subdir = "packages/predict", rev = "1159d79af33c70e09e406310e1d8f067832ede9d", published-at = "0xf5ea2b3749c65d6e56507cc35388719aadb28f9cab873696a2f8687f5c785138" }
+# We point at the existing vendored subtree at scripts/deepbookv3/ and ship a
+# hand-authored Published.toml there for predict (see
+# scripts/deepbookv3/packages/predict/Published.toml). Reproducible across CI
+# and other dev machines because the file is committed.
+#
+# The deepbook entry above stays git-based because the upstream packages/deepbook/
+# already ships Published.toml correctly.
+#
+# scripts/verify-deepbookv3-pin.sh handles this asymmetry — deepbook's rev is
+# the canonical SHA and the predict vendor is asserted equivalent via subtree
+# pull. Phase 5 mainnet-deploy.sh swaps in the mainnet Predict address when
+# DeepBook Predict ships on mainnet.
+deepbook_predict = { local = "../scripts/deepbookv3/packages/predict" }
 
 [addresses]
 deepvault = "0x0"

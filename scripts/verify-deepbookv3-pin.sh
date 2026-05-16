@@ -22,9 +22,12 @@ cd "$REPO_ROOT"
 
 MOVE_TOML="contracts/Move.toml"
 
-# 1. Extract the rev pins from contracts/Move.toml. Both DeepBookV3 (subdir
-#    deepbook) and DeepBookPredict (subdir predict) live in the same vendored
-#    subtree, so they MUST share the same rev.
+# 1. Extract the rev pin from contracts/Move.toml.
+#
+# Post-2026-05-16: deepbook_predict is local-vendored (no `rev =`), because
+# upstream packages/predict/ is missing Published.toml. deepbook stays git-based
+# (its upstream Published.toml is present). The vendored predict source must
+# match the deepbook SHA — verified below via subtree-split equivalence.
 extract_rev() {
   local key="$1"
   grep -E "^${key}\s*=" "${MOVE_TOML}" \
@@ -33,23 +36,34 @@ extract_rev() {
 }
 
 DEEPBOOKV3_REV="$(extract_rev deepbook)"
-DEEPBOOKPREDICT_REV="$(extract_rev deepbook_predict)"
 
 if [[ -z "${DEEPBOOKV3_REV}" ]] || [[ ! "${DEEPBOOKV3_REV}" =~ ^[0-9a-f]{40}$ ]]; then
   echo "::error::Could not parse a 40-char SHA rev from ${MOVE_TOML} DeepBookV3 line."
   exit 2
 fi
 
-if [[ -z "${DEEPBOOKPREDICT_REV}" ]] || [[ ! "${DEEPBOOKPREDICT_REV}" =~ ^[0-9a-f]{40}$ ]]; then
-  echo "::error::Could not parse a 40-char SHA rev from ${MOVE_TOML} DeepBookPredict line."
+# Sanity: deepbook_predict line MUST be present and MUST be a `local = "..."`
+# pointer at the vendored subtree. If it ever flips back to a git dep, the
+# author needs to confirm upstream finally shipped Published.toml.
+PREDICT_LINE="$(grep -E '^deepbook_predict\s*=' "${MOVE_TOML}" | head -n 1)"
+if [[ -z "${PREDICT_LINE}" ]]; then
+  echo "::error::No deepbook_predict line found in ${MOVE_TOML}."
   exit 2
 fi
+if [[ ! "${PREDICT_LINE}" =~ local[[:space:]]*=[[:space:]]*\"\.\./scripts/deepbookv3/packages/predict\" ]]; then
+  echo "::error::deepbook_predict is not the expected local-vendor pointer in ${MOVE_TOML}."
+  echo "         Found:    ${PREDICT_LINE}"
+  echo "         Expected: deepbook_predict = { local = \"../scripts/deepbookv3/packages/predict\" }"
+  echo "         If upstream has shipped Published.toml for predict, you can revert to a"
+  echo "         git dep — also re-symmetrize this script's rev-equality check."
+  exit 1
+fi
 
-if [[ "${DEEPBOOKV3_REV}" != "${DEEPBOOKPREDICT_REV}" ]]; then
-  echo "::error::DeepBookV3 and DeepBookPredict rev pins disagree."
-  echo "          DeepBookV3:      ${DEEPBOOKV3_REV}"
-  echo "          DeepBookPredict: ${DEEPBOOKPREDICT_REV}"
-  echo "          Both deps point at the same upstream repo and must share a SHA."
+# Assert the vendored predict ships its hand-authored Published.toml (the whole
+# reason we switched to local-vendor).
+PREDICT_PUBLISHED="scripts/deepbookv3/packages/predict/Published.toml"
+if [[ ! -f "${PREDICT_PUBLISHED}" ]]; then
+  echo "::error::${PREDICT_PUBLISHED} missing — local-vendor predict requires it."
   exit 1
 fi
 

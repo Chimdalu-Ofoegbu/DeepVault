@@ -29,10 +29,12 @@ The policy below is committed in writing in `CONTRIBUTING.md` before backtest op
 
 ### Wallet & Mainnet Funding
 
-- **D-06: Two separate wallets** — testnet dev wallet (high churn, faucet-fed, exposed to scripts) and mainnet deploy wallet (locked down, only used for Phase 5 deploy + smoke test + demo recording).
-- **D-07: Mainnet budget ~$80** — $50 USDsui smoke deposit (DEPLOY-04) + ~$15 SUI gas for `sui client publish` and shared-object creation + ~$15 buffer for demo PTBs and one redeploy retry. **Risk flag:** $30 buffer is tight; if Phase 5 hits a redeploy due to Predict mainnet contract churn or a config bug, top up to $150 before Day 36.
-- **D-08: USDsui acquired via Cetus DEX swap from SUI.** Path: CEX → SUI → mainnet wallet → Cetus swap → USDsui. Document the playbook in `docs/MAINNET-FUNDING.md` during Phase 0 so Phase 5 execution is mechanical.
-- **D-09: No third "fresh wallet" provisioned** — fresh-wallet PTB tests (PTB-06) use ephemeral generated keypairs in CI and a fresh manual keypair on demo day.
+> **Superseded 2026-05-13 (D-06, D-07, D-08 mainnet execution portions):** Per the Phase 5 reshape, mainnet redeploy and the $50 USDsui smoke deposit are deferred to post-submission. DeepBook Predict mainnet is not shipping inside the submission window; the planned mainnet smoke test would degrade to a no-hedge cycle. Phase 5 now delivers a mainnet-readiness toolkit (scripts + runbook) that is ready to execute when Predict mainnet ships. Funding budget for the submission window: **$0** spent on mainnet operations. The $80 budget and wallet provisioning below remain valid for post-submission execution. `docs/MAINNET-FUNDING.md` is renamed to `docs/MAINNET-READINESS.md` and absorbs the funding playbook as the post-submission operational reference. See ROADMAP.md Phase 5 reshape note + `.planning/phases/05-testnet-demo-hardening/05-CONTEXT.md` for full rationale.
+
+- **D-06: Two separate wallets** — testnet dev wallet (high churn, faucet-fed, exposed to scripts) and mainnet deploy wallet (locked down, only used for post-submission Phase 5 toolkit execution + demo recording). *Wallet-isolation guidance still applies; mainnet wallet stays cold until post-submission.*
+- **D-07: Mainnet budget ~$80** — $50 USDsui smoke deposit + ~$15 SUI gas + ~$15 buffer. *Superseded for submission window: $0 spent; budget retained for post-submission execution.* Risk flag (top up to $150 if redeploy retry needed) applies at post-submission execution time, not now.
+- **D-08: USDsui acquired via Cetus DEX swap from SUI.** Path: CEX → SUI → mainnet wallet → Cetus swap → USDsui. Documented in the renamed `docs/MAINNET-READINESS.md`. *Execution deferred to post-submission.*
+- **D-09: No third "fresh wallet" provisioned** — fresh-wallet PTB tests (PTB-06) use ephemeral generated keypairs in CI and a fresh manual keypair on demo day. *Unchanged — testnet-only concern.*
 
 ### Repository Visibility & Build-in-Public
 

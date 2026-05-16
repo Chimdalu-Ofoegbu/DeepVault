@@ -47,7 +47,7 @@ DeepVault is a composable structured product on Sui's DeepBook Predict that fuse
 
 **Deploy & submission**
 - [ ] Testnet integration end-to-end against current Predict contracts (verified each Monday)
-- [ ] Mainnet redeploy actually executed before submission (USDsui, Predict mainnet contracts)
+- [ ] Mainnet-readiness toolkit shipped (scripts + runbook), execution deferred to post-submission. *Superseded 2026-05-13: was "Mainnet redeploy actually executed before submission"; DeepBook Predict mainnet not shipping in submission window, see Phase 5 reshape note. Toolkit ready for post-submission deploy when Predict ships.*
 - [ ] Demo video showing single PTB opening Margin + Predict + vault share atomically, with dashboard
 - [ ] Documentation: README, architecture diagram, strategy whitepaper
 - [ ] Submission package complete by 2026-06-16
@@ -81,13 +81,13 @@ DeepVault is a composable structured product on Sui's DeepBook Predict that fuse
 
 - **Timeline**: Hard ship date 2026-06-16, 39 days from start. Cuts are non-negotiable; the brief's "hard floor" (vault + dashboard with live SVI) is the primary path, not the fallback.
 - **Team**: Solo builder. No parallelizable second pair of hands; sequencing matters more than it would on a team build.
-- **Smart contracts**: Move on Sui. Mainnet redeploy must execute by submission, not just be planned.
+- **Smart contracts**: Move on Sui. Mainnet-readiness toolkit must exist and lint clean by submission. *Superseded 2026-05-13: was "Mainnet redeploy must execute by submission" — execution deferred to post-submission pending DeepBook Predict mainnet launch. See Phase 5 reshape note in ROADMAP.md.*
 - **Quant work bar**: Hedge pricing must be mathematically correct (SVI evaluator audited against Gatheral paper); sizing is fixed at v1 but parameterized for future dynamic policies.
 - **Backtest integrity**: Lookahead-bias audit is required before any backtest number is published. Manual cross-checks on PnL distribution, drawdown, and hedge cost.
 - **Tech stack**: Move (vault), Python numpy/pandas (backtest), Node.js or Rust event-subscription service, React + TypeScript + Plotly + Recharts (dashboard), DeepBookV3 SDK + DeepBook Predict package + deepbook_margin.
 - **Data**: `predict-server.testnet.mystenlabs.com` indexer + Sui RPC `OracleSVIUpdated` event subscriptions; BTC historical data for backtest.
 - **Composability primitives that must be load-bearing**: Programmable Transaction Blocks, Move object model, BalanceManager + TradeCap pattern, shared objects, Move events.
-- **Submission**: Working end-to-end testnet flow + mainnet redeploy + handbook-grade backtest + demo video + documentation, all bundled by 2026-06-16.
+- **Submission**: Working end-to-end testnet flow (full PTB + Predict + Margin + vault hedge, `make demo` reproducible) + mainnet-readiness toolkit (scripts + runbook, ready for post-submission deploy) + handbook-grade backtest + demo video + documentation, all bundled by 2026-06-16. *Superseded 2026-05-13: was "+ mainnet redeploy"; execution deferred to post-submission. See Phase 5 reshape note.*
 
 ## Key Decisions
 
@@ -95,7 +95,8 @@ DeepVault is a composable structured product on Sui's DeepBook Predict that fuse
 |----------|-----------|---------|
 | Two-protocol PTB (Margin + Predict), not three (drop Iron Bank) | 39-day solo window. Brief's Week 6 cut. Iron Bank is the highest-risk integration; story still works without it. | — Pending |
 | Fixed-ratio hedge sizing in v1, parameterized for future dynamic policies | Correct fixed sizing > buggy dynamic sizing under time pressure. Brief's Week 8 cut adopted up front. | — Pending |
-| Mainnet redeploy in v1 scope (actual deploy, not just plan) | User decision. Handbook expects day-one redeploy; doing it real differentiates submission. | — Pending |
+| ~~Mainnet redeploy in v1 scope (actual deploy, not just plan)~~ → **Mainnet-readiness toolkit in v1 scope; execution deferred to post-submission.** | **Superseded 2026-05-13.** Original rationale: handbook expects day-one redeploy; doing it real differentiates submission. **Updated rationale:** DeepBook Predict mainnet not shipping inside 2026-06-16 submission window; executing a mainnet smoke test without Predict would degrade to a no-hedge supply/redeem cycle — a worse judge story than the full-PTB testnet demo. Toolkit (preflight + deploy + smoke-test + predict-check scripts + MAINNET-READINESS.md runbook) ships ready for post-submission execution. | Superseded |
+| **Testnet demo target (Phase 5 + 6)** | **Reshape 2026-05-13.** Demo recorded on testnet against full PTB (Margin + Predict + vault hedge) with ~10-second mainnet-readiness sidebar showing post-submission deploy procedure. | — Pending |
 | Live SVI surface but no time-travel slider | Brief's Week 10 cut. Live plot is high-leverage; slider is polish. | — Pending |
 | Quality bar over component count | User explicit: "I want everything to be quality." Vault math, backtest integrity, and dashboard polish take priority over breadth. | — Pending |
 | BTC-only at v1 | Brief targets BTC for SVI/backtest; multi-asset is post-submission. | — Pending |

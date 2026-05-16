@@ -1,8 +1,10 @@
-# DeepVault Mainnet Funding Playbook
+# DeepVault Mainnet-Readiness Playbook
 
-**Purpose:** Mechanical Phase 5 execution — the mainnet redeploy is high-pressure; this playbook eliminates decisions during deploy.
-**Budget:** ~$80 USD total (with $30 buffer; see Risk Flag below)
-**Trigger:** Phase 5 begins ~Day 33 (2026-06-10) per ROADMAP.
+> **Reshape note (2026-05-13):** Renamed from `MAINNET-FUNDING.md`. Mainnet deploy is deferred to post-submission pending DeepBook Predict mainnet launch. This doc now serves two audiences: judges/readers who want to understand the mainnet posture, and the post-submission operator running the actual deploy. The toolkit (preflight + predict-mainnet-check + mainnet-deploy + mainnet-smoke-test scripts) is committed and lint-clean, ready to invoke. See `.planning/phases/05-testnet-demo-hardening/05-CONTEXT.md` for full rationale. The funding playbook below remains valid for post-submission execution. **Plan 05-05 will append "Why deferred" + "≤30-minute deploy procedure" sections at the top of this doc.**
+
+**Purpose:** Two audiences. (1) **Judges/readers** — understand why DeepVault's mainnet deploy is post-submission and how the toolkit is ready to invoke. (2) **Post-submission operator** — mechanical playbook for the actual deploy when Predict mainnet ships. The playbook below eliminates decisions during the high-pressure window.
+**Budget:** ~$80 USD total (with $30 buffer; see Risk Flag below). $0 spent during submission window.
+**Trigger:** Post-submission, after `scripts/predict-mainnet-check.sh` reports `shipped:true` and ABI matches.
 
 ## Wallets (per `.planning/phases/00-setup-ground-rules/00-CONTEXT.md` D-06)
 

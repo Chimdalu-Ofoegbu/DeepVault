@@ -79,17 +79,19 @@ Requirements for the Sui Overflow 2026 submission (target 2026-06-16). Each maps
 - [ ] **DASH-12**: Position viewer with PnL attribution per user (PLP yield, hedge cost, hedge payoff, net)
 - [ ] **DASH-13**: WebSocket auto-reconnect tested by killing connection mid-recording — no white screen, no stale state
 
-### Mainnet Deploy & Submission
+### Demo Hardening + Mainnet-Readiness & Submission
 
-- [ ] **DEPLOY-01**: Mainnet preflight script asserts `Move.toml` matches mainnet config, golden vectors pass against fresh mainnet RPC, Predict mainnet pkg version pinned, Margin mainnet pkg version pinned, full Move test suite + Python parity tests green
-- [ ] **DEPLOY-02**: `deepvault` Move package published on Sui mainnet; package ID captured in `config/mainnet.toml`
-- [ ] **DEPLOY-03**: Vault shared object created on mainnet with USDsui as quote asset; AdminCap held by deployer wallet
-- [ ] **DEPLOY-04**: Mainnet smoke test: real $50 USDsui deposit → hedge mint → withdrawal-request → redeem cycle completes successfully (deadline 2026-06-12)
-- [ ] **DEPLOY-05**: Demo video (~3 min) recorded against MAINNET vault showing the single PTB opening Margin + Predict + vault share atomically, with wallet-diff visualization and tx digest visible
-- [ ] **DEPLOY-06**: README with one-paragraph laypitch, glossary, prerequisites, reproducible-run script (`make demo`); cold-read tested
+> **Reshape note (2026-05-13):** DEPLOY-01..05 and DEPLOY-09 were originally written for the "Mainnet Redeploy + Smoke Test" Phase 5. Because DeepBook Predict mainnet is not expected to ship inside the submission window (2026-06-16), executing a mainnet smoke test would degrade to a hedge-less supply/redeem cycle — a worse judge story than the full-PTB testnet demo. Phase 5 pivots to hardening the testnet demo and writing the mainnet toolkit for post-submission execution. The mainnet push remains intended post-submission if DeepVault pursues mainnet launch. See ROADMAP.md Phase 5 reshape note + `.planning/phases/05-testnet-demo-hardening/05-CONTEXT.md`.
+
+- [x] **DEPLOY-01**: Mainnet-readiness preflight script written (not executed): `scripts/preflight.sh` asserts `Move.toml` mainnet block matches config, golden vectors pass against fresh mainnet RPC for non-Predict reads, full Move test suite + Python parity tests green; intentionally exits non-zero today because Predict mainnet pkg is TBD. Lints clean (`bash -n`, `shellcheck`).
+- [ ] **DEPLOY-02**: Mainnet-readiness deploy script written (not executed): `scripts/mainnet-deploy.sh` will publish `deepvault` Move package on Sui mainnet and capture package ID into `config/mainnet.toml` when invoked post-submission. `MAINNET-DEPLOY.json` placeholder `{"status":"not_deployed","reason":"Predict mainnet pending"}` committed. Script lints clean; deferred execution.
+- [ ] **DEPLOY-03**: Mainnet vault-creation parameters frozen in `scripts/mainnet-deploy.sh` and verified against testnet analog (USDsui quote-type tag slot, AdminCap recipient = deployer wallet, treasury cap quarantine). Acceptance: source-code parity with `scripts/e2e-vault-deploy.sh` for the parameter-binding section. Execution deferred.
+- [ ] **DEPLOY-04**: Testnet smoke test harness (`scripts/testnet-smoke-test.sh` + `.ts`) — staged $50-equivalent DUSDC deposit → hedge mint → withdrawal-request → redeem cycle with dual ±10 bps NAV verification (per-depositor return ratio ≥ 99.9% AND vault NAV drift ≤ 10 bps). Reproducible by judges via `make demo`. Green by 2026-06-12.
+- [ ] **DEPLOY-05**: Demo video (~3 min) recorded against TESTNET vault showing the single PTB opening Margin + Predict + vault share atomically, with wallet-diff visualization and tx digest visible (Sui testnet explorer); ~10-second mainnet-readiness sidebar explains the post-submission deploy procedure from `docs/MAINNET-READINESS.md`.
+- [ ] **DEPLOY-06**: README with one-paragraph laypitch, glossary, prerequisites, reproducible-run script (`make demo` → `scripts/testnet-smoke-test.sh`); cold-read tested
 - [ ] **DEPLOY-07**: Architecture diagram (PNG/SVG, GitHub-renderable) showing all components and data flow
 - [ ] **DEPLOY-08**: Strategy whitepaper (Gatheral-style, 6-12 pages): SSVI math, hedge price formula, sizing policy bounds, liquidation-under-worst-case-Predict-outcome section, risk disclosures
-- [ ] **DEPLOY-09**: Mainnet redeploy contingency documented — if Predict mainnet does not ship by 2026-06-09, fallback to "vault + Margin path on mainnet, testnet-only Predict path" with written rationale
+- [ ] **DEPLOY-09**: `docs/MAINNET-READINESS.md` (renamed from `docs/MAINNET-FUNDING.md`) documents (a) why mainnet deploy is deferred to post-submission, (b) the ≤30-minute deploy procedure (preflight → deploy → smoke-test), (c) the architecture's mainnet compatibility — single-config-flip via `config/mainnet.toml`, (d) the original $80 funding budget retained for post-submission execution.
 - [ ] **DEPLOY-10**: Submission package complete on Devpost / Sui Overflow portal by 2026-06-16
 
 ## v2 Requirements
@@ -201,7 +203,7 @@ Phase mapping finalized by gsd-roadmapper on 2026-05-09 against ROADMAP.md. Ever
 | DASH-11 | Phase 4 | Pending |
 | DASH-12 | Phase 4 | Pending |
 | DASH-13 | Phase 4 | Pending |
-| DEPLOY-01 | Phase 5 | Pending |
+| DEPLOY-01 | Phase 5 | Complete |
 | DEPLOY-02 | Phase 5 | Pending |
 | DEPLOY-03 | Phase 5 | Pending |
 | DEPLOY-04 | Phase 5 | Pending |

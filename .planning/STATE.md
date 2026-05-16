@@ -4,14 +4,14 @@ milestone: v1.1
 milestone_name: milestone
 status: executing
 stopped_at: Phase 5 context gathered
-last_updated: "2026-05-13T02:10:45.048Z"
-last_activity: 2026-05-13 -- Phase 05 planning complete
+last_updated: "2026-05-16T02:36:33.907Z"
+last_activity: 2026-05-16
 progress:
   total_phases: 7
   completed_phases: 5
-  total_plans: 48
-  completed_plans: 42
-  percent: 88
+  total_plans: 47
+  completed_plans: 43
+  percent: 91
 ---
 
 # Project State
@@ -21,15 +21,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-08)
 
 **Core value:** A working PLP+Hedge vault on DeepBook Predict with a credible, auditable risk dashboard, deployed on mainnet by 2026-06-16. Quality of vault math, backtest, and dashboard polish > component count.
-**Current focus:** Phase 04 — plp-risk-studio-dashboard-relay
+**Current focus:** Phase 05 — testnet-demo-hardening
 
 ## Current Position
 
-Phase: 04 (plp-risk-studio-dashboard-relay) — EXECUTING
-Plan: 1 of 7
+Phase: 05 (testnet-demo-hardening) — EXECUTING
+Plan: 2 of 5
 Status: Ready to execute
 Next phase: Phase 2 — Vault & Strategy (PLP+Hedge vault, predict_adapter, rebalance); imports parity-gate-protected svi_view::binary_price; depends on Phase 1
-Last activity: 2026-05-13 -- Phase 05 planning complete
+Last activity: 2026-05-16
 
 Progress: [█████████████████] 100% Phase 1 / 100% milestone
 
@@ -88,6 +88,7 @@ Progress: [█████████████████] 100% Phase 1 / 1
 | Phase 03 P07 | 35min | 2 tasks | 2 files |
 | Phase 03 P08 | 50min | 3 tasks | 6 files |
 | Phase 03 P09 | 30min | 3 tasks | 7 files |
+| Phase 05 P05-01 | 25min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -214,6 +215,7 @@ Recent decisions affecting current work:
 - [Phase ?]: Phase 03-08: WalkForwardResult shipped with equity_curve + actions fields (9 total, not 7) so Plan 03-09 HTML report renderer + __main__.py CLI both have a stable contract
 - [Phase ?]: Phase 03-08: __main__.py CLI W4 lock closes BACK-05 gap — Plan 03-09 nightly-backtest.yml can drop '|| echo' fallback and invoke python -m deepvault walk_forward --window-days 365 --out reports/full-365d.json directly
 - [Phase ?]: [Phase 03]: Plan 03-09 PHASE 3 CLOSED — BACK-10 institutional HTML report ships at 95% coverage; nightly-backtest.yml invokes real 365-day CLI (W4 lock — no masking fallback); 6-job ci.yml matrix names preserved; capability containment grep extended to TradeCap/MarginManager/MockMarginPool + TS demo no-free-binding; W6 template extension adds per-trade table + IV surface evolution; W5 e2e test loads micro-fixture-7d.json + asserts 11 D-13 anchors + HTML >= 50 KB; D-07 hand-recompute notebook ships 9 cells with to-the-wei asserts
+- [Phase ?]: Phase 05-01: Preflight + predict-mainnet-check landed; section-aware scan_tbd_slots awk helper (T-05-02 mitigation); name-only ABI v1 with post-submission TODO; no GitHub Actions cron (D-07); 60 USDsui balance gate (carry-forward research #1)
 
 ### Pending Todos
 
@@ -254,6 +256,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-13T01:10:25.866Z
+Last session: 2026-05-16T02:36:01.249Z
 Stopped at: Phase 5 context gathered
-Resume file: .planning/phases/05-mainnet-redeploy-smoke-test/05-CONTEXT.md
+Resume file: None

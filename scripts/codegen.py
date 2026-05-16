@@ -88,6 +88,7 @@ def emit_move(data: dict) -> str:
     infl = data["inflation_defense"]
     ltv = data["ltv"]
     oracle = data["oracle"]
+    red = data["redemption"]
     svi = data["svi"]
 
     parts = [header_block("//", sv)]
@@ -135,6 +136,11 @@ def emit_move(data: dict) -> str:
     parts.append(
         f"    public fun max_staleness_seconds(): u64 {{ {oracle['max_staleness_seconds']} }}\n"
     )
+    parts.append("\n    // Redemption (1h cooldown between redeem_request and redeem_fulfill)\n")
+    parts.append(
+        f"    public fun redemption_cooldown_ms(): u64 "
+        f"{{ {red['cooldown_ms']} }}\n"
+    )
     parts.append("\n    // SVI (locked per re-routes D-01, D-10, D-13, D-14)\n")
     parts.append(f'    public fun svi_parameterization(): vector<u8> {{ b"{svi["parameterization"]}" }}\n')
     parts.append(f"    public fun svi_scale(): u8 {{ {svi['scale']} }}\n")
@@ -158,6 +164,7 @@ def emit_python(data: dict) -> str:
     infl = data["inflation_defense"]
     ltv = data["ltv"]
     oracle = data["oracle"]
+    red = data["redemption"]
     svi = data["svi"]
 
     parts = [header_block("#", sv)]
@@ -197,6 +204,8 @@ def emit_python(data: dict) -> str:
     )
     parts.append("# Oracle\n")
     parts.append(f"MAX_STALENESS_SECONDS: Final[int] = {oracle['max_staleness_seconds']}\n\n")
+    parts.append("# Redemption (1h cooldown between redeem_request and redeem_fulfill)\n")
+    parts.append(f"REDEMPTION_COOLDOWN_MS: Final[int] = {red['cooldown_ms']}\n\n")
     parts.append("# SVI (locked per re-routes D-01, D-10, D-13, D-14)\n")
     parts.append(f'SVI_PARAMETERIZATION: Final[str] = "{svi["parameterization"]}"\n')
     parts.append(f"SVI_SCALE: Final[int] = {svi['scale']}\n")
@@ -219,6 +228,7 @@ def emit_typescript(data: dict) -> str:
     infl = data["inflation_defense"]
     ltv = data["ltv"]
     oracle = data["oracle"]
+    red = data["redemption"]
     svi = data["svi"]
 
     parts = [header_block("//", sv)]
@@ -253,6 +263,8 @@ def emit_typescript(data: dict) -> str:
     )
     parts.append("  // Oracle\n")
     parts.append(f"  MAX_STALENESS_SECONDS: {oracle['max_staleness_seconds']},\n\n")
+    parts.append("  // Redemption (1h cooldown between redeem_request and redeem_fulfill)\n")
+    parts.append(f"  REDEMPTION_COOLDOWN_MS: {red['cooldown_ms']}n,\n\n")
     parts.append("  // SVI (locked per re-routes D-01, D-10, D-13, D-14)\n")
     parts.append(f"  SVI_PARAMETERIZATION: '{svi['parameterization']}' as const,\n")
     parts.append(f"  SVI_SCALE: {svi['scale']},\n")

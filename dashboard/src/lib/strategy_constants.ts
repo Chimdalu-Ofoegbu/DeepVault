@@ -36,6 +36,9 @@ export const STRATEGY_CONSTANTS = {
   // Oracle
   MAX_STALENESS_SECONDS: 300,
 
+  // Redemption (1h cooldown between redeem_request and redeem_fulfill)
+  REDEMPTION_COOLDOWN_MS: 3600000n,
+
   // SVI (locked per re-routes D-01, D-10, D-13, D-14)
   SVI_PARAMETERIZATION: 'raw_svi_5param' as const,
   SVI_SCALE: 9,

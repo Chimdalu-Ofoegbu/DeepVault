@@ -37,6 +37,9 @@ WORST_CASE_SETTLEMENT_HAIRCUT_BPS: Final[int] = 10000
 # Oracle
 MAX_STALENESS_SECONDS: Final[int] = 300
 
+# Redemption (1h cooldown between redeem_request and redeem_fulfill)
+REDEMPTION_COOLDOWN_MS: Final[int] = 3600000
+
 # SVI (locked per re-routes D-01, D-10, D-13, D-14)
 SVI_PARAMETERIZATION: Final[str] = "raw_svi_5param"
 SVI_SCALE: Final[int] = 9

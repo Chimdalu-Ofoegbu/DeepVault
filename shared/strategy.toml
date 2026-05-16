@@ -51,6 +51,12 @@ worst_case_settlement_haircut_bps = 10000       # 100% — assume full Predict a
 [oracle]
 max_staleness_seconds = 300         # 5 min; vault refuses supply/rebalance if exceeded
 
+[redemption]
+# 1-hour cooldown between redeem_request and redeem_fulfill (D-01 of Phase 2).
+# Single source of truth for the on-chain redeem.move gate AND the testnet-smoke-test wait.
+# Plan 05-04 extracted this from contracts/sources/redeem.move const COOLDOWN_MS.
+cooldown_ms = 3_600_000   # 1 hour = 60 * 60 * 1000
+
 [svi]
 # LOCKED per re-routed D-01, D-10, D-13, D-14 (CONTEXT.md "Re-routes from RESEARCH.md (2026-05-09)").
 # Math layer matches on-chain Predict — see shared/svi-spec.md.

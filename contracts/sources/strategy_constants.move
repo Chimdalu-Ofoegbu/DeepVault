@@ -35,6 +35,9 @@ module deepvault::strategy_constants {
     // Oracle
     public fun max_staleness_seconds(): u64 { 300 }
 
+    // Redemption (1h cooldown between redeem_request and redeem_fulfill)
+    public fun redemption_cooldown_ms(): u64 { 3600000 }
+
     // SVI (locked per re-routes D-01, D-10, D-13, D-14)
     public fun svi_parameterization(): vector<u8> { b"raw_svi_5param" }
     public fun svi_scale(): u8 { 9 }

@@ -86,7 +86,7 @@ Requirements for the Sui Overflow 2026 submission (target 2026-06-16). Each maps
 - [x] **DEPLOY-01**: Mainnet-readiness preflight script written (not executed): `scripts/preflight.sh` asserts `Move.toml` mainnet block matches config, golden vectors pass against fresh mainnet RPC for non-Predict reads, full Move test suite + Python parity tests green; intentionally exits non-zero today because Predict mainnet pkg is TBD. Lints clean (`bash -n`, `shellcheck`).
 - [ ] **DEPLOY-02**: Mainnet-readiness deploy script written (not executed): `scripts/mainnet-deploy.sh` will publish `deepvault` Move package on Sui mainnet and capture package ID into `config/mainnet.toml` when invoked post-submission. `MAINNET-DEPLOY.json` placeholder `{"status":"not_deployed","reason":"Predict mainnet pending"}` committed. Script lints clean; deferred execution.
 - [ ] **DEPLOY-03**: Mainnet vault-creation parameters frozen in `scripts/mainnet-deploy.sh` and verified against testnet analog (USDsui quote-type tag slot, AdminCap recipient = deployer wallet, treasury cap quarantine). Acceptance: source-code parity with `scripts/e2e-vault-deploy.sh` for the parameter-binding section. Execution deferred.
-- [ ] **DEPLOY-04**: Testnet smoke test harness (`scripts/testnet-smoke-test.sh` + `.ts`) — staged $50-equivalent DUSDC deposit → hedge mint → withdrawal-request → redeem cycle with dual ±10 bps NAV verification (per-depositor return ratio ≥ 99.9% AND vault NAV drift ≤ 10 bps). Reproducible by judges via `make demo`. Green by 2026-06-12.
+- [x] **DEPLOY-04**: Testnet smoke test harness (`scripts/testnet-smoke-test.sh` + `.ts`) — staged $50-equivalent DUSDC deposit → hedge mint → withdrawal-request → redeem cycle with dual ±10 bps NAV verification (per-depositor return ratio ≥ 99.9% AND vault NAV drift ≤ 10 bps). Reproducible by judges via `make demo`. Green by 2026-06-12.
 - [ ] **DEPLOY-05**: Demo video (~3 min) recorded against TESTNET vault showing the single PTB opening Margin + Predict + vault share atomically, with wallet-diff visualization and tx digest visible (Sui testnet explorer); ~10-second mainnet-readiness sidebar explains the post-submission deploy procedure from `docs/MAINNET-READINESS.md`.
 - [ ] **DEPLOY-06**: README with one-paragraph laypitch, glossary, prerequisites, reproducible-run script (`make demo` → `scripts/testnet-smoke-test.sh`); cold-read tested
 - [ ] **DEPLOY-07**: Architecture diagram (PNG/SVG, GitHub-renderable) showing all components and data flow
@@ -206,7 +206,7 @@ Phase mapping finalized by gsd-roadmapper on 2026-05-09 against ROADMAP.md. Ever
 | DEPLOY-01 | Phase 5 | Complete |
 | DEPLOY-02 | Phase 5 | Pending |
 | DEPLOY-03 | Phase 5 | Pending |
-| DEPLOY-04 | Phase 5 | Pending |
+| DEPLOY-04 | Phase 5 | Complete |
 | DEPLOY-05 | Phase 6 | Pending |
 | DEPLOY-06 | Phase 6 | Pending |
 | DEPLOY-07 | Phase 6 | Pending |

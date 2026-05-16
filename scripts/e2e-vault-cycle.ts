@@ -31,7 +31,14 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Transaction } from '@mysten/sui/transactions';
-import { SuiClient, getFullnodeUrl } from '@mysten/sui/client';
+// @mysten/sui 2.16.0 moved SuiClient -> SuiJsonRpcClient under /jsonRpc;
+// getFullnodeUrl was renamed to getJsonRpcFullnodeUrl. Re-alias both names
+// so the rest of this file reads identically to the pre-2.16.0 shape.
+// Matches scripts/testnet-smoke-test.ts and scripts/two-protocol-ptb-demo.ts.
+import {
+    SuiJsonRpcClient as SuiClient,
+    getJsonRpcFullnodeUrl as getFullnodeUrl,
+} from '@mysten/sui/jsonRpc';
 import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
 
 type DeployJson = {
@@ -148,7 +155,12 @@ async function main(): Promise<void> {
         throw new Error('ORACLE_SVI_ID env var required (BTC-USD OracleSVI shared object id)');
     }
 
-    const client = new SuiClient({ url: getFullnodeUrl('testnet') });
+    // SuiJsonRpcClient (aliased as SuiClient above) requires `network` alongside `url`
+    // in @mysten/sui 2.16.0 — see SuiJsonRpcClientOptions definition.
+    const client = new SuiClient({
+        url: getFullnodeUrl('testnet'),
+        network: 'testnet',
+    });
     const keypair = Ed25519Keypair.fromSecretKey(privateKey);
     const signerAddress = keypair.getPublicKey().toSuiAddress();
     console.log(`==> signer: ${signerAddress}`);

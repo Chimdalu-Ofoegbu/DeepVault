@@ -6,7 +6,7 @@
 #   test      — sui move test + pnpm -r test + uv run pytest
 #   lint      — pnpm -r lint + ruff check + ruff format --check
 #   clean     — remove node_modules, .venv, contracts/build
-#   demo      — placeholder until Phase 6
+#   demo      — judge-facing testnet smoke test (scripts/testnet-smoke-test.sh)
 
 .PHONY: install codegen build test lint clean demo
 
@@ -38,4 +38,8 @@ clean:
 	rm -rf backtest/.venv
 
 demo:
-	@echo "TODO: Phase 6 fills this in — should reproduce demo end-to-end from fresh clone"
+	@echo "==> Running testnet smoke test (judge-facing demo cycle)."
+	@echo "    Requires SUI_PRIVATE_KEY + ORACLE_SVI_ID env vars."
+	@echo "    See docs/DEV-BOOTSTRAP.md for ephemeral testnet keypair setup."
+	@echo "    Wall-clock duration: ~1 hour (REDEMPTION_COOLDOWN_MS + RPC latency)."
+	bash scripts/testnet-smoke-test.sh

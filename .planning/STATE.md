@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
 status: executing
-stopped_at: Completed Plan 05-04 (cooldown codegen)
-last_updated: "2026-05-16T03:05:22.699Z"
+stopped_at: Completed Plan 05-02 (mainnet-readiness toolkit scripts)
+last_updated: "2026-05-16T03:20:24.306Z"
 last_activity: 2026-05-16
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 47
-  completed_plans: 45
-  percent: 96
+  completed_plans: 46
+  percent: 98
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 05 (testnet-demo-hardening) — EXECUTING
-Plan: 4 of 5 (next: 05-02 mainnet-readiness deploy toolkit OR 05-03 testnet smoke test — both Wave 2; 05-04 cooldown codegen complete)
+Plan: 5 of 5 (next: 05-02 mainnet-readiness deploy toolkit OR 05-03 testnet smoke test — both Wave 2; 05-04 cooldown codegen complete)
 Status: Ready to execute
 Next phase: Phase 6 — Submission Package (demo video + README cold-read + architecture diagram + whitepaper + Devpost submission)
 Last activity: 2026-05-16
@@ -91,6 +91,7 @@ Progress: [█████████████████] 100% Phase 1 / 1
 | Phase 05 P05-01 | 25min | 2 tasks | 2 files |
 | Phase 05 P05-04 | ~10min | 2 tasks | 6 files |
 | Phase 05 P05-03 | 30min | 2 tasks | 2 files |
+| Phase 05 P02 | 35min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -221,6 +222,8 @@ Recent decisions affecting current work:
 - [Phase 05]: Plan 05-04: shared/strategy.toml [redemption].cooldown_ms = 3_600_000 extension + codegen emits to Move (redemption_cooldown_ms() u64), Python (REDEMPTION_COOLDOWN_MS: Final[int] = 3600000), TS (REDEMPTION_COOLDOWN_MS: 3600000n BigInt) — single source of truth, T-05-08 mitigation. contracts/sources/redeem.move local const COOLDOWN_MS deleted; cooldown gate at L115 now calls strategy_constants::redemption_cooldown_ms() inline matching nav_scale() pattern. sui move build exits 0; 15/15 redeem-related move tests PASS (deepvault::redeem_test/admin_test/integration_test/property_test). Idempotent (md5-verified); --check exits 0.
 - [Phase ?]: Phase 05-03: testnet-smoke-test.{sh,ts} ship lint-clean and tsc-clean; 7 staged checkpoint PASS markers + dual ±10 bps gate; imports REDEMPTION_COOLDOWN_MS from Plan 05-04 codegen; DEPLOY-04 static gate closed; execution gate deferred to operator per Plan 01-05/02-09 fallback pattern
 - [Phase ?]: Plan 05-03 surfaced latent bug: @mysten/sui 2.16.0 moved SuiClient->SuiJsonRpcClient under /jsonRpc and getFullnodeUrl->getJsonRpcFullnodeUrl; scripts/e2e-vault-cycle.ts + possibly scripts/two-protocol-ptb-demo.ts still import broken names from /client (would crash at runtime). Fix scope-boundary'd: testnet-smoke-test.ts uses correct 2.16.0 imports; others deferred to follow-up plan
+- [Phase ?]: Plan 05-02: mainnet-readiness toolkit complete — mainnet-deploy.sh + mainnet-smoke-test.{sh,ts} + MAINNET-DEPLOY.json placeholder shipped as write-but-don't-execute. extract_config_value() awk helper eliminates testnet-literal hardcoding (Pitfall 14). AdminCap owner gate inline (DEPLOY-03 closure). Same @mysten/sui 2.16.0 import fix Plan 05-03 established.
+- [Phase ?]: Plan 05-02: MAINNET-DEPLOY.json schema dual-named (quote_type_tag canonical + dusdc_type_tag alias) for Phase 4 dashboard back-compat; oracle_svi_id field per carry-forward research finding.
 
 ### Pending Todos
 
@@ -261,6 +264,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-16T03:04:41.460Z
-Stopped at: Completed Plan 05-04 (cooldown codegen)
+Last session: 2026-05-16T03:20:00.796Z
+Stopped at: Completed Plan 05-02 (mainnet-readiness toolkit scripts)
 Resume file: None

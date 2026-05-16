@@ -1,0 +1,10 @@
+{
+  "status": "not_deployed",
+  "reason": "Predict mainnet pending - DeepBook Predict not shipped on Sui mainnet as of submission window 2026-06-16",
+  "scripts_ready": true,
+  "toolkit_path": "scripts/mainnet-deploy.sh",
+  "preflight_path": "scripts/preflight.sh",
+  "predict_check_path": "scripts/predict-mainnet-check.sh",
+  "smoke_test_path": "scripts/mainnet-smoke-test.sh",
+  "runbook": "docs/MAINNET-READINESS.md"
+}

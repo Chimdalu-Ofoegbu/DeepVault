@@ -171,7 +171,7 @@ Drop in this order, never reverse:
 - [x] 05-02-PLAN.md — Mainnet-Readiness Deploy + Smoke Test Toolkit: scripts/mainnet-deploy.sh + scripts/mainnet-smoke-test.sh + scripts/mainnet-smoke-test.ts + MAINNET-DEPLOY.json placeholder ({"status":"not_deployed","reason":"Predict mainnet pending"}); written but not executed (Wave 2; DEPLOY-02, DEPLOY-03)
 - [x] 05-03-PLAN.md — Testnet Smoke Test Harness (judge-facing): scripts/testnet-smoke-test.sh + .ts forked from e2e-vault-cycle with staged checkpoints + dual ±10 bps NAV gate + STRATEGY_CONSTANTS.REDEMPTION_COOLDOWN_MS import (Wave 2; DEPLOY-04)
 - [x] 05-04-PLAN.md — Strategy.toml Cooldown + Codegen Extension: [redemption].cooldown_ms = 3_600_000 + emit to Move/Python/TS (Wave 1; DEPLOY-04 enabler)
-- [ ] 05-05-PLAN.md — Mainnet-Readiness Docs + README Hardening + make demo: rename docs/MAINNET-FUNDING.md → docs/MAINNET-READINESS.md; document ≤30-min post-submission deploy procedure; README laypitch + testnet addresses + Phase 5 closure; wire `make demo` Makefile target to testnet-smoke-test.sh (Wave 3; DEPLOY-09)
+- [x] 05-05-PLAN.md — Mainnet-Readiness Docs + README Hardening + make demo: rename docs/MAINNET-FUNDING.md → docs/MAINNET-READINESS.md; document ≤30-min post-submission deploy procedure; README laypitch + testnet addresses + Phase 5 closure; wire `make demo` Makefile target to testnet-smoke-test.sh (Wave 3; DEPLOY-09)
 
 ### Phase 6: Submission Package
 **Goal**: A polished Devpost submission package — demo video recorded against testnet (full PTB + Predict + Margin + vault hedge), README/architecture diagram/strategy whitepaper rendered, backtest report exported, all bundled by 2026-06-16.

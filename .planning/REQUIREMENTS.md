@@ -91,7 +91,7 @@ Requirements for the Sui Overflow 2026 submission (target 2026-06-16). Each maps
 - [ ] **DEPLOY-06**: README with one-paragraph laypitch, glossary, prerequisites, reproducible-run script (`make demo` → `scripts/testnet-smoke-test.sh`); cold-read tested
 - [ ] **DEPLOY-07**: Architecture diagram (PNG/SVG, GitHub-renderable) showing all components and data flow
 - [ ] **DEPLOY-08**: Strategy whitepaper (Gatheral-style, 6-12 pages): SSVI math, hedge price formula, sizing policy bounds, liquidation-under-worst-case-Predict-outcome section, risk disclosures
-- [ ] **DEPLOY-09**: `docs/MAINNET-READINESS.md` (renamed from `docs/MAINNET-FUNDING.md`) documents (a) why mainnet deploy is deferred to post-submission, (b) the ≤30-minute deploy procedure (preflight → deploy → smoke-test), (c) the architecture's mainnet compatibility — single-config-flip via `config/mainnet.toml`, (d) the original $80 funding budget retained for post-submission execution.
+- [x] **DEPLOY-09**: `docs/MAINNET-READINESS.md` (renamed from `docs/MAINNET-FUNDING.md`) documents (a) why mainnet deploy is deferred to post-submission, (b) the ≤30-minute deploy procedure (preflight → deploy → smoke-test), (c) the architecture's mainnet compatibility — single-config-flip via `config/mainnet.toml`, (d) the original $80 funding budget retained for post-submission execution.
 - [ ] **DEPLOY-10**: Submission package complete on Devpost / Sui Overflow portal by 2026-06-16
 
 ## v2 Requirements
@@ -211,7 +211,7 @@ Phase mapping finalized by gsd-roadmapper on 2026-05-09 against ROADMAP.md. Ever
 | DEPLOY-06 | Phase 6 | Pending |
 | DEPLOY-07 | Phase 6 | Pending |
 | DEPLOY-08 | Phase 6 | Pending |
-| DEPLOY-09 | Phase 5 | Pending |
+| DEPLOY-09 | Phase 5 | Complete |
 | DEPLOY-10 | Phase 6 | Pending |
 
 **Coverage:**

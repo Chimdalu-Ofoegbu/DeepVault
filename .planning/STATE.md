@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
-status: executing
+status: verifying
 stopped_at: Completed Plan 05-02 (mainnet-readiness toolkit scripts)
-last_updated: "2026-05-16T03:20:24.306Z"
+last_updated: "2026-05-16T03:30:22.273Z"
 last_activity: 2026-05-16
 progress:
   total_phases: 7
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 47
-  completed_plans: 46
-  percent: 98
+  completed_plans: 47
+  percent: 100
 ---
 
 # Project State
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 
 Phase: 05 (testnet-demo-hardening) — EXECUTING
 Plan: 5 of 5 (next: 05-02 mainnet-readiness deploy toolkit OR 05-03 testnet smoke test — both Wave 2; 05-04 cooldown codegen complete)
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Next phase: Phase 6 — Submission Package (demo video + README cold-read + architecture diagram + whitepaper + Devpost submission)
 Last activity: 2026-05-16
 
@@ -92,6 +92,7 @@ Progress: [█████████████████] 100% Phase 1 / 1
 | Phase 05 P05-04 | ~10min | 2 tasks | 6 files |
 | Phase 05 P05-03 | 30min | 2 tasks | 2 files |
 | Phase 05 P02 | 35min | 3 tasks | 4 files |
+| Phase 05 P05-05 | 25min | 4 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -224,6 +225,7 @@ Recent decisions affecting current work:
 - [Phase ?]: Plan 05-03 surfaced latent bug: @mysten/sui 2.16.0 moved SuiClient->SuiJsonRpcClient under /jsonRpc and getFullnodeUrl->getJsonRpcFullnodeUrl; scripts/e2e-vault-cycle.ts + possibly scripts/two-protocol-ptb-demo.ts still import broken names from /client (would crash at runtime). Fix scope-boundary'd: testnet-smoke-test.ts uses correct 2.16.0 imports; others deferred to follow-up plan
 - [Phase ?]: Plan 05-02: mainnet-readiness toolkit complete — mainnet-deploy.sh + mainnet-smoke-test.{sh,ts} + MAINNET-DEPLOY.json placeholder shipped as write-but-don't-execute. extract_config_value() awk helper eliminates testnet-literal hardcoding (Pitfall 14). AdminCap owner gate inline (DEPLOY-03 closure). Same @mysten/sui 2.16.0 import fix Plan 05-03 established.
 - [Phase ?]: Plan 05-02: MAINNET-DEPLOY.json schema dual-named (quote_type_tag canonical + dusdc_type_tag alias) for Phase 4 dashboard back-compat; oracle_svi_id field per carry-forward research finding.
+- [Phase ?]: Plan 05-05: Phase 5 closes. docs/MAINNET-READINESS.md hardened with 3 new top sections (Why deferred / 30-min procedure / single-config-flip architecture); funding playbook preserved; Step 2 USDsui corrected to 60 USDsui (10 seed + 50 smoke). README hardened with testnet pointers + make demo docs + Mainnet readiness section + Week 5 log. Makefile demo target wired to bash scripts/testnet-smoke-test.sh. All 5 DEPLOY-XX closed; Phase 6 takes the baton.
 
 ### Pending Todos
 
@@ -264,6 +266,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-16T03:20:00.796Z
+Last session: 2026-05-16T03:29:43.621Z
 Stopped at: Completed Plan 05-02 (mainnet-readiness toolkit scripts)
 Resume file: None

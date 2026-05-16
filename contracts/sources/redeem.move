@@ -34,11 +34,6 @@ const ECooldownNotMet: u64 = 302;
 const EInsufficientLiquidity: u64 = 303;
 const EZeroSharesRequested: u64 = 304;
 
-// === Constants ===
-
-/// D-01: 1-hour cooldown between redeem_request and redeem_fulfill.
-const COOLDOWN_MS: u64 = 3_600_000;
-
 // === Events ===
 
 public struct RedeemRequested has copy, drop, store {
@@ -117,7 +112,7 @@ public fun redeem_fulfill<Quote>(
         slot_ts = vault::request_timestamp_ms(slot_ref);
         outstanding = vault::request_shares_value(slot_ref);
     };
-    assert!(now_ms >= slot_ts + COOLDOWN_MS, ECooldownNotMet);
+    assert!(now_ms >= slot_ts + strategy_constants::redemption_cooldown_ms(), ECooldownNotMet);
     assert!(outstanding > 0, EZeroSharesRequested);
 
     // pro_rata = outstanding * nav_per_share / NAV_SCALE (1e9).

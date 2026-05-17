@@ -112,23 +112,23 @@ describe('<ArbCheckerPanel>', () => {
     expect(screen.getByText(/Waiting for first SVI update/i)).toBeInTheDocument();
   });
 
-  it('mounts ReferenceLine at y=0 with rose-600 stroke (UI-SPEC color contract)', async () => {
+  it('mounts ReferenceLine at y=0 with the coral hedge token stroke (UI-SPEC color contract)', async () => {
     // Recharts in jsdom does not paint a sized SVG (ResponsiveContainer needs a
     // ResizeObserver-reported width); we cannot rely on rendered <line> elements.
-    // The UI-SPEC color contract is enforced at the SOURCE level — assert that
-    // the panel source declares <ReferenceLine y={0} stroke="#e11d48" .../>.
-    const src = await import('@/components/panels/ArbCheckerPanel?raw' as string).catch(
-      () => null,
-    );
-    // Vite ?raw is dev-server only; fall back to fs read in vitest.
+    // The UI-SPEC color contract is enforced at the SOURCE level. Plan 04.1-03
+    // recolored the ReferenceLine from the hardcoded rose-600 hex to the shared
+    // CHART_COLORS.hedge token — assert the violation threshold + the g(k) line
+    // both source their stroke from CHART_COLORS (no hardcoded hex).
     const { readFileSync } = await import('node:fs');
     const { resolve } = await import('node:path');
     const file = resolve(
       process.cwd(),
       'src/components/panels/ArbCheckerPanel.tsx',
     );
-    const text = src ? (src as { default: string }).default : readFileSync(file, 'utf8');
+    const text = readFileSync(file, 'utf8');
     expect(text).toMatch(/<ReferenceLine[\s\S]*?y=\{0\}/);
-    expect(text).toMatch(/stroke="#e11d48"/);
+    expect(text).toMatch(/stroke=\{CHART_COLORS\.hedge\}/);
+    expect(text).toMatch(/stroke=\{CHART_COLORS\.accent\}/);
+    expect(text).not.toMatch(/#e11d48|#06b6d4/);
   });
 });

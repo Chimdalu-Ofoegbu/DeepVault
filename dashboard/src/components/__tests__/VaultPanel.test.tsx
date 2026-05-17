@@ -1,34 +1,28 @@
-// dashboard/src/components/__tests__/VaultPanel.test.tsx — Plan 04-05 Task 1.
+// dashboard/src/components/__tests__/VaultPanel.test.tsx — Plan 04-05 Task 1;
+// the `<VaultPanel>` card block rewritten in Plan 04.1-03 Task 3.
 //
 // Validates UI-SPEC §Component Inventory VaultPanel + DASH-06:
 //   - useVaultState computes navPerShareScaled and utilizationBps via BigInt math
 //     (no Number coercion at the math layer; Pitfall 8 mitigation)
-//   - VaultPanel renders empty state ("Vault is initializing") when view is null
-//   - VaultPanel renders three stat blocks (NAV / total assets / total shares)
-//     using formatNav/formatDusdc/formatShares via NumericValue
-//   - utilization radial chart container is mounted; chart fill is cyan-500
-//   - paused banner appears when vault.paused === true
+//   - VaultPanel is a PURE DATA FEEDER (Plan 04.1-03 Task 3 / UI-SPEC #7):
+//     it renders no card; it re-exports the `useVaultState`/`VaultView` data
+//     path and exposes the `vaultStats` selector the headline `dh-stats` strip
+//     consumes. The Phase-4 card UI (shadcn Card + Recharts RadialBarChart)
+//     was removed because App.tsx mounts the headline strip, not a vault card.
 //
-// Recharts in jsdom: ResponsiveContainer cannot resolve a width, so we test on
-// (a) data-testid presence, (b) source-level grep for the locked colors, and
-// (c) DOM text assertions for the labels + formatted numerics.
+// The `useVaultState` BigInt-math tests are unchanged — the hook itself is
+// untouched by the reskin.
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { render, screen, renderHook } from '@testing-library/react';
+import { renderHook } from '@testing-library/react';
 
-import { VaultPanel } from '@/components/panels/VaultPanel';
+import {
+  useVaultState as useVaultStateReExport,
+  vaultStats,
+  type VaultView,
+} from '@/components/panels/VaultPanel';
 import { useVaultState } from '@/hooks/useVaultState';
 import type { FullSnapshot } from '@/lib/types';
-
-// ResizeObserver shim (Recharts ResponsiveContainer reaches for it in jsdom).
-class ResizeObserverPolyfill {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
-}
-(globalThis as unknown as { ResizeObserver: typeof ResizeObserverPolyfill }).ResizeObserver =
-  (globalThis as unknown as { ResizeObserver: typeof ResizeObserverPolyfill }).ResizeObserver ??
-  ResizeObserverPolyfill;
 
 const NAV_SCALE = 1_000_000_000n;
 
@@ -154,31 +148,24 @@ describe('useVaultState (BigInt math)', () => {
   });
 });
 
-describe('<VaultPanel>', () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-    vi.setSystemTime(Date.parse('2026-05-12T12:00:00Z'));
-  });
-  afterEach(() => {
-    vi.useRealTimers();
+describe('VaultPanel (pure data feeder — Plan 04.1-03 Task 3)', () => {
+  it('re-exports the useVaultState data path', () => {
+    // The headline strip + DepositWithdrawPanel import the vault data path
+    // through this module; the re-export must be the same hook.
+    expect(useVaultStateReExport).toBe(useVaultState);
   });
 
-  it('renders empty state when view is null', () => {
-    render(<VaultPanel view={null} />);
-    expect(screen.getByText('Vault is initializing')).toBeInTheDocument();
-    expect(
-      screen.getByText(/Once the deployer seeds 10 DUSDC into the vault/i),
-    ).toBeInTheDocument();
-    expect(screen.queryByTestId('utilization-chart')).not.toBeInTheDocument();
+  it('vaultStats returns null for a null view', () => {
+    expect(vaultStats(null)).toBeNull();
   });
 
-  it('renders populated state with NAV / total assets / total shares / utilization', () => {
+  it('vaultStats projects a VaultView into display-ready figures', () => {
     const now = Date.now();
-    const view = {
+    const view: VaultView = {
       vault: {
         vault_id: '0xVAULT',
         balance: '200000000',
-        total_assets: '1000000000',
+        total_assets: '1000000000', // 1000 DUSDC at 6 decimals
         total_shares: '500000000',
         paused: false,
         last_updated_ms: String(now - 5_000),
@@ -187,57 +174,42 @@ describe('<VaultPanel>', () => {
       utilizationBps: 8000n, // 80.00%
       lastUpdatedMs: now - 5_000,
     };
-    render(<VaultPanel view={view} />);
-    expect(screen.getByText('NAV per share')).toBeInTheDocument();
-    expect(screen.getByText('Total assets (DUSDC)')).toBeInTheDocument();
-    expect(screen.getByText('Total shares')).toBeInTheDocument();
-    expect(screen.getByText('Utilization')).toBeInTheDocument();
-    expect(screen.getByTestId('utilization-chart')).toBeInTheDocument();
-    // utilization 80.0% percentage label
-    expect(screen.getByText(/80\.0%/)).toBeInTheDocument();
-    // 8000 bps numeric
-    expect(screen.getByText(/8000 bps/i)).toBeInTheDocument();
-    // paused banner is NOT in the document when paused=false
-    expect(screen.queryByTestId('paused-banner')).not.toBeInTheDocument();
+    const stats = vaultStats(view);
+    expect(stats).not.toBeNull();
+    expect(stats!.navDusdc).toBe(1000); // 1_000_000_000 / 1e6
+    expect(stats!.utilizationPct).toBe(80); // 8000 bps / 100
+    expect(stats!.navPerShare).toBe(2); // 2 * NAV_SCALE / 1e9
+    expect(stats!.paused).toBe(false);
   });
 
-  it('renders PAUSED banner when vault.paused === true', () => {
+  it('vaultStats surfaces the paused flag (D-10)', () => {
     const now = Date.now();
-    const view = {
+    const view: VaultView = {
       vault: {
         vault_id: '0xVAULT',
-        balance: '200000000',
-        total_assets: '1000000000',
-        total_shares: '500000000',
+        balance: '0',
+        total_assets: '10000000',
+        total_shares: '1000000',
         paused: true,
-        last_updated_ms: String(now - 5_000),
+        last_updated_ms: String(now),
       },
-      navPerShareScaled: 2n * NAV_SCALE,
-      utilizationBps: 8000n,
-      lastUpdatedMs: now - 5_000,
+      navPerShareScaled: NAV_SCALE,
+      utilizationBps: 0n,
+      lastUpdatedMs: now,
     };
-    render(<VaultPanel view={view} />);
-    expect(screen.getByTestId('paused-banner')).toBeInTheDocument();
-    expect(screen.getByTestId('paused-banner').textContent).toMatch(/PAUSED/);
+    expect(vaultStats(view)!.paused).toBe(true);
   });
 
-  it('routes all numeric rendering through format.ts helpers (grep gate)', async () => {
+  it('renders no standalone card — no Card / RadialBarChart / chart hex (grep gate)', async () => {
     const { readFileSync } = await import('node:fs');
     const { resolve } = await import('node:path');
     const file = resolve(process.cwd(), 'src/components/panels/VaultPanel.tsx');
     const text = readFileSync(file, 'utf8');
-    expect(text).toMatch(/formatNav/);
-    expect(text).toMatch(/formatDusdc/);
-    expect(text).toMatch(/formatShares/);
-    expect(text).toMatch(/formatBps/);
-  });
-
-  it('mounts a Recharts RadialBarChart with cyan-500 active fill (UI-SPEC color contract)', async () => {
-    const { readFileSync } = await import('node:fs');
-    const { resolve } = await import('node:path');
-    const file = resolve(process.cwd(), 'src/components/panels/VaultPanel.tsx');
-    const text = readFileSync(file, 'utf8');
-    expect(text).toMatch(/RadialBarChart/);
-    expect(text).toMatch(/#06b6d4/); // cyan-500 (UI-SPEC §Recharts palette utilization active band)
+    expect(text).not.toMatch(/RadialBarChart/);
+    expect(text).not.toMatch(/<Card/);
+    expect(text).not.toMatch(/#06b6d4|#10b981|#94a3b8/);
+    // the data path is preserved + importable
+    expect(text).toMatch(/useVaultState/);
+    expect(text).toMatch(/VaultView/);
   });
 });

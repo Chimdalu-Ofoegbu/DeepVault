@@ -58,9 +58,11 @@ const surfaceFixture = (ts: number): SurfaceView => ({
 });
 
 describe('<SurfacePanel>', () => {
-  it("renders empty state ('Waiting for first SVI update') when surface is null", () => {
+  it("renders empty state ('Waiting for surface data') when surface is null", () => {
+    // Plan 04.1-03 reskin: the empty-state copy is the UI-SPEC verbatim
+    // "Waiting for surface data" heading (replaced the Phase-4 placeholder).
     render(<SurfacePanel surface={null} />);
-    expect(screen.getByText(/Waiting for first SVI update/i)).toBeInTheDocument();
+    expect(screen.getByText(/Waiting for surface data/i)).toBeInTheDocument();
     // The plot mock should NOT be in the document.
     expect(screen.queryByTestId('plot-mock')).not.toBeInTheDocument();
   });

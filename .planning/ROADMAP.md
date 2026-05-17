@@ -160,13 +160,13 @@ Drop in this order, never reverse:
 **Goal:** The DeepVault dashboard reskinned in-place to faithfully match the Claude Design handoff (per 04.1-UI-SPEC.md): OKLCH token system, Geist type, the rail + headline + 3-row card layout, all 8 panels reskinned, a new live EventStreamPanel, a working light/dark theme toggle, and a full motion pass — without regressing any Phase 4 verified behavior.
 **Requirements**: D-01, D-02, D-03, D-04 (CONTEXT.md decisions — decimal phase, no REQ-ID mapping)
 **Depends on:** Phase 4
-**Plans:** 3/6 plans executed
+**Plans:** 4/6 plans executed
 
 Plans:
 - [x] 04.1-01-PLAN.md (Wave 1) — Design token foundation: OKLCH :root + paper-light into globals.css, tailwind.config off hsl(var()), Geist self-host, CHART_COLORS constants
 - [x] 04.1-02-PLAN.md (Wave 2) — Layout shell: App.tsx rail+headline+3-row grid, new Rail.tsx scroll-anchor nav, Header.tsx db-bar reskin
 - [x] 04.1-03-PLAN.md (Wave 3) — Panel reskin A: SurfacePanel, ArbCheckerPanel (g(k) retained), VaultPanel — db-card chrome + mint chart colors
-- [ ] 04.1-04-PLAN.md (Wave 3) — Panel reskin B: BucketGauge, ExposurePanel (BTC-only), WhatIfSimulator (7 shock buttons), PositionViewer (BTC-only), DepositWithdrawPanel chrome, 5 status primitives
+- [x] 04.1-04-PLAN.md (Wave 3) — Panel reskin B: BucketGauge, ExposurePanel (BTC-only), WhatIfSimulator (7 shock buttons), PositionViewer (BTC-only), DepositWithdrawPanel chrome, 5 status primitives
 - [ ] 04.1-05-PLAN.md (Wave 4) — EventStreamPanel (live relay ring-buffer ticker) + theme toggle control
 - [ ] 04.1-06-PLAN.md (Wave 5) — Motion pass: SVI-draw loader, pulse dots, hover transitions, shock toggle, event flash
 
@@ -214,7 +214,7 @@ Decimal phases (e.g., 2.1) reserved for urgent insertions and execute between th
 | 2. Vault Move Package + Testnet Deploy | 0/9 | Not started | - |
 | 3. Backtest Harness + Two-Protocol PTB | 4/9 | In Progress|  |
 | 4. PLP Risk Studio Dashboard + Relay | 0/TBD | Not started | - |
-| 04.1 Dashboard Visual Polish | 3/6 | In Progress|  |
+| 04.1 Dashboard Visual Polish | 4/6 | In Progress|  |
 | 5. Testnet Demo Hardening + Mainnet-Readiness Toolkit | 2/5 | In progress | - |
 | 6. Submission Package | 0/TBD | Not started | - |
 

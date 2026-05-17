@@ -3,9 +3,10 @@
 //
 // Phase 04.1 reskin (UI-SPEC #12): recolor-only pass — the tone tokens move
 // from the Phase-4 cyan/amber/rose Tailwind ramp to the handoff mint/coral
-// OKLCH tokens, and the connected state gains the handoff `live-dot` element
-// (the pulse keyframe lands in Plan 06's motion pass; this plan ships the
-// mint dot + color). The WsState state machine is UNCHANGED.
+// OKLCH tokens, and the connected state carries the handoff `live-dot`
+// element. Plan 04.1-06's motion pass attaches the `@keyframes pulse`
+// connection-ring animation to the `.live-dot` class in globals.css, so the
+// connected-state dot now pulses. The WsState state machine is UNCHANGED.
 //
 // Maps the WsState state machine (from useWebSocket, Plan 04-03 Task 2) to:
 //   live         → 'LIVE'                 mint + live-dot
@@ -67,20 +68,10 @@ export function RelayStatusPill({ state, secondsUntilReconnect }: Props) {
       className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider border"
       style={toneStyle}
     >
-      {/* Connected state shows the handoff live-dot (pulse keyframe lands in
-          Plan 06's motion pass). */}
-      {state === 'live' && (
-        <i
-          aria-hidden="true"
-          style={{
-            width: 5,
-            height: 5,
-            borderRadius: '50%',
-            background: 'var(--accent)',
-            display: 'inline-block',
-          }}
-        />
-      )}
+      {/* Connected state shows the handoff `live-dot` — the .live-dot class
+          carries the @keyframes pulse connection-ring animation (Plan 04.1-06
+          motion section in globals.css; muted under prefers-reduced-motion). */}
+      {state === 'live' && <i className="live-dot" aria-hidden="true" />}
       {text}
     </Badge>
   );

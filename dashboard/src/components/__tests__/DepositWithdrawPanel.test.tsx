@@ -85,7 +85,7 @@ describe('<DepositWithdrawPanel>', () => {
     mockUseCurrentAccount.mockReturnValue(null);
     render(<DepositWithdrawPanel vaultView={vaultView} />);
     expect(
-      screen.getByText('Connect wallet to deposit or redeem'),
+      screen.getByText(/Connect wallet to deposit or redeem/),
     ).toBeInTheDocument();
   });
 
@@ -146,7 +146,7 @@ describe('<DepositWithdrawPanel>', () => {
     });
   });
 
-  it('source declares useSignAndExecuteTransaction + Insufficient DUSDC copy + destructive Cancel + Confirm deposit', async () => {
+  it('source: PTB + sign flow preserved, chrome reskinned to db-card, 1-hour cooldown copy present', async () => {
     const { readFileSync } = await import('node:fs');
     const { resolve } = await import('node:path');
     const file = resolve(
@@ -154,10 +154,19 @@ describe('<DepositWithdrawPanel>', () => {
       'src/components/panels/DepositWithdrawPanel.tsx',
     );
     const text = readFileSync(file, 'utf8');
+    // PTB + dapp-kit sign flow is byte-identical (link contract / T-04.1-10).
     expect(text).toMatch(/useSignAndExecuteTransaction/);
+    expect(text).toMatch(/buildSupplyTx/);
+    expect(text).toMatch(/buildRedeemRequestTx/);
     expect(text).toMatch(/Insufficient DUSDC/);
-    expect(text).toMatch(/Cancel redemption request/);
     expect(text).toMatch(/Confirm deposit of/);
-    expect(text).toMatch(/variant=['"]destructive['"]/); // destructive button for cancel
+    // Destructive withdraw/cancel buttons stay coral (variant=destructive).
+    expect(text).toMatch(/variant=['"]destructive['"]/);
+    // UI-SPEC §Destructive verbatim withdraw confirmation copy.
+    expect(text).toMatch(/1-hour cooldown/);
+    expect(text).toMatch(/escrowed shares are\s+returned\s+immediately/);
+    // Chrome reskinned to the handoff db-card (shadcn Card wrapper removed).
+    expect(text).toMatch(/db-card/);
+    expect(text).not.toMatch(/from\s+['"]@\/components\/ui\/card['"]/);
   });
 });

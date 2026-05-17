@@ -1,11 +1,18 @@
-// dashboard/src/components/__tests__/PositionViewer.test.tsx — Plan 04-07 Task 2.
+// dashboard/src/components/__tests__/PositionViewer.test.tsx — Plan 04.1-04 Task 3.
 //
-// Validates the zero-vs-unknown rendering contract:
-//   - plpYield === null → em-dash with tooltip "PLP yield realized at redemption..."
-//   - hedgePayoff === null → em-dash with tooltip "Hedge has not been unwound yet..."
+// Validates the Phase 04.1 reskin (UI-SPEC #5, LD-2) + the preserved
+// zero-vs-unknown rendering contract:
+//   - plpYield/hedgePayoff/netQuote === null → em-dash with locked tooltip
 //   - hedgePayoff === 0n → "0.00 DUSDC" (real OTM payout, NOT em-dash)
-//   - netQuote === null → em-dash with tooltip "Net PnL awaits both..."
-//   - 3 empty states (wallet disconnected / vault not deployed / no positions)
+//   - two empty states (wallet disconnected / connected-no-position) with the
+//     UI-SPEC verbatim copy
+//   - pos-table chrome with a single disabled BTC chip — no asset-filter tabs
+//
+// Test contract updated for the reskin (Rule 1): the Phase-4 assertions
+// checked the replaced shadcn Table copy ("Connect wallet to view your
+// positions", "No positions yet") and the emerald/rose/cyan/slate Tailwind
+// PnL classes — the reskin moves to the handoff pos-table `td.pos`/`td.neg`
+// mint/coral classes. The zero-vs-unknown behavioral coverage is preserved.
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
@@ -56,14 +63,18 @@ describe('<PositionViewer>', () => {
     vi.restoreAllMocks();
   });
 
-  it('renders wallet-disconnected empty state', () => {
+  it('renders wallet-disconnected empty state (UI-SPEC verbatim copy)', () => {
     mockUseCurrentAccount.mockReturnValue(null);
     render(<PositionViewer positions={[]} vault={vault} />);
-    expect(screen.getByText('Connect wallet to view your positions')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Connect a wallet to view your vault position and PnL attribution.',
+      ),
+    ).toBeInTheDocument();
     expect(screen.queryByTestId('positions-table')).not.toBeInTheDocument();
   });
 
-  it('renders vault-not-deployed empty state (UI-SPEC error copy verbatim)', () => {
+  it('renders vault-not-deployed empty state', () => {
     mockUseCurrentAccount.mockReturnValue({ address: '0xUSER' });
     mockIsDeployed.mockReturnValue(false);
     render(<PositionViewer positions={[]} vault={vault} />);
@@ -72,16 +83,15 @@ describe('<PositionViewer>', () => {
     ).toBeInTheDocument();
   });
 
-  it('renders no-positions empty state when wallet connected + deployed + positions empty', () => {
+  it('renders connected-no-position empty state (UI-SPEC verbatim copy)', () => {
     mockUseCurrentAccount.mockReturnValue({ address: '0xUSER' });
     render(<PositionViewer positions={[]} vault={vault} />);
-    expect(screen.getByText('No positions yet')).toBeInTheDocument();
     expect(
-      screen.getByText(/Deposit DUSDC to mint vault shares/),
+      screen.getByText('No position yet. Deposit DUSDC to receive vault shares.'),
     ).toBeInTheDocument();
   });
 
-  it('renders the positions table with header + PnL attribution columns', () => {
+  it('renders the pos-table with PnL attribution columns + a disabled BTC chip', () => {
     mockUseCurrentAccount.mockReturnValue({ address: '0xUSER' });
     render(
       <PositionViewer
@@ -93,16 +103,16 @@ describe('<PositionViewer>', () => {
     expect(screen.getByText('PLP yield')).toBeInTheDocument();
     expect(screen.getByText('Hedge cost')).toBeInTheDocument();
     expect(screen.getByText('Hedge payoff')).toBeInTheDocument();
-    expect(screen.getByText('Net')).toBeInTheDocument();
+    expect(screen.getByText('Net PnL')).toBeInTheDocument();
+    // BTC indicator chip + BTC underlying cells (LD-2 — no asset-filter tabs).
+    expect(screen.getAllByText('BTC').length).toBeGreaterThan(0);
   });
 
-  it('renders em-dash for null plpYield (NOT "0" or "0.00") with locked tooltip copy', () => {
+  it('renders em-dash for null plpYield with locked tooltip copy', () => {
     mockUseCurrentAccount.mockReturnValue({ address: '0xUSER' });
     render(<PositionViewer positions={[pos({ plpYield: null })]} vault={vault} />);
-    // At least one em-dash is rendered for null plpYield/hedgePayoff/netQuote.
     const dashes = screen.getAllByTestId('nullable-em-dash');
     expect(dashes.length).toBeGreaterThan(0);
-    // Tooltip copy is asserted via aria-label which is rendered eagerly.
     expect(
       screen.getAllByLabelText(
         'PLP yield realized at redemption. Awaiting your first Redeemed event.',
@@ -118,16 +128,13 @@ describe('<PositionViewer>', () => {
         vault={vault}
       />,
     );
-    // hedgePayoff=0n renders formatted DUSDC ("0.00"), not em-dash.
-    // formatDusdc(0n) outputs "0.00" (minimum 2 fraction digits per Intl).
-    // We assert the cyan-300 hedgePayoff cell contains a numeric (not em-dash).
-    const cyanCells = document.querySelectorAll('.text-cyan-300');
-    const hedgePayoffCell = Array.from(cyanCells).find((el) =>
-      /^[-\d.,]+$/.test(el.textContent?.trim() ?? ''),
+    // hedgePayoff=0n renders formatted DUSDC ("0.00"), not em-dash. The 0n
+    // value is non-negative so it carries the mint `pos` class.
+    const posCells = document.querySelectorAll('.pos');
+    const zeroCell = Array.from(posCells).find(
+      (el) => /^0\.0+$/.test(el.textContent?.trim() ?? ''),
     );
-    expect(hedgePayoffCell?.textContent?.trim()).toMatch(/^0\.0+$/);
-    // The em-dash should NOT appear for the hedgePayoff column when value is 0n.
-    // (em-dash MAY still appear for plpYield/netQuote depending on overrides.)
+    expect(zeroCell?.textContent?.trim()).toMatch(/^0\.0+$/);
   });
 
   it('renders em-dash for null hedgePayoff with the locked tooltip', () => {
@@ -150,14 +157,18 @@ describe('<PositionViewer>', () => {
     ).toBeGreaterThan(0);
   });
 
-  it('source declares the PnL attribution color palette (emerald/rose/cyan/slate)', async () => {
+  it('source: BTC-only pos-table, no asset-filter tabs, no Phase-4 PnL hex/tailwind colors', async () => {
     const { readFileSync } = await import('node:fs');
     const { resolve } = await import('node:path');
     const file = resolve(process.cwd(), 'src/components/panels/PositionViewer.tsx');
     const text = readFileSync(file, 'utf8');
-    expect(text).toMatch(/text-emerald-300/); // PLP yield
-    expect(text).toMatch(/text-rose-300/); // hedge cost
-    expect(text).toMatch(/text-cyan-300/); // hedge payoff
-    expect(text).toMatch(/text-slate-100/); // net
+    // Reskinned to the handoff pos-table; usePositions data path preserved.
+    expect(text).toMatch(/pos-table/);
+    expect(text).toMatch(/usePositions/);
+    // No Phase-4 emerald/rose/cyan Tailwind PnL classes; no hardcoded hex.
+    expect(text).not.toMatch(/text-emerald-300/);
+    expect(text).not.toMatch(/text-rose-300/);
+    expect(text).not.toMatch(/text-cyan-300/);
+    expect(text).not.toMatch(/#06b6d4|#10b981|#e11d48/);
   });
 });

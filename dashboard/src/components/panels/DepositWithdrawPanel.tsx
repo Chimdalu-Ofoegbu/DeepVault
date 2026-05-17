@@ -1,4 +1,17 @@
-// dashboard/src/components/panels/DepositWithdrawPanel.tsx — Plan 04-07 Task 2 (DASH-11).
+// dashboard/src/components/panels/DepositWithdrawPanel.tsx — Plan 04.1-04 Task 3.
+//
+// Phase 04.1 reskin (UI-SPEC Per-Panel Mapping #8): CHROME RESKIN ONLY. The
+// shadcn <Card> wrapper is replaced by the handoff `db-card` chrome and the
+// buttons take the handoff `btn`/`db-pill` language — deposit confirm is mint
+// (`--accent`), withdraw-request + cancel-confirm are coral (`--hedge`) per
+// UI-SPEC §Destructive. The <Dialog>/<Tabs>/<Input> shadcn primitives are
+// kept (their tokens were re-pointed to OKLCH by Plan 04.1-01).
+//
+// CRITICAL — the 3-step Input -> Review -> Execute flow, the PTB builders
+// (`ptbBuilders.ts`), the pre-sign balance-check, the dapp-kit
+// `useSignAndExecuteTransaction` signing path, and the Sonner toasts are
+// UNCHANGED. The PTB construction + sign flow stays byte-identical; this is a
+// security-load-bearing constraint (threat register T-04.1-10).
 //
 // 3-step Input -> Review -> Execute flow per UI-SPEC §Deposit/Redeem flow:
 //   Step 1 (Input):  amount field with client-side validation (>0, ≤ wallet balance)
@@ -15,10 +28,9 @@
 //   2. vault not deployed → "Vault not yet deployed to testnet..."
 //   3. wallet connected + deployed → Tabs(Deposit, Redeem)
 //
-// Destructive copy contract (UI-SPEC §Destructive actions): Cancel request is
-// the ONLY destructive Dialog. Fulfill redemption uses the default Dialog
-// variant (irreversible payout but not destructive — destructive is reserved
-// for "Cancel" per UI-SPEC).
+// Destructive copy contract (UI-SPEC §Destructive actions): withdraw-request
+// starts a 1-hour cooldown; cancel returns escrow. Both use coral confirm
+// buttons; their confirmation copy is the UI-SPEC verbatim §Destructive text.
 
 import { useEffect, useMemo, useState } from 'react';
 import {
@@ -29,13 +41,6 @@ import {
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -85,76 +90,72 @@ export function DepositWithdrawPanel({ vaultView }: Props) {
   // State 1: wallet disconnected.
   if (!account) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Deposit / Redeem</CardTitle>
-          <CardDescription>
-            Connect a wallet to deposit DUSDC and mint vault shares, or to
-            redeem an open position.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="font-semibold text-slate-200">
-            Connect wallet to deposit or redeem
-          </p>
-        </CardContent>
-      </Card>
+      <div className="db-card pad" data-section="deposit-withdraw">
+        <header className="db-h">
+          <div>
+            <span className="db-mark">§ Account</span>
+            <h3>Deposit / Redeem</h3>
+          </div>
+        </header>
+        <p className="text-sm" style={{ color: 'var(--text-2)' }}>
+          Connect wallet to deposit or redeem. Deposit DUSDC to mint vault
+          shares, or redeem an open position.
+        </p>
+      </div>
     );
   }
 
   // State 2: vault not deployed.
   if (!deployed) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Deposit / Redeem</CardTitle>
-          <CardDescription>DUSDC deposit + share redemption.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-slate-400">
-            Vault not yet deployed to testnet. The dashboard is in snapshot-only
-            mode — live events resume after deploy.
-          </p>
-        </CardContent>
-      </Card>
+      <div className="db-card pad" data-section="deposit-withdraw">
+        <header className="db-h">
+          <div>
+            <span className="db-mark">§ Account</span>
+            <h3>Deposit / Redeem</h3>
+          </div>
+        </header>
+        <p className="text-sm" style={{ color: 'var(--muted)' }}>
+          Vault not yet deployed to testnet. The dashboard is in snapshot-only
+          mode — live events resume after deploy.
+        </p>
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Deposit / Redeem</CardTitle>
-        <CardDescription>
-          Deposit DUSDC to mint vault shares + open a hedged position. Redeem
-          via two-step queue (1h cooldown).
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Tabs defaultValue="deposit">
-          <TabsList>
-            <TabsTrigger value="deposit">Deposit</TabsTrigger>
-            <TabsTrigger value="redeem">Redeem</TabsTrigger>
-          </TabsList>
-          <TabsContent value="deposit">
-            <DepositForm
-              account={account}
-              client={client}
-              vaultView={vaultView}
-              signAndExecute={signAndExecute}
-              isPending={isPending}
-            />
-          </TabsContent>
-          <TabsContent value="redeem">
-            <RedeemForm
-              account={account}
-              client={client}
-              signAndExecute={signAndExecute}
-              isPending={isPending}
-            />
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
+    <div className="db-card pad" data-section="deposit-withdraw">
+      <header className="db-h">
+        <div>
+          <span className="db-mark">§ Account</span>
+          <h3>Deposit / Redeem</h3>
+        </div>
+        <span className="mono dim">1h redeem cooldown</span>
+      </header>
+      <Tabs defaultValue="deposit">
+        <TabsList>
+          <TabsTrigger value="deposit">Deposit</TabsTrigger>
+          <TabsTrigger value="redeem">Redeem</TabsTrigger>
+        </TabsList>
+        <TabsContent value="deposit">
+          <DepositForm
+            account={account}
+            client={client}
+            vaultView={vaultView}
+            signAndExecute={signAndExecute}
+            isPending={isPending}
+          />
+        </TabsContent>
+        <TabsContent value="redeem">
+          <RedeemForm
+            account={account}
+            client={client}
+            signAndExecute={signAndExecute}
+            isPending={isPending}
+          />
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 }
 
@@ -251,7 +252,10 @@ function DepositForm({
 
   return (
     <div className="space-y-4 pt-4">
-      <label className="block text-sm font-medium text-slate-200">
+      <label
+        className="block text-sm font-medium"
+        style={{ color: 'var(--text)' }}
+      >
         Amount (DUSDC)
         <Input
           type="text"
@@ -262,7 +266,7 @@ function DepositForm({
           className="mt-2"
         />
       </label>
-      <p className="text-sm text-slate-400">
+      <p className="text-sm" style={{ color: 'var(--text-2)' }}>
         You receive ~
         <span className="font-mono tabular-nums">{expectedShares.toString()}</span>{' '}
         shares, gas ~0.01 SUI
@@ -316,6 +320,7 @@ function RedeemForm({
   const [shareBalance, setShareBalance] = useState<bigint>(0n);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [fulfillDialogOpen, setFulfillDialogOpen] = useState(false);
+  const [requestDialogOpen, setRequestDialogOpen] = useState(false);
 
   // Discover the user's Coin<SHARE>. v1: pick the first share coin if any.
   useEffect(() => {
@@ -349,7 +354,11 @@ function RedeemForm({
     };
   }, [account.address, client]);
 
-  function onRequestRedeem() {
+  // PTB build + dapp-kit sign path is byte-identical to Phase 4 — the only
+  // reskin change is that this fires from the coral confirmation dialog and
+  // closes it on settle (UI-SPEC §Destructive: withdraw request is a
+  // destructive affordance, threat register T-04.1-11).
+  function onConfirmRequestRedeem() {
     if (!shareCoinId) {
       toast.error('No vault shares to redeem. Deposit first.');
       return;
@@ -365,6 +374,7 @@ function RedeemForm({
               <TxDigestLink digest={digest} />
             ) as unknown as string,
           });
+          setRequestDialogOpen(false);
         },
         onError: (err) => {
           const msg = String(err?.message ?? err);
@@ -373,6 +383,7 @@ function RedeemForm({
           } else {
             toast.error('Redemption request failed', { description: msg });
           }
+          setRequestDialogOpen(false);
         },
       },
     );
@@ -434,15 +445,28 @@ function RedeemForm({
     );
   }
 
+  const hasShares = !!shareCoinId;
+
   return (
     <div className="space-y-4 pt-4">
-      <div className="text-sm text-slate-400">
+      <div className="text-sm" style={{ color: 'var(--text-2)' }}>
         Current SHARE balance:{' '}
         <span className="font-mono tabular-nums">{shareBalance.toString()}</span>
       </div>
       <div className="flex flex-wrap gap-2">
-        <Button onClick={onRequestRedeem} disabled={!shareCoinId || isPending}>
-          Request redemption
+        {/* Withdraw request is destructive (starts the 1h cooldown) — coral. */}
+        <Button
+          variant="destructive"
+          onClick={() => {
+            if (!hasShares) {
+              toast.error('No vault shares to redeem. Deposit first.');
+              return;
+            }
+            setRequestDialogOpen(true);
+          }}
+          disabled={!hasShares || isPending}
+        >
+          Request withdrawal
         </Button>
         <Button
           variant="outline"
@@ -459,6 +483,32 @@ function RedeemForm({
           Cancel request
         </Button>
       </div>
+
+      {/* Withdraw-request confirmation dialog — UI-SPEC §Destructive verbatim
+          copy; coral confirm button. The PTB build + sign path is unchanged. */}
+      <Dialog open={requestDialogOpen} onOpenChange={setRequestDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Request withdrawal?</DialogTitle>
+            <DialogDescription>
+              Request withdrawal of your vault shares? A 1-hour cooldown
+              applies before you can claim.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRequestDialogOpen(false)}>
+              Back
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={onConfirmRequestRedeem}
+              disabled={isPending}
+            >
+              {isPending ? 'Signing...' : 'Request withdrawal'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Fulfill confirmation dialog — UI-SPEC §Destructive: NOT destructive variant */}
       <Dialog open={fulfillDialogOpen} onOpenChange={setFulfillDialogOpen}>
@@ -487,8 +537,8 @@ function RedeemForm({
           <DialogHeader>
             <DialogTitle>Cancel redemption request?</DialogTitle>
             <DialogDescription>
-              Your escrowed shares will be returned to your wallet. The 1-hour
-              cooldown timer will reset if you submit a new request.
+              Cancel pending withdrawal request? Your escrowed shares are
+              returned immediately.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

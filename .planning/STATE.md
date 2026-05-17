@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
 status: executing
-stopped_at: Completed Plan 05-02 (mainnet-readiness toolkit scripts)
-last_updated: "2026-05-17T05:21:11.675Z"
+stopped_at: Completed Plan 04.1-05 (EventStreamPanel + theme toggle)
+last_updated: "2026-05-17T06:35:00.000Z"
 last_activity: 2026-05-17
 progress:
   total_phases: 8
   completed_phases: 6
   total_plans: 53
-  completed_plans: 51
-  percent: 96
+  completed_plans: 52
+  percent: 98
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 04.1 (dashboard-visual-polish) — EXECUTING
-Plan: 5 of 6
+Plan: 6 of 6
 Status: Ready to execute
 Next phase: Phase 6 — Submission Package (demo video + README cold-read + architecture diagram + whitepaper + Devpost submission)
 Last activity: 2026-05-17
@@ -97,6 +97,7 @@ Progress: [█████████████████] 100% Phase 1 / 1
 | Phase 04.1 P04.1-02 | ~14min | 3 tasks | 4 files |
 | Phase 04.1 P04.1-03 | 8min | 3 tasks | 6 files |
 | Phase 04.1 P04.1-04 | ~22min | 4 tasks | 15 files |
+| Phase 04.1 P04.1-05 | ~12min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -233,6 +234,7 @@ Recent decisions affecting current work:
 - [Phase ?]: Plan 05-05: Phase 5 closes. docs/MAINNET-READINESS.md hardened with 3 new top sections (Why deferred / 30-min procedure / single-config-flip architecture); funding playbook preserved; Step 2 USDsui corrected to 60 USDsui (10 seed + 50 smoke). README hardened with testnet pointers + make demo docs + Mainnet readiness section + Week 5 log. Makefile demo target wired to bash scripts/testnet-smoke-test.sh. All 5 DEPLOY-XX closed; Phase 6 takes the baton.
 - [Phase ?]: Plan 04.1-02: Dashboard layout shell landed — App.tsx restructured into dash-body 232px rail + 1fr main grid; Rail.tsx scroll-anchor nav; Header.tsx db-bar reskin; headline dh-stats strip fed by useVaultState; VaultPanel feeder-only; Row-3 backtest link card. Data spine byte-identical; tsc + pnpm build clean.
 - [Phase ?]: [Phase 04.1]: Plan 04.1-03: SurfacePanel + ArbCheckerPanel reskinned to handoff db-card chrome; g(k) plot retained (R-2); VaultPanel converted to pure data feeder (re-exports useVaultState/VaultView + vaultStats selector, no card). Chart colors via CHART_COLORS/MINT_COLORSCALE — zero hardcoded hex. 431/431 dashboard tests pass.
+- [Phase 04.1]: Plan 04.1-05: D-02 + D-03 closed. EventStreamPanel (new) consumes the existing useWebSocket snapshot.ring_buffer (RingEvent[]) — no new hook/socket; newest-first, 14-row cap, 700ms accent flash via React render state; event strings rendered as escaped React children (no raw-HTML injection — T-04.1-13). ThemeToggle (new) reuses the existing next-themes provider (useTheme/setTheme), hydration-mismatch guard, mounted in the Header db-bar pill row. Both wired into the Plan-02 layout shell; data spine unchanged; 427/427 dashboard tests pass; tsc + pnpm build clean.
 
 ### Pending Todos
 
@@ -273,6 +275,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-17T05:21:05.044Z
-Stopped at: Completed Plan 05-02 (mainnet-readiness toolkit scripts)
+Last session: 2026-05-17T06:35:00.000Z
+Stopped at: Completed Plan 04.1-05 (EventStreamPanel + theme toggle)
 Resume file: None

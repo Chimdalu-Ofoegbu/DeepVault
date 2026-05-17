@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
-status: verifying
+status: executing
 stopped_at: Completed Plan 05-02 (mainnet-readiness toolkit scripts)
-last_updated: "2026-05-16T03:30:22.273Z"
-last_activity: 2026-05-16
+last_updated: "2026-05-17T04:09:18.221Z"
+last_activity: 2026-05-17 -- Phase 04.1 planning complete
 progress:
-  total_phases: 7
+  total_phases: 8
   completed_phases: 6
-  total_plans: 47
+  total_plans: 53
   completed_plans: 47
-  percent: 100
+  percent: 89
 ---
 
 # Project State
@@ -27,9 +27,9 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 
 Phase: 05 (testnet-demo-hardening) — EXECUTING
 Plan: 5 of 5 (next: 05-02 mainnet-readiness deploy toolkit OR 05-03 testnet smoke test — both Wave 2; 05-04 cooldown codegen complete)
-Status: Phase complete — ready for verification
+Status: Ready to execute
 Next phase: Phase 6 — Submission Package (demo video + README cold-read + architecture diagram + whitepaper + Devpost submission)
-Last activity: 2026-05-16
+Last activity: 2026-05-17 -- Phase 04.1 planning complete
 
 Progress: [█████████████████] 100% Phase 1 / 100% milestone
 

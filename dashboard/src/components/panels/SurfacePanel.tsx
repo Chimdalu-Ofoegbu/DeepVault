@@ -1,4 +1,5 @@
-// dashboard/src/components/panels/SurfacePanel.tsx — Plan 04-04 Task 2.
+// dashboard/src/components/panels/SurfacePanel.tsx — Plan 04-04 Task 2;
+// reskinned to the handoff `svi-card` db-card chrome in Plan 04.1-03 Task 1.
 //
 // UI-SPEC §Plotly Performance Contract + RESEARCH Pattern 5 (revision-prop) +
 // Pitfall 4 (full re-mount danger if no useMemo).
@@ -29,27 +30,30 @@
 // happens INSIDE SurfacePanel.tsx — Phase 1 SVI lib files (svi.ts, math.ts,
 // isqrt.ts, phi.ts, ln.ts) remain bigint-pure and CI-grep-clean. This panel
 // is visualization-bound, not parity-bound.
+//
+// Plan 04.1-03 reskin (UI-SPEC #1): the panel is wrapped in the handoff
+// `db-card svi-card` chrome — `db-h` header (§ Surface mark + db-tabs),
+// `svi-params` strip (a/b/ρ/m/σ + butterfly·ok / calendar·ok + "Ns ago"),
+// `db-foot`. The Plotly surface keeps `type:'surface'` + the useMemo/revision
+// perf logic UNCHANGED — only the colorway is recolored to the mint
+// `MINT_COLORSCALE` (CHART_COLORS), no hardcoded slate/cyan hex.
 
 import Plot from 'react-plotly.js';
 import { useEffect, useMemo, useState } from 'react';
 import type { Config, Data, Layout } from 'plotly.js';
 
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
-import { StalenessPill } from '@/components/primitives/StalenessPill';
+  CHART_COLORS,
+  CHART_FONT_FAMILY,
+  MINT_COLORSCALE,
+} from '@/lib/dashboard_constants';
 import { totalVariance, type SVIParams } from '@/lib/svi';
+import { checkArb } from '@/lib/arb_checker';
 import type { SurfaceView } from '@/hooks/useSurfaceSnapshot';
 
 const K_GRID = 50; // UI-SPEC dim cap
 const K_MIN = -2.0;
 const K_MAX = 2.0;
-const FLOAT_SCALING = 1_000_000_000n;
 const FLOAT_SCALING_NUM = 1_000_000_000;
 
 // v1 single BTC oracle (CONTEXT.md A9) — render a 3-tenor ribbon at 7d, 14d, 30d
@@ -58,6 +62,13 @@ const FLOAT_SCALING_NUM = 1_000_000_000;
 const DEFAULT_TENORS_YEARS = [7 / 365, 14 / 365, 30 / 365];
 
 type Props = { surface: SurfaceView; tenors?: number[] };
+
+// SVI param formatting for the `svi-params` strip. Params arrive as bigint at
+// FLOAT_SCALING 1e9 (a/b/sigma) or signed bigint (rho/m); dequantize to a
+// human-readable float at the display boundary only.
+function fmtSvi(v: bigint, digits = 4): string {
+  return (Number(v) / FLOAT_SCALING_NUM).toFixed(digits);
+}
 
 export function SurfacePanel({ surface, tenors = DEFAULT_TENORS_YEARS }: Props) {
   // Pre-compute the k-axis once per K_GRID (constants are module-level, so this
@@ -106,7 +117,9 @@ export function SurfacePanel({ surface, tenors = DEFAULT_TENORS_YEARS }: Props) 
               x: grid.x,
               y: grid.y,
               z: grid.z,
-              colorscale: 'Viridis',
+              // Plan 04.1-03: mint colorway via the shared MINT_COLORSCALE
+              // constant (CHART_COLORS) — chart libs cannot read CSS vars.
+              colorscale: MINT_COLORSCALE,
               showscale: false,
               contours: {
                 z: { show: true, usecolormap: true, project: { z: true } },
@@ -120,15 +133,27 @@ export function SurfacePanel({ surface, tenors = DEFAULT_TENORS_YEARS }: Props) 
   const layout: Partial<Layout> = useMemo(
     () => ({
       scene: {
-        xaxis: { title: { text: 'log-strike k' }, color: '#94a3b8' },
-        yaxis: { title: { text: 'tenor T (years)' }, color: '#94a3b8' },
-        zaxis: { title: { text: 'total variance w(k,T)' }, color: '#94a3b8' },
+        xaxis: {
+          title: { text: 'log-strike k' },
+          color: CHART_COLORS.text2,
+          gridcolor: CHART_COLORS.gridLine,
+        },
+        yaxis: {
+          title: { text: 'tenor T (years)' },
+          color: CHART_COLORS.text2,
+          gridcolor: CHART_COLORS.gridLine,
+        },
+        zaxis: {
+          title: { text: 'total variance w(k,T)' },
+          color: CHART_COLORS.text2,
+          gridcolor: CHART_COLORS.gridLine,
+        },
         camera: { eye: { x: 1.3, y: 1.3, z: 0.9 } },
       },
       margin: { t: 0, r: 0, b: 0, l: 0 },
       paper_bgcolor: 'rgba(0,0,0,0)',
       plot_bgcolor: 'rgba(0,0,0,0)',
-      font: { color: '#94a3b8', family: 'Inter' },
+      font: { color: CHART_COLORS.text2, family: CHART_FONT_FAMILY },
       autosize: true,
     }),
     [],
@@ -143,6 +168,23 @@ export function SurfacePanel({ surface, tenors = DEFAULT_TENORS_YEARS }: Props) 
     [],
   );
 
+  // Arb-free status for the svi-params chips (butterfly / calendar). The g(k)
+  // detail plot lives in ArbCheckerPanel (R-2); this is the at-a-glance chip.
+  const arb = useMemo(() => (surface ? checkArb(surface.svi) : null), [surface]);
+  const butterflyOk = arb ? arb.paramsValid && arb.minGk >= 0n : false;
+  const calendarOk = arb ? arb.calendarPass : false;
+
+  // "Ns ago" — seconds since the relay applied the last OracleSVIUpdated.
+  const [, forceTick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => forceTick((t) => t + 1), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const agoSec =
+    surface != null
+      ? Math.max(0, Math.round((Date.now() - surface.lastUpdatedMs) / 1000))
+      : null;
+
   // Pattern 5: bump revision when the underlying snapshot timestamp changes.
   // Plotly redraws in-place rather than remounting the WebGL canvas.
   const [revision, setRevision] = useState(0);
@@ -152,27 +194,84 @@ export function SurfacePanel({ surface, tenors = DEFAULT_TENORS_YEARS }: Props) 
   }, [tsKey]);
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-start justify-between">
+    <div className="db-card svi-card">
+      <header className="db-h">
         <div>
-          <CardTitle>BTC volatility surface (live)</CardTitle>
-          <CardDescription>
-            50×50 grid: log-strike k × tenor T × total variance w(k,T).
-            Re-renders on every OracleSVIUpdated event.
-          </CardDescription>
+          <span className="db-mark">§ Surface</span>
+          <h2>SVI · live</h2>
         </div>
-        {surface && <StalenessPill lastUpdatedMs={surface.lastUpdatedMs} />}
-      </CardHeader>
-      <CardContent>
+        <div className="db-tabs">
+          <em className="on">3D mesh</em>
+          <em className="dim">Slice · τ=7d</em>
+          <em className="dim">Slice · τ=14d</em>
+          <em className="dim mono">replay ⏮</em>
+        </div>
+      </header>
+
+      {!surface || !grid ? (
+        // Empty state (UI-SPEC §Empty states verbatim).
+        <div className="svi-params">
+          <span style={{ display: 'block' }}>
+            <strong style={{ color: 'var(--text)', fontWeight: 500 }}>
+              Waiting for surface data
+            </strong>
+            <br />
+            <span style={{ color: 'var(--muted)' }}>
+              No OracleSVIUpdated events received yet. The live SVI surface
+              renders within ~2s of the first oracle update.
+            </span>
+          </span>
+        </div>
+      ) : (
+        <div className="svi-params" data-testid="svi-params">
+          <span>
+            <i>a</i>
+            {fmtSvi(surface.svi.a)}
+          </span>
+          <span>
+            <i>b</i>
+            {fmtSvi(surface.svi.b)}
+          </span>
+          <span>
+            <i>ρ</i>
+            {fmtSvi(surface.svi.rho)}
+          </span>
+          <span>
+            <i>m</i>
+            {fmtSvi(surface.svi.m)}
+          </span>
+          <span>
+            <i>σ</i>
+            {fmtSvi(surface.svi.sigma)}
+          </span>
+          <span className={butterflyOk ? 'ok' : ''}>
+            butterfly · {butterflyOk ? 'ok' : 'check'}
+          </span>
+          <span className={calendarOk ? 'ok' : ''}>
+            calendar · {calendarOk ? 'ok' : 'check'}
+          </span>
+          <span className="mono dim right">{agoSec}s ago</span>
+        </div>
+      )}
+
+      <div className="svi-plot">
         {!surface || !grid ? (
-          <div className="space-y-4">
-            <Skeleton className="h-[600px] w-full" />
-            <p className="text-sm text-slate-400">
-              Waiting for first SVI update — the relay is connected and listening.
-            </p>
+          <div
+            style={{
+              width: '100%',
+              height: 560,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--muted)',
+              fontFamily: 'var(--f-mono)',
+              fontSize: '12px',
+            }}
+          >
+            Relay connected · listening for the first OracleSVIUpdated event
           </div>
         ) : (
-          <div data-testid="surface-plot" style={{ width: '100%', height: 600 }}>
+          <div data-testid="surface-plot" style={{ width: '100%', height: 560 }}>
             <Plot
               data={data}
               layout={layout}
@@ -183,7 +282,14 @@ export function SurfacePanel({ surface, tenors = DEFAULT_TENORS_YEARS }: Props) 
             />
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+
+      <footer className="db-foot">
+        <span>
+          Source · <code>OracleSVIUpdated</code> via predict-server.testnet
+        </span>
+        <span className="mono dim">live · revision {revision}</span>
+      </footer>
+    </div>
   );
 }

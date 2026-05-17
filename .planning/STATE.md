@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
 status: executing
-stopped_at: Completed Plan 05-02 (mainnet-readiness toolkit scripts)
-last_updated: "2026-05-17T04:09:18.221Z"
-last_activity: 2026-05-17 -- Phase 04.1 planning complete
+stopped_at: Completed Plan 04.1-01 (dashboard token foundation)
+last_updated: "2026-05-17T04:36:53.642Z"
+last_activity: 2026-05-17 -- Completed Plan 04.1-01 (OKLCH token foundation)
 progress:
   total_phases: 8
   completed_phases: 6
   total_plans: 53
-  completed_plans: 47
-  percent: 89
+  completed_plans: 48
+  percent: 91
 ---
 
 # Project State
@@ -21,15 +21,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-08)
 
 **Core value:** A working PLP+Hedge vault on DeepBook Predict with a credible, auditable risk dashboard, deployed on mainnet by 2026-06-16. Quality of vault math, backtest, and dashboard polish > component count.
-**Current focus:** Phase 05 — testnet-demo-hardening
+**Current focus:** Phase 04.1 — dashboard-visual-polish
 
 ## Current Position
 
-Phase: 05 (testnet-demo-hardening) — EXECUTING
-Plan: 5 of 5 (next: 05-02 mainnet-readiness deploy toolkit OR 05-03 testnet smoke test — both Wave 2; 05-04 cooldown codegen complete)
-Status: Ready to execute
+Phase: 04.1 (dashboard-visual-polish) — EXECUTING
+Plan: 2 of 6
+Status: Executing Phase 04.1 (Plan 04.1-01 complete — token foundation landed)
 Next phase: Phase 6 — Submission Package (demo video + README cold-read + architecture diagram + whitepaper + Devpost submission)
-Last activity: 2026-05-17 -- Phase 04.1 planning complete
+Last activity: 2026-05-17 -- Completed Plan 04.1-01 (OKLCH token foundation)
 
 Progress: [█████████████████] 100% Phase 1 / 100% milestone
 
@@ -93,6 +93,7 @@ Progress: [█████████████████] 100% Phase 1 / 1
 | Phase 05 P05-03 | 30min | 2 tasks | 2 files |
 | Phase 05 P02 | 35min | 3 tasks | 4 files |
 | Phase 05 P05-05 | 25min | 4 tasks | 4 files |
+| Phase 04.1 P04.1-01 | ~18min | 4 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -225,6 +226,7 @@ Recent decisions affecting current work:
 - [Phase ?]: Plan 05-03 surfaced latent bug: @mysten/sui 2.16.0 moved SuiClient->SuiJsonRpcClient under /jsonRpc and getFullnodeUrl->getJsonRpcFullnodeUrl; scripts/e2e-vault-cycle.ts + possibly scripts/two-protocol-ptb-demo.ts still import broken names from /client (would crash at runtime). Fix scope-boundary'd: testnet-smoke-test.ts uses correct 2.16.0 imports; others deferred to follow-up plan
 - [Phase ?]: Plan 05-02: mainnet-readiness toolkit complete — mainnet-deploy.sh + mainnet-smoke-test.{sh,ts} + MAINNET-DEPLOY.json placeholder shipped as write-but-don't-execute. extract_config_value() awk helper eliminates testnet-literal hardcoding (Pitfall 14). AdminCap owner gate inline (DEPLOY-03 closure). Same @mysten/sui 2.16.0 import fix Plan 05-03 established.
 - [Phase ?]: Plan 05-02: MAINNET-DEPLOY.json schema dual-named (quote_type_tag canonical + dusdc_type_tag alias) for Phase 4 dashboard back-compat; oracle_svi_id field per carry-forward research finding.
+- [Phase 04.1]: Plan 04.1-01: Dashboard reskin token foundation landed — handoff OKLCH token system (dark :root/.dark + .light paper override) + full transcribed dashboard.css component-class layer (.db-card/.rail/.db-bar/.pos-table/.bucket/.oracles/.shock-row/.ev-list/.db-side + 1200/1024/900px breakpoints) in globals.css. shadcn semantic aliases re-pointed at OKLCH so 13 primitives inherit reskin with no per-component edit. tailwind.config.ts off hsl(var()) (OKLCH != HSL) onto raw var(--token). Geist/Geist Mono self-hosted via @fontsource (replaces Inter/JetBrains Mono). CHART_COLORS/MINT_COLORSCALE/CHART_FONT_FAMILY constants module added (chart libs cannot read CSS vars at runtime). pnpm build passes. Greeks panel + backtest-replay class groups excluded (LD-1, LD-3). Unblocks Waves 2-5 panel reskins.
 - [Phase ?]: Plan 05-05: Phase 5 closes. docs/MAINNET-READINESS.md hardened with 3 new top sections (Why deferred / 30-min procedure / single-config-flip architecture); funding playbook preserved; Step 2 USDsui corrected to 60 USDsui (10 seed + 50 smoke). README hardened with testnet pointers + make demo docs + Mainnet readiness section + Week 5 log. Makefile demo target wired to bash scripts/testnet-smoke-test.sh. All 5 DEPLOY-XX closed; Phase 6 takes the baton.
 
 ### Pending Todos

@@ -1,189 +1,78 @@
-// dashboard/src/components/panels/ExposurePanel.tsx — Plan 04-05 Task 3 (DASH-08).
+// dashboard/src/components/panels/ExposurePanel.tsx — Plan 04.1-04 Task 1.
 //
-// UI-SPEC §Component Inventory ExposurePanel:
-//   - Horizontal Recharts BarChart of notional per open hedge, grouped by
-//     (oracle, strike, expiry) — bar label = `${strikeDisplay} @ ${expiryDisplay}`.
-//   - Color contract (UI-SPEC §Recharts palette "Exposure bars: single-color
-//     slate-400 bars"): bars are uniform slate-400 (#94a3b8); the chart's
-//     value is the SHAPE, not chroma diversity. Per-panel 5-color cap honored.
-//   - Below the chart, a shadcn `<Table>` lists strike / expiry / direction /
-//     notional / premium per row.
-//   - StalenessPill in CardHeader bound to vault.last_updated_ms (proxy for
-//     "events are flowing" — D-10 staleness model applies to all vault-side
-//     panels because the same WS heartbeat drives them).
+// Phase 04.1 reskin (UI-SPEC Per-Panel Mapping #3, LD-2): the Phase-4 shadcn
+// <Card> + Recharts horizontal BarChart + <Table> is replaced by the handoff
+// `§ Per-oracle` `db-card.pad` `oracles` bar-list (the `.db-card`/`.oracles`
+// classes come from the globals.css component layer added by Plan 04.1-01
+// Task 2). Recharts is removed from this file — the CSS bar-list is the
+// contract.
 //
-// Empty state copy (UI-SPEC §Empty states verbatim):
-//   Heading: "No hedges currently open"
-//   Body:    "Hedges are minted automatically on supply and rolled when
-//             within 48 hours of expiry."
+// BTC-ONLY (LD-2): the dashboard is locked to BTC at v1. The handoff's
+// other-asset rows are NOT rendered — exposure shows a single BTC oracle row.
+// The bar width is the BTC oracle's share of total hedge notional (100% when
+// any hedges are open, since BTC is the only oracle).
 //
-// All numeric rendering routes through `formatDusdc` (Pitfall 8 bigint).
+// Empty state (UI-SPEC Copywriting verbatim): when no hedge legs are open the
+// panel still renders a single BTC row at 0% with the body copy
+// "BTC oracle · 0% exposure — no hedge legs open yet."
+//
+// `useExposure` is unchanged — this panel is a pure consumer of `Hedge[]`.
 
 import { useMemo } from 'react';
-import {
-  Bar,
-  BarChart,
-  ResponsiveContainer,
-  Tooltip as RcTooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { NumericValue } from '@/components/primitives/NumericValue';
-import { StalenessPill } from '@/components/primitives/StalenessPill';
-import { formatDusdc } from '@/lib/format';
 import type { Hedge } from '@/hooks/useExposure';
+import { formatDusdc } from '@/lib/format';
 import type { VaultStateSnapshot } from '@/lib/types';
 
 type Props = { hedges: Hedge[]; vault: VaultStateSnapshot };
 
-export function ExposurePanel({ hedges, vault }: Props) {
-  // BarChart data: bigint -> Number at the boundary only (Pitfall 8).
-  // Display unit is DUSDC (6 decimals); divide by 1e6 so axis ticks are
-  // in DUSDC, not micro-units.
-  const chartData = useMemo(
-    () =>
-      hedges.map((h) => ({
-        name: `${h.strikeDisplay} @ ${h.expiryDisplay}`,
-        notional: Number(h.notionalQuote) / 1e6,
-        key: h.marketKey,
-      })),
+export function ExposurePanel({ hedges }: Props) {
+  // BTC-only (LD-2): aggregate all open-hedge notional into one BTC row.
+  // Total notional is the sum across hedges; the BTC oracle holds 100% of it.
+  const totalNotional = useMemo(
+    () => hedges.reduce((acc, h) => acc + h.notionalQuote, 0n),
     [hedges],
   );
 
-  if (hedges.length === 0) {
-    return (
-      <Card>
-        <CardHeader className="flex flex-row items-start justify-between">
-          <div>
-            <CardTitle>Hedge book exposure</CardTitle>
-            <CardDescription>
-              Open hedges grouped by oracle / strike / expiry.
-            </CardDescription>
-          </div>
-          {vault && (
-            <StalenessPill
-              lastUpdatedMs={Number(vault.last_updated_ms)}
-              compact
-            />
-          )}
-        </CardHeader>
-        <CardContent>
-          <p className="font-semibold text-slate-200">No hedges currently open</p>
-          <p className="mt-1 text-sm text-slate-400">
-            Hedges are minted automatically on supply and rolled when within 48
-            hours of expiry.
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
+  const hasHedges = hedges.length > 0 && totalNotional > 0n;
+  const pct = hasHedges ? 100 : 0;
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-start justify-between">
+    <div className="db-card pad" data-section="exposure">
+      <header className="db-h">
         <div>
-          <CardTitle>Hedge book exposure</CardTitle>
-          <CardDescription>
-            Notional (DUSDC) per open hedge, grouped by strike × expiry.
-          </CardDescription>
+          <span className="db-mark">§ Per-oracle</span>
+          <h3>Exposure</h3>
         </div>
-        {vault && (
-          <StalenessPill
-            lastUpdatedMs={Number(vault.last_updated_ms)}
-            compact
-          />
-        )}
-      </CardHeader>
-      <CardContent>
-        <div
-          data-testid="exposure-chart"
-          style={{ width: '100%', height: 220 }}
-        >
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={chartData}
-              layout="vertical"
-              margin={{ top: 8, right: 16, left: 80, bottom: 8 }}
-            >
-              <XAxis
-                type="number"
-                tick={{ fill: '#94a3b8', fontSize: 11 }}
-              />
-              <YAxis
-                type="category"
-                dataKey="name"
-                tick={{ fill: '#94a3b8', fontSize: 11 }}
-                width={150}
-              />
-              <RcTooltip
-                contentStyle={{
-                  background: '#0f172a',
-                  border: '1px solid #334155',
-                  borderRadius: 6,
-                }}
-              />
-              {/* UI-SPEC §Recharts palette: single-color slate-400 bars
-                  (#94a3b8) — the chart's value is the shape, not chroma
-                  diversity. Per-panel 5-color cap honored. */}
-              <Bar
-                dataKey="notional"
-                fill="#94a3b8"
-                isAnimationActive={false}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-        <Table className="mt-4">
-          <TableHeader>
-            <TableRow>
-              <TableHead>Strike</TableHead>
-              <TableHead>Expiry</TableHead>
-              <TableHead>Direction</TableHead>
-              <TableHead className="text-right">Notional</TableHead>
-              <TableHead className="text-right">Premium</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {hedges.map((h) => (
-              <TableRow key={h.marketKey}>
-                <TableCell>
-                  <NumericValue>{h.strikeDisplay}</NumericValue>
-                </TableCell>
-                <TableCell>
-                  <NumericValue>{h.expiryDisplay}</NumericValue>
-                </TableCell>
-                <TableCell>{h.direction}</TableCell>
-                <TableCell className="text-right">
-                  <NumericValue>
-                    {formatDusdc(h.notionalQuote)}
-                  </NumericValue>
-                </TableCell>
-                <TableCell className="text-right">
-                  <NumericValue>
-                    {formatDusdc(h.premiumQuote)}
-                  </NumericValue>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+      </header>
+      {hasHedges ? (
+        <ul className="oracles" data-testid="exposure-list">
+          <li>
+            <span>BTC oracle</span>
+            <b>{pct.toFixed(1)}%</b>
+            <em className="bar" style={{ ['--w' as string]: `${pct}%` }} />
+          </li>
+        </ul>
+      ) : (
+        <>
+          <ul className="oracles" data-testid="exposure-list">
+            <li>
+              <span>BTC oracle</span>
+              <b>0%</b>
+              <em className="bar" style={{ ['--w' as string]: '0%' }} />
+            </li>
+          </ul>
+          <p className="mt-3 text-sm" style={{ color: 'var(--muted)' }}>
+            BTC oracle · 0% exposure — no hedge legs open yet.
+          </p>
+        </>
+      )}
+      {hasHedges && (
+        <p className="mt-3 mono dim" style={{ fontSize: '11px' }}>
+          notional · {formatDusdc(totalNotional)} DUSDC across {hedges.length}{' '}
+          leg{hedges.length === 1 ? '' : 's'}
+        </p>
+      )}
+    </div>
   );
 }

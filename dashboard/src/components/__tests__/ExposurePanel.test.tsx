@@ -195,6 +195,11 @@ describe('useExposure', () => {
 });
 
 describe('<ExposurePanel>', () => {
+  // Phase 04.1 reskin (UI-SPEC #3, LD-2): the Phase-4 Recharts BarChart +
+  // shadcn Table is replaced by the handoff `§ Per-oracle` `oracles` CSS
+  // bar-list. BTC-only — no ETH/SOL/SUI rows. Test contract updated (Rule 1):
+  // the old assertions checked the removed `exposure-chart` Recharts container
+  // and the `#94a3b8` slate bar hex that the reskin drops.
   beforeEach(() => {
     vi.useFakeTimers();
     vi.setSystemTime(Date.parse('2026-05-12T12:00:00Z'));
@@ -203,16 +208,19 @@ describe('<ExposurePanel>', () => {
     vi.useRealTimers();
   });
 
-  it("renders empty state ('No hedges currently open') when hedges is empty", () => {
+  it('renders the BTC-only empty-state copy verbatim when hedges is empty', () => {
     render(<ExposurePanel hedges={[]} vault={null} />);
-    expect(screen.getByText('No hedges currently open')).toBeInTheDocument();
+    // UI-SPEC Copywriting verbatim empty-state row for Per-oracle exposure.
     expect(
-      screen.getByText(/Hedges are minted automatically on supply/i),
+      screen.getByText(
+        'BTC oracle · 0% exposure — no hedge legs open yet.',
+      ),
     ).toBeInTheDocument();
-    expect(screen.queryByTestId('exposure-chart')).not.toBeInTheDocument();
+    // The §Per-oracle header still renders.
+    expect(screen.getByText('§ Per-oracle')).toBeInTheDocument();
   });
 
-  it('renders chart container + table rows when hedges are present', () => {
+  it('renders a single BTC oracles bar-list row when hedges are present', () => {
     const future = Date.now() + 14 * 24 * 60 * 60 * 1000;
     const hedges = [
       {
@@ -228,10 +236,31 @@ describe('<ExposurePanel>', () => {
       },
     ];
     render(<ExposurePanel hedges={hedges} vault={null} />);
-    expect(screen.getByTestId('exposure-chart')).toBeInTheDocument();
-    expect(screen.getByText('Hedge book exposure')).toBeInTheDocument();
-    // Direction string from data appears in Table row.
-    expect(screen.getByText('down')).toBeInTheDocument();
+    expect(screen.getByTestId('exposure-list')).toBeInTheDocument();
+    expect(screen.getByText('BTC oracle')).toBeInTheDocument();
+    // BTC holds 100% of exposure (it is the only oracle — LD-2).
+    expect(screen.getByText('100.0%')).toBeInTheDocument();
+  });
+
+  it('renders only a BTC row — no ETH/SOL/SUI rows (LD-2)', () => {
+    const future = Date.now() + 14 * 24 * 60 * 60 * 1000;
+    const hedges = [
+      {
+        marketKey: '0xORACLE_BTC|85000000000000|' + future + '|true',
+        oracleId: '0xORACLE_BTC',
+        strike: 85_000_000_000_000n,
+        strikeDisplay: '85000.00',
+        expiryMs: future,
+        expiryDisplay: '2026-05-26 12:00',
+        direction: 'down',
+        notionalQuote: 10_000_000n,
+        premiumQuote: 0n,
+      },
+    ];
+    render(<ExposurePanel hedges={hedges} vault={null} />);
+    expect(screen.queryByText(/ETH/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/SOL/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/SUI/)).not.toBeInTheDocument();
   });
 
   it('source-grep: useExposure matches HedgeMinted via suffix endsWith (relay strips qualified type)', async () => {
@@ -246,13 +275,17 @@ describe('<ExposurePanel>', () => {
     expect(text).toMatch(/endsWith\(['"]HedgeUnwound['"]\)/);
   });
 
-  it('source-grep: ExposurePanel imports BarChart from recharts (UI-SPEC contract)', async () => {
+  it('source-grep: ExposurePanel uses the oracles bar-list and keeps useExposure (no hardcoded hex, BTC-only)', async () => {
     const { readFileSync } = await import('node:fs');
     const { resolve } = await import('node:path');
     const file = resolve(process.cwd(), 'src/components/panels/ExposurePanel.tsx');
     const text = readFileSync(file, 'utf8');
-    expect(text).toMatch(/import[\s\S]*?BarChart[\s\S]*?from\s+['"]recharts['"]/);
-    // Slate-400 bars per UI-SPEC §Recharts palette (exposure bars: single-color slate-400).
-    expect(text).toMatch(/#94a3b8/);
+    // Reskinned to the handoff `oracles` bar-list — no Recharts hex.
+    expect(text).toMatch(/oracles/);
+    expect(text).not.toMatch(/#94a3b8/);
+    expect(text).not.toMatch(/#10b981/);
+    expect(text).not.toMatch(/#e11d48/);
+    // BTC-only (LD-2) — no ETH/SOL/SUI literals.
+    expect(text).not.toMatch(/ETH|SOL|SUI/);
   });
 });

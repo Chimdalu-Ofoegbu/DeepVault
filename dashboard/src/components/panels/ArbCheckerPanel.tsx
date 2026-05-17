@@ -1,4 +1,5 @@
-// dashboard/src/components/panels/ArbCheckerPanel.tsx — Plan 04-04 Task 1.
+// dashboard/src/components/panels/ArbCheckerPanel.tsx — Plan 04-04 Task 1;
+// reskinned to the handoff `db-card` chrome in Plan 04.1-03 Task 2.
 //
 // UI-SPEC §Component Inventory + Pitfall 3 (NEVER resample g(k)):
 //
@@ -8,19 +9,26 @@
 //     downsampled, never decimated. The "we ship the array, not the boolean"
 //     differentiator (Phase 1 D-04, MATH-04 lever).
 //   - Status pill:
-//        GREEN (emerald) when paramsValid && minGk >= 0n && calendarPass
-//        RED   (rose)    when any of the above fail; AUTO-EXPANDS the curve so
-//                        the violation is visible without a click
-//        STALE (slate)   when surface.lastUpdatedMs is older than 5 minutes
-//                        (UI-SPEC §Staleness arb-checker special case —
-//                        Pitfall 9 mitigation: never render GREEN/RED on stale math).
-//   - `<ReferenceLine y={0}>` in rose-600 (#e11d48) marks the violation threshold.
-//   - StalenessPill in the CardHeader binds to oracle.last_updated_ms.
+//        GREEN (mint)  when paramsValid && minGk >= 0n && calendarPass
+//        RED   (coral) when any of the above fail; AUTO-EXPANDS the curve so
+//                      the violation is visible without a click
+//        STALE (muted) when surface.lastUpdatedMs is older than 5 minutes
+//                      (UI-SPEC §Staleness arb-checker special case —
+//                      Pitfall 9 mitigation: never render GREEN/RED on stale math).
+//   - `<ReferenceLine y={0}>` marks the violation threshold.
+//   - StalenessPill in the header binds to oracle.last_updated_ms.
 //
 // Boundary cast: gK is bigint[] at FLOAT_SCALING 1e9. Conversion to Number for
 // Recharts happens at the boundary (acceptable per `arb_checker.ts:14-16` —
 // arb_checker is visualization-bound, NOT parity-bound). The forbidden-token
 // grep targets svi/phi/isqrt/ln/math.ts only.
+//
+// Plan 04.1-03 reskin (UI-SPEC R-2 — LOAD-BEARING KEEP): the dedicated g(k)
+// 200-point plot is RETAINED (DASH-05 / MATH-04 differentiator) even though
+// the handoff folds arb status into the svi-params strip. Chrome reskinned to
+// `db-card`; status badge + g(k) line + ReferenceLine recolored to mint/coral
+// via CHART_COLORS — no hardcoded hex. The `checkArb` useMemo + the
+// auto-expand-on-RED Collapsible logic are Phase 4 verified behavior, unchanged.
 
 import { useMemo, useState } from 'react';
 import {
@@ -35,14 +43,6 @@ import {
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import {
   Collapsible,
   CollapsibleContent,
@@ -50,17 +50,52 @@ import {
 } from '@/components/ui/collapsible';
 import { StalenessPill } from '@/components/primitives/StalenessPill';
 import { checkArb } from '@/lib/arb_checker';
+import { CHART_COLORS } from '@/lib/dashboard_constants';
 import type { SurfaceView } from '@/hooks/useSurfaceSnapshot';
 
 // UI-SPEC §Staleness special case: arb-checker has its own 5-minute gate ON TOP
 // of the generic 30/60s staleness state machine (Plan 04-03 useStaleness). Once
 // the SVI source is >5min old, the math cannot be trusted to reflect current
-// market conditions, so the pill flips to gray STALE regardless of g(k).
+// market conditions, so the pill flips to muted STALE regardless of g(k).
 const STALE_THRESHOLD_MS = 5 * 60 * 1000;
 
 type Props = { surface: SurfaceView };
 
 type Status = 'green' | 'red' | 'stale';
+
+// Status badge — recolored to the handoff mint/coral tokens (Plan 04.1-03).
+function StatusBadge({ status }: { status: Status }) {
+  const label =
+    status === 'green'
+      ? 'GREEN'
+      : status === 'red'
+        ? 'RED'
+        : 'STALE — CANNOT VERIFY';
+  const tone =
+    status === 'green'
+      ? CHART_COLORS.accent
+      : status === 'red'
+        ? CHART_COLORS.hedge
+        : CHART_COLORS.muted;
+  return (
+    <span
+      style={{
+        fontFamily: 'var(--f-mono)',
+        fontSize: '11px',
+        fontWeight: 600,
+        letterSpacing: '0.06em',
+        textTransform: 'uppercase',
+        color: tone,
+        border: `1px solid ${tone}`,
+        borderRadius: 'var(--r-1)',
+        padding: '3px 8px',
+        background: `color-mix(in oklab, ${tone} 14%, transparent)`,
+      }}
+    >
+      {label}
+    </span>
+  );
+}
 
 export function ArbCheckerPanel({ surface }: Props) {
   const surfaceAgeMs = surface ? Date.now() - surface.lastUpdatedMs : Infinity;
@@ -94,152 +129,144 @@ export function ArbCheckerPanel({ surface }: Props) {
   // Empty state: no oracle event has arrived yet.
   if (!surface) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Arbitrage check</CardTitle>
-          <CardDescription>
-            g(k) curve (200-point grid). Status flips RED when min g(k) &lt; 0
-            or calendar arbitrage is detected.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-slate-400">
-            Waiting for first SVI update — the relay is connected and listening.
-          </p>
-        </CardContent>
-      </Card>
+      <div className="db-card pad" style={{ marginTop: '20px' }}>
+        <header className="db-h">
+          <div>
+            <span className="db-mark">§ Arb-free</span>
+            <h3>Arbitrage check</h3>
+          </div>
+        </header>
+        <p style={{ color: 'var(--muted)', fontSize: '13px' }}>
+          Waiting for first SVI update — the relay is connected and listening.
+        </p>
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-start justify-between">
+    <div className="db-card pad" style={{ marginTop: '20px' }}>
+      <header className="db-h">
         <div>
-          <CardTitle>Arbitrage check</CardTitle>
-          <CardDescription>
-            g(k) curve (200-point grid). Status flips RED when min g(k) &lt; 0
-            or calendar arbitrage is detected.
-          </CardDescription>
+          <span className="db-mark">§ Arb-free</span>
+          <h3>Arbitrage check</h3>
         </div>
-        <div className="flex items-center gap-2">
-          {status === 'green' && (
-            <Badge
-              className="border border-emerald-500/30 bg-emerald-500/15 text-[11px] font-semibold uppercase tracking-wider text-emerald-300"
-            >
-              GREEN
-            </Badge>
-          )}
-          {status === 'red' && (
-            <Badge
-              className="border border-rose-600/30 bg-rose-600/15 text-[11px] font-semibold uppercase tracking-wider text-rose-300"
-            >
-              RED
-            </Badge>
-          )}
-          {status === 'stale' && (
-            <Badge
-              className="border border-slate-600 bg-slate-700/30 text-[11px] font-semibold uppercase tracking-wider text-slate-300"
-            >
-              STALE — CANNOT VERIFY
-            </Badge>
-          )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <StatusBadge status={status} />
           <StalenessPill lastUpdatedMs={surface.lastUpdatedMs} compact />
         </div>
-      </CardHeader>
-      <CardContent>
-        {status === 'stale' ? (
-          <p className="text-sm text-slate-400">
-            Arbitrage check requires SVI fresher than 5 minutes. Displayed status
-            paused until the next OracleSVIUpdated event arrives.
-          </p>
-        ) : !arb ? (
-          <p className="text-sm text-slate-400">Waiting for first SVI update.</p>
-        ) : (
-          <Collapsible open={expanded} onOpenChange={setOpen}>
-            <div className="flex items-center justify-between text-sm text-slate-400">
-              <span>
-                min g(k) ={' '}
-                <span className="font-mono tabular-nums text-slate-200">
-                  {(Number(arb.minGk) / 1e9).toFixed(6)}
-                </span>
+      </header>
+      <p
+        style={{
+          color: 'var(--muted)',
+          fontSize: '12.5px',
+          marginBottom: '12px',
+        }}
+      >
+        g(k) curve (200-point grid). Status flips RED when min g(k) &lt; 0 or
+        calendar arbitrage is detected.
+      </p>
+      {status === 'stale' ? (
+        <p style={{ color: 'var(--muted)', fontSize: '13px' }}>
+          Arbitrage check requires SVI fresher than 5 minutes. Displayed status
+          paused until the next OracleSVIUpdated event arrives.
+        </p>
+      ) : !arb ? (
+        <p style={{ color: 'var(--muted)', fontSize: '13px' }}>
+          Waiting for first SVI update.
+        </p>
+      ) : (
+        <Collapsible open={expanded} onOpenChange={setOpen}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              fontSize: '13px',
+              color: 'var(--text-2)',
+            }}
+          >
+            <span>
+              min g(k) ={' '}
+              <span
+                className="mono"
+                style={{ color: 'var(--text)', fontVariantNumeric: 'tabular-nums' }}
+              >
+                {(Number(arb.minGk) / 1e9).toFixed(6)}
               </span>
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  {expanded ? (
-                    <>
-                      <ChevronUp className="mr-1 h-4 w-4" /> Hide g(k) curve
-                    </>
-                  ) : (
-                    <>
-                      <ChevronDown className="mr-1 h-4 w-4" /> View g(k) curve
-                    </>
-                  )}
-                </Button>
-              </CollapsibleTrigger>
+            </span>
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" size="sm">
+                {expanded ? (
+                  <>
+                    <ChevronUp className="mr-1 h-4 w-4" /> Hide g(k) curve
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="mr-1 h-4 w-4" /> View g(k) curve
+                  </>
+                )}
+              </Button>
+            </CollapsibleTrigger>
+          </div>
+          <CollapsibleContent>
+            <div
+              data-testid="gk-chart"
+              className="mt-4"
+              style={{ width: '100%', height: 320 }}
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={chartData}
+                  margin={{ top: 8, right: 16, left: 8, bottom: 8 }}
+                >
+                  <XAxis
+                    dataKey="k"
+                    tick={{ fill: CHART_COLORS.text2, fontSize: 11 }}
+                    label={{
+                      value: 'log-strike k',
+                      position: 'insideBottom',
+                      offset: -2,
+                      fill: CHART_COLORS.text2,
+                    }}
+                  />
+                  <YAxis
+                    tick={{ fill: CHART_COLORS.text2, fontSize: 11 }}
+                    label={{
+                      value: 'g(k)',
+                      angle: -90,
+                      position: 'insideLeft',
+                      fill: CHART_COLORS.text2,
+                    }}
+                  />
+                  <RcTooltip
+                    contentStyle={{
+                      background: CHART_COLORS.cardBg,
+                      border: `1px solid ${CHART_COLORS.gridLine}`,
+                      borderRadius: 6,
+                    }}
+                  />
+                  <ReferenceLine
+                    y={0}
+                    stroke={CHART_COLORS.hedge}
+                    strokeDasharray="3 3"
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="g"
+                    stroke={CHART_COLORS.accent}
+                    strokeWidth={2}
+                    dot={false}
+                    isAnimationActive={false}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
-            <CollapsibleContent>
-              <div
-                data-testid="gk-chart"
-                className="mt-4"
-                style={{ width: '100%', height: 320 }}
-              >
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart
-                    data={chartData}
-                    margin={{ top: 8, right: 16, left: 8, bottom: 8 }}
-                  >
-                    <XAxis
-                      dataKey="k"
-                      tick={{ fill: '#94a3b8', fontSize: 11 }}
-                      label={{
-                        value: 'log-strike k',
-                        position: 'insideBottom',
-                        offset: -2,
-                        fill: '#94a3b8',
-                      }}
-                    />
-                    <YAxis
-                      tick={{ fill: '#94a3b8', fontSize: 11 }}
-                      label={{
-                        value: 'g(k)',
-                        angle: -90,
-                        position: 'insideLeft',
-                        fill: '#94a3b8',
-                      }}
-                    />
-                    <RcTooltip
-                      contentStyle={{
-                        background: '#0f172a',
-                        border: '1px solid #334155',
-                        borderRadius: 6,
-                      }}
-                    />
-                    <ReferenceLine
-                      y={0}
-                      stroke="#e11d48"
-                      strokeDasharray="3 3"
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="g"
-                      stroke="#06b6d4"
-                      strokeWidth={2}
-                      dot={false}
-                      isAnimationActive={false}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-              <p
-                data-testid="gk-point-count"
-                className="sr-only"
-              >
-                Points: {chartData.length}
-              </p>
-            </CollapsibleContent>
-          </Collapsible>
-        )}
-      </CardContent>
-    </Card>
+            <p data-testid="gk-point-count" className="sr-only">
+              Points: {chartData.length}
+            </p>
+          </CollapsibleContent>
+        </Collapsible>
+      )}
+    </div>
   );
 }

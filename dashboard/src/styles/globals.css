@@ -953,3 +953,173 @@
     }
   }
 }
+
+/* === MOTION PASS (Plan 04.1-06, CONTEXT D-04, UI-SPEC Interaction Contract) ===
+ *
+ * APPENDED below the component-class layer — this section adds ONLY the
+ * @keyframes + animation/transition declarations for the handoff motion
+ * language. It does NOT re-derive the .rail-nav/.db-card/.pos-table/.ev-list/
+ * .shock/.db-tabs component classes — those were transcribed by Plan 04.1-01
+ * Task 2 above and already carry their .12s hover/focus transitions and the
+ * .shock.active toggle state. This section layers the missing pieces:
+ *   - the live/net-dot box-shadow ring pulse keyframe;
+ *   - the loader SVI line-draw keyframe;
+ *   - card/oracle border-color hover transitions not already present;
+ *   - the dashboard-loader overlay chrome (consumed by DashboardLoader.tsx);
+ *   - a prefers-reduced-motion guard that mutes the pulse + loader animation.
+ *
+ * EXCLUDED: the landing-page line-draw / fade-in / scroll-reveal keyframes
+ * (styles.css:381-389, 1225-1227) — those belong to index.html, not the
+ * dashboard (UI-SPEC §Interaction Contract, §Out of Scope).
+ */
+
+/* ---- @keyframes pulse — live/net-dot connection-ring pulse ---------------
+ * Transcribed verbatim from DeepVault-handoff/project/styles.css:164-173. */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent) 50%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 9px color-mix(in oklab, var(--accent) 0%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent) 0%, transparent);
+  }
+}
+
+/* ---- @keyframes dash — loader SVI line-draw ------------------------------
+ * Transcribed from DeepVault-handoff/project/styles.css:119. The loader SVG
+ * paths start fully dash-offset and animate stroke-dashoffset to 0, so the
+ * SVI curve "draws itself" on first paint. */
+@keyframes dash {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@layer components {
+  /* ---- live / net dots — apply the pulse ring (handoff styles.css:157-173).
+   * The dot fill/size is set inline by RelayStatusPill / by the .net-dot rule
+   * in the rail; this adds the connection-pulse animation. */
+  .net-dot {
+    background: var(--accent);
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent) 50%, transparent);
+    animation: pulse 2.2s ease-out infinite;
+  }
+  .live-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-right: 8px;
+    vertical-align: middle;
+    animation: pulse 2s ease-out infinite;
+  }
+
+  /* ---- hover/focus transitions — additive to the component layer above.
+   * .rail-nav a (.12s background/color), .pos-table tbody tr:hover,
+   * .ev-list li:hover, .shock (.12s background/border/color) and .db-tabs em.on
+   * already carry their transitions from Plan 04.1-01 Task 2. The card +
+   * oracle + db-pill border-color shifts are added here. */
+  .db-card {
+    transition: border-color 0.15s ease;
+  }
+  .db-card:hover {
+    border-color: var(--border-2);
+  }
+  .pos-table tbody tr {
+    transition: background 0.12s ease;
+  }
+  .ev-list li {
+    transition: background 0.12s ease;
+  }
+  .oracles li .bar {
+    transition: border-color 0.12s ease;
+  }
+  .db-tabs em {
+    transition: color 0.12s ease, border-color 0.12s ease;
+  }
+
+  /* ---- DASHBOARD LOADER — SVI-draw overlay (D-04, consumed by
+   * DashboardLoader.tsx). Transcribed/recolored from the handoff
+   * styles.css:86-125 `.loader` block onto the dashboard OKLCH tokens. */
+  .loader {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: var(--bg);
+    display: grid;
+    place-items: center;
+    color: var(--text);
+    transition: opacity 0.6s ease;
+  }
+  .loader.gone {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .loader-wrap {
+    width: min(440px, 86vw);
+  }
+  .loader-mark {
+    font-family: var(--f-mono);
+    font-size: 14px;
+    letter-spacing: 0.05em;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    color: var(--text-2);
+  }
+  .lm-bracket {
+    color: var(--accent);
+  }
+  .lm-word {
+    color: var(--text);
+  }
+  .loader-svi {
+    display: block;
+    width: 100%;
+    height: 100px;
+    margin-top: 28px;
+    color: var(--accent);
+  }
+  .loader-svi path {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: dash 1.8s cubic-bezier(0.7, 0, 0.2, 1) forwards;
+  }
+  .loader-svi path:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+  .loader-svi path:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+  .loader-meta {
+    margin-top: 16px;
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--f-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+}
+
+/* ---- prefers-reduced-motion guard --------------------------------------
+ * Accessibility: when the OS requests reduced motion, mute the infinite dot
+ * pulse and the loader line-draw. The loader still renders (and still
+ * self-dismisses on its timer — DashboardLoader.tsx shortens the timer under
+ * reduced motion) but its paths appear fully drawn rather than animating in. */
+@media (prefers-reduced-motion: reduce) {
+  .net-dot,
+  .live-dot {
+    animation: none;
+  }
+  .loader {
+    transition: none;
+  }
+  .loader-svi path {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}

@@ -155,6 +155,21 @@ Drop in this order, never reverse:
 - [ ] 04-07-PLAN.md (Wave 5) — DepositWithdrawPanel (3-step PTB flow) + PositionViewer (PnL split) + CI extension + Vercel/Render configs + DASH-13 demo checklist (DASH-11, DASH-12, DASH-13 e2e) [contains checkpoint]
 **UI hint**: yes
 
+### Phase 04.1: Dashboard Visual Polish (INSERTED)
+
+**Goal:** The DeepVault dashboard reskinned in-place to faithfully match the Claude Design handoff (per 04.1-UI-SPEC.md): OKLCH token system, Geist type, the rail + headline + 3-row card layout, all 8 panels reskinned, a new live EventStreamPanel, a working light/dark theme toggle, and a full motion pass — without regressing any Phase 4 verified behavior.
+**Requirements**: D-01, D-02, D-03, D-04 (CONTEXT.md decisions — decimal phase, no REQ-ID mapping)
+**Depends on:** Phase 4
+**Plans:** 6 plans
+
+Plans:
+- [ ] 04.1-01-PLAN.md (Wave 1) — Design token foundation: OKLCH :root + paper-light into globals.css, tailwind.config off hsl(var()), Geist self-host, CHART_COLORS constants
+- [ ] 04.1-02-PLAN.md (Wave 2) — Layout shell: App.tsx rail+headline+3-row grid, new Rail.tsx scroll-anchor nav, Header.tsx db-bar reskin
+- [ ] 04.1-03-PLAN.md (Wave 3) — Panel reskin A: SurfacePanel, ArbCheckerPanel (g(k) retained), VaultPanel — db-card chrome + mint chart colors
+- [ ] 04.1-04-PLAN.md (Wave 3) — Panel reskin B: BucketGauge, ExposurePanel (BTC-only), WhatIfSimulator (7 shock buttons), PositionViewer (BTC-only), DepositWithdrawPanel chrome, 5 status primitives
+- [ ] 04.1-05-PLAN.md (Wave 4) — EventStreamPanel (live relay ring-buffer ticker) + theme toggle control
+- [ ] 04.1-06-PLAN.md (Wave 5) — Motion pass: SVI-draw loader, pulse dots, hover transitions, shock toggle, event flash
+
 ### Phase 5: Testnet Demo Hardening + Mainnet-Readiness Toolkit
 **Goal**: Testnet `deepvault` vault hardened to judge-presentable demo quality with a reproducible staged smoke test (dual ±10 bps NAV gate), and a complete mainnet-readiness toolkit (preflight + deploy + smoke-test scripts + predict-mainnet check + runbook) written and audited but NOT executed — ready to ship in 30 minutes when DeepBook Predict goes live on mainnet (post-submission, contingent on DeepVault winning or otherwise pursuing mainnet launch).
 **Depends on**: Phase 4
@@ -189,7 +204,7 @@ Drop in this order, never reverse:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 0 → 1 → 2 → 3 → 4 → 5 → 6.
+Phases execute in numeric order: 0 → 1 → 2 → 3 → 4 → 4.1 → 5 → 6.
 Decimal phases (e.g., 2.1) reserved for urgent insertions and execute between their integers.
 
 | Phase | Plans Complete | Status | Completed |
@@ -199,6 +214,7 @@ Decimal phases (e.g., 2.1) reserved for urgent insertions and execute between th
 | 2. Vault Move Package + Testnet Deploy | 0/9 | Not started | - |
 | 3. Backtest Harness + Two-Protocol PTB | 4/9 | In Progress|  |
 | 4. PLP Risk Studio Dashboard + Relay | 0/TBD | Not started | - |
+| 04.1 Dashboard Visual Polish | 0/6 | Planned | - |
 | 5. Testnet Demo Hardening + Mainnet-Readiness Toolkit | 2/5 | In progress | - |
 | 6. Submission Package | 0/TBD | Not started | - |
 
@@ -218,7 +234,7 @@ All 67 v1 requirements mapped to exactly one phase. No orphans, no duplicates.
 | DEPLOY-05..08, DEPLOY-10 | 5 | Phase 6 |
 | **Total** | **64** | — |
 
-Note: REQUIREMENTS.md counts 67 v1 items (the 8+6+11+10+6+13+10 = 64 matches the headline + 3 cross-track items recounted). Cross-check: SETUP=8, MATH=6, VAULT=11, BACK=10, PTB=6, DASH=13, DEPLOY=10. Total = 8+6+11+10+6+13+10 = 64. The "67" headline in REQUIREMENTS.md appears to be an off-by-three; this roadmap maps every actual checkbox in REQUIREMENTS.md and any reconciliation will be picked up in the traceability table update. **All 64 distinct REQ-IDs in REQUIREMENTS.md are mapped exactly once** — no orphans.
+Note: REQUIREMENTS.md counts 67 v1 items (the 8+6+11+10+6+13+10 = 64 matches the headline + 3 cross-track items recounted). Cross-check: SETUP=8, MATH=6, VAULT=11, BACK=10, PTB=6, DASH=13, DEPLOY=10. Total = 8+6+11+10+6+13+10 = 64. The "67" headline in REQUIREMENTS.md appears to be an off-by-three; this roadmap maps every actual checkbox in REQUIREMENTS.md and any reconciliation will be picked up in the traceability table update. **All 64 distinct REQ-IDs in REQUIREMENTS.md are mapped exactly once** — no orphans. Phase 04.1 is a decimal-phase visual reskin of Phase 4's dashboard; it has no REQ-IDs (governed by CONTEXT.md decisions D-01..D-04 and the 04.1-UI-SPEC contract).
 
 ---
 *Roadmap created: 2026-05-09*

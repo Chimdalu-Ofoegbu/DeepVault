@@ -4,14 +4,14 @@ milestone: v1.1
 milestone_name: milestone
 status: executing
 stopped_at: Completed Plan 05-02 (mainnet-readiness toolkit scripts)
-last_updated: "2026-05-17T04:46:58.239Z"
+last_updated: "2026-05-17T04:59:16.852Z"
 last_activity: 2026-05-17
 progress:
   total_phases: 8
   completed_phases: 6
   total_plans: 53
-  completed_plans: 49
-  percent: 92
+  completed_plans: 50
+  percent: 94
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 04.1 (dashboard-visual-polish) — EXECUTING
-Plan: 3 of 6
+Plan: 4 of 6
 Status: Ready to execute
 Next phase: Phase 6 — Submission Package (demo video + README cold-read + architecture diagram + whitepaper + Devpost submission)
 Last activity: 2026-05-17
@@ -95,6 +95,7 @@ Progress: [█████████████████] 100% Phase 1 / 1
 | Phase 05 P05-05 | 25min | 4 tasks | 4 files |
 | Phase 04.1 P04.1-01 | ~18min | 4 tasks | 6 files |
 | Phase 04.1 P04.1-02 | ~14min | 3 tasks | 4 files |
+| Phase 04.1 P04.1-03 | 8min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -230,6 +231,7 @@ Recent decisions affecting current work:
 - [Phase 04.1]: Plan 04.1-01: Dashboard reskin token foundation landed — handoff OKLCH token system (dark :root/.dark + .light paper override) + full transcribed dashboard.css component-class layer (.db-card/.rail/.db-bar/.pos-table/.bucket/.oracles/.shock-row/.ev-list/.db-side + 1200/1024/900px breakpoints) in globals.css. shadcn semantic aliases re-pointed at OKLCH so 13 primitives inherit reskin with no per-component edit. tailwind.config.ts off hsl(var()) (OKLCH != HSL) onto raw var(--token). Geist/Geist Mono self-hosted via @fontsource (replaces Inter/JetBrains Mono). CHART_COLORS/MINT_COLORSCALE/CHART_FONT_FAMILY constants module added (chart libs cannot read CSS vars at runtime). pnpm build passes. Greeks panel + backtest-replay class groups excluded (LD-1, LD-3). Unblocks Waves 2-5 panel reskins.
 - [Phase ?]: Plan 05-05: Phase 5 closes. docs/MAINNET-READINESS.md hardened with 3 new top sections (Why deferred / 30-min procedure / single-config-flip architecture); funding playbook preserved; Step 2 USDsui corrected to 60 USDsui (10 seed + 50 smoke). README hardened with testnet pointers + make demo docs + Mainnet readiness section + Week 5 log. Makefile demo target wired to bash scripts/testnet-smoke-test.sh. All 5 DEPLOY-XX closed; Phase 6 takes the baton.
 - [Phase ?]: Plan 04.1-02: Dashboard layout shell landed — App.tsx restructured into dash-body 232px rail + 1fr main grid; Rail.tsx scroll-anchor nav; Header.tsx db-bar reskin; headline dh-stats strip fed by useVaultState; VaultPanel feeder-only; Row-3 backtest link card. Data spine byte-identical; tsc + pnpm build clean.
+- [Phase ?]: [Phase 04.1]: Plan 04.1-03: SurfacePanel + ArbCheckerPanel reskinned to handoff db-card chrome; g(k) plot retained (R-2); VaultPanel converted to pure data feeder (re-exports useVaultState/VaultView + vaultStats selector, no card). Chart colors via CHART_COLORS/MINT_COLORSCALE — zero hardcoded hex. 431/431 dashboard tests pass.
 
 ### Pending Todos
 
@@ -270,6 +272,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-17T04:46:44.505Z
+Last session: 2026-05-17T04:58:54.435Z
 Stopped at: Completed Plan 05-02 (mainnet-readiness toolkit scripts)
 Resume file: None

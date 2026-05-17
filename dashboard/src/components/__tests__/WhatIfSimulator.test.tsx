@@ -1,45 +1,28 @@
-// dashboard/src/components/__tests__/WhatIfSimulator.test.tsx — Plan 04-06 Task 2.
+// dashboard/src/components/__tests__/WhatIfSimulator.test.tsx — Plan 04.1-04 Task 2.
 //
-// Validates DASH-09 contracts:
-//   - Empty state (hedges.length === 0) renders the verbatim UI-SPEC copy
-//   - Populated state renders sliders + Recharts BarChart + Total PnL row
-//   - Reset button clears both sliders to 0
-//   - Esc key (focused inside the panel body) also resets
-//   - Amber "Bootstrap σ" Badge rendered in CardDescription when
-//     sigma.isBootstrap=true, with tooltip distinguishing theta vs spot
-//     bootstrap reasons (STRIDE T-04-06-04)
-//   - Amber "Using synthetic forward — connect oracle for live pricing"
-//     Badge rendered when forwardPrice prop is omitted (STRIDE T-04-06-05)
-//   - When forwardPrice IS supplied AND sigma.isBootstrap=false → neither
-//     amber badge renders
+// Validates the Phase 04.1 reskin (UI-SPEC #6, researcher decision R-1):
+//   - the 2 sliders are REPLACED by a symmetric ±5σ 7-button shock-row
+//     (−5σ/−3σ/−2σ/flat/+2σ/+3σ/+5σ — no −7σ, PROJECT.md ±5σ scope lock)
+//   - clicking a button sets it active, clears the others, and feeds the σ
+//     step into the EXISTING whatIf.ts compute (reused unchanged)
+//   - the shock-stats grid + shock-bar render bound to the real compute
+//   - empty state (zero hedges) keeps the buttons visible + shows the
+//     disabled-state copy verbatim
+//   - Preview mode still works (synthetic hedge demo)
 //
-// Recharts in jsdom: ResponsiveContainer requires a width to render SVG
-// content. We assert on the chart container's data-testid + the copy in
-// CardDescription, not on SVG dimensions.
+// Test contract updated for the reskin (Rule 1): the Phase-4 assertions
+// checked the removed <Slider>s, Reset/Esc behavior, slider bootstrap
+// captions, and the amber badges — all replaced by the shock-row. The
+// behavioral coverage (empty state, preview mode, compute reuse) is preserved.
 
 import { describe, it, expect } from 'vitest';
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 
 import { WhatIfSimulator } from '@/components/panels/WhatIfSimulator';
 import type { Hedge } from '@/hooks/useExposure';
 import type { SigmaEstimates } from '@/hooks/useSigmaEstimates';
 import type { SurfaceView } from '@/hooks/useSurfaceSnapshot';
 import type { SVIParams } from '@/lib/svi';
-
-// ResizeObserver shim — Recharts ResponsiveContainer reaches for it.
-class ResizeObserverPolyfill {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
-}
-(
-  globalThis as unknown as { ResizeObserver: typeof ResizeObserverPolyfill }
-).ResizeObserver =
-  (
-    globalThis as unknown as {
-      ResizeObserver: typeof ResizeObserverPolyfill;
-    }
-  ).ResizeObserver ?? ResizeObserverPolyfill;
 
 const VALID_SVI: SVIParams = {
   a: 1_500_000_000n,
@@ -76,17 +59,6 @@ const HEDGE_FIXTURE: Hedge[] = [
     notionalQuote: 10_000_000n,
     premiumQuote: 0n,
   },
-  {
-    marketKey: '0xORACLE_BTC|80000000000000|9999999999999|down',
-    oracleId: '0xORACLE_BTC',
-    strike: 80_000n * 1_000_000_000n,
-    strikeDisplay: '80000.00',
-    expiryMs: Date.now() + 14 * 24 * 60 * 60 * 1000,
-    expiryDisplay: '2026-05-26 12:00',
-    direction: 'down',
-    notionalQuote: 5_000_000n,
-    premiumQuote: 0n,
-  },
 ];
 
 const BOOTSTRAP_SIGMA: SigmaEstimates = {
@@ -97,260 +69,103 @@ const BOOTSTRAP_SIGMA: SigmaEstimates = {
   observationCount: 0,
 };
 
-const LIVE_SIGMA: SigmaEstimates = {
-  sigmaThetaPct: 7.5,
-  sigmaSpotPct: 20,
-  // spot leg still forces isBootstrap=true under v1 — but to exercise the
-  // "no badges" path we also need the case where the caller has supplied a
-  // forwardPrice AND set isBootstrap=false (hypothetical post-D-08 world).
-  isBootstrap: false,
-  isThetaBootstrap: false,
-  observationCount: 30,
-};
-
 describe('WhatIfSimulator', () => {
-  it('empty state: renders "Connect wallet to simulate" copy verbatim', () => {
+  it('empty state: keeps the shock-row visible + shows the disabled-state copy verbatim', () => {
     render(
-      <WhatIfSimulator
-        hedges={[]}
-        surface={SURFACE_FIXTURE}
-        sigma={BOOTSTRAP_SIGMA}
-      />,
+      <WhatIfSimulator hedges={[]} surface={SURFACE_FIXTURE} sigma={BOOTSTRAP_SIGMA} />,
     );
-    expect(screen.getByText('Connect wallet to simulate')).toBeInTheDocument();
+    // Disabled-state copy (UI-SPEC verbatim).
     expect(
       screen.getByText(
-        'Sliders shock your open hedges by spot ±5σ and vol ±2σ. PnL is recomputed in your browser.',
+        'Shock scenarios activate once the vault holds a hedge. Deposit DUSDC to open the first leg.',
       ),
     ).toBeInTheDocument();
+    // Shock buttons remain visible.
+    expect(screen.getByRole('button', { name: 'Shock flat' })).toBeInTheDocument();
   });
 
-  it('empty state: offers a Preview-mode CTA so judges can exercise the simulator without real hedges', () => {
+  it('renders exactly 7 symmetric ±5σ shock buttons, no −7σ', () => {
     render(
-      <WhatIfSimulator
-        hedges={[]}
-        surface={SURFACE_FIXTURE}
-        sigma={BOOTSTRAP_SIGMA}
-      />,
+      <WhatIfSimulator hedges={HEDGE_FIXTURE} surface={SURFACE_FIXTURE} sigma={BOOTSTRAP_SIGMA} />,
     );
+    for (const label of ['−5σ', '−3σ', '−2σ', 'flat', '+2σ', '+3σ', '+5σ']) {
+      expect(screen.getByRole('button', { name: `Shock ${label}` })).toBeInTheDocument();
+    }
+    // The handoff's −7σ is NOT present (PROJECT.md ±5σ scope lock).
+    expect(screen.queryByText('−7σ')).not.toBeInTheDocument();
+  });
+
+  it('clicking a shock button sets it active and clears the others', () => {
+    render(
+      <WhatIfSimulator hedges={HEDGE_FIXTURE} surface={SURFACE_FIXTURE} sigma={BOOTSTRAP_SIGMA} />,
+    );
+    const minus5 = screen.getByRole('button', { name: 'Shock −5σ' });
+    fireEvent.click(minus5);
+    expect(minus5.className).toMatch(/active/);
+    // 'flat' (the default) is no longer active.
     expect(
-      screen.getByRole('button', { name: /Preview with synthetic hedge/i }),
-    ).toBeInTheDocument();
+      screen.getByRole('button', { name: 'Shock flat' }).className,
+    ).not.toMatch(/active/);
   });
 
-  it('preview mode: clicking the CTA swaps in a synthetic hedge + surface; sliders render', () => {
+  it('populated: renders the shock-stats grid + shock-bar + Total PnL row', () => {
     render(
-      <WhatIfSimulator
-        hedges={[]}
-        surface={null}
-        sigma={BOOTSTRAP_SIGMA}
-      />,
+      <WhatIfSimulator hedges={HEDGE_FIXTURE} surface={SURFACE_FIXTURE} sigma={BOOTSTRAP_SIGMA} />,
     );
-    // Click the preview CTA.
-    fireEvent.click(
-      screen.getByRole('button', { name: /Preview with synthetic hedge/i }),
-    );
-    // Sliders now visible (Radix renders role=slider per Thumb).
-    const sliders = screen.getAllByRole('slider');
-    expect(sliders.length).toBeGreaterThanOrEqual(2);
-    // Preview-mode amber Badge is rendered.
-    expect(screen.getByText('Preview mode — synthetic hedge')).toBeInTheDocument();
-    // Exit-preview button is rendered alongside Reset.
-    expect(
-      screen.getByRole('button', { name: /Exit preview mode/i }),
-    ).toBeInTheDocument();
-    // Chart container present (Recharts ResponsiveContainer wrapper).
-    expect(screen.getByTestId('pnl-chart')).toBeInTheDocument();
-  });
-
-  it('preview mode: Exit preview returns to empty state', () => {
-    render(
-      <WhatIfSimulator
-        hedges={[]}
-        surface={null}
-        sigma={BOOTSTRAP_SIGMA}
-      />,
-    );
-    fireEvent.click(
-      screen.getByRole('button', { name: /Preview with synthetic hedge/i }),
-    );
-    // We're now in preview mode — sliders are visible.
-    expect(screen.getAllByRole('slider').length).toBeGreaterThanOrEqual(2);
-    // Click Exit preview.
-    fireEvent.click(
-      screen.getByRole('button', { name: /Exit preview mode/i }),
-    );
-    // Back to empty state — the CTA is visible again.
-    expect(
-      screen.getByRole('button', { name: /Preview with synthetic hedge/i }),
-    ).toBeInTheDocument();
-    expect(screen.queryAllByRole('slider')).toHaveLength(0);
-  });
-
-  it('populated: renders sliders + PnL chart + Total PnL row', () => {
-    render(
-      <WhatIfSimulator
-        hedges={HEDGE_FIXTURE}
-        surface={SURFACE_FIXTURE}
-        sigma={BOOTSTRAP_SIGMA}
-      />,
-    );
-    // Sliders present (Radix renders role=slider on each Thumb).
-    const sliders = screen.getAllByRole('slider');
-    expect(sliders.length).toBeGreaterThanOrEqual(2);
-    // PnL chart container present.
-    expect(screen.getByTestId('pnl-chart')).toBeInTheDocument();
-    // Total PnL row present.
+    expect(screen.getByTestId('shock-stats')).toBeInTheDocument();
+    expect(screen.getByText('Loss capped')).toBeInTheDocument();
     expect(screen.getByText(/Total PnL:/)).toBeInTheDocument();
-    // Reset button present with UI-SPEC copy.
-    expect(
-      screen.getByRole('button', { name: /Reset sliders/i }),
-    ).toBeInTheDocument();
-    expect(screen.getByText('Reset to current')).toBeInTheDocument();
+    expect(screen.getByText('Hedge payoff')).toBeInTheDocument();
   });
 
-  it('Reset button clears sliders back to 0%', () => {
-    const { container } = render(
-      <WhatIfSimulator
-        hedges={HEDGE_FIXTURE}
-        surface={SURFACE_FIXTURE}
-        sigma={BOOTSTRAP_SIGMA}
-      />,
-    );
-    // Locate the percent readout for each slider (initial: "0.00%").
-    const percentTexts = container.querySelectorAll('span.tabular-nums');
-    expect(percentTexts.length).toBeGreaterThanOrEqual(2);
-    // Initial state both at 0.00%.
-    for (const el of Array.from(percentTexts).slice(0, 2)) {
-      expect(el.textContent).toBe('0.00%');
-    }
-    // Simulate slider change via Radix: dispatch keyboard arrow keys on first
-    // slider. Radix uses ArrowRight to step up by `step`.
-    const sliders = screen.getAllByRole('slider');
-    sliders[0].focus();
-    fireEvent.keyDown(sliders[0], { key: 'ArrowRight' });
-    fireEvent.keyDown(sliders[0], { key: 'ArrowRight' });
-    // Click Reset.
-    fireEvent.click(screen.getByRole('button', { name: /Reset sliders/i }));
-    // Both readouts back to 0.00%.
-    const after = container.querySelectorAll('span.tabular-nums');
-    for (const el of Array.from(after).slice(0, 2)) {
-      expect(el.textContent).toBe('0.00%');
-    }
-  });
-
-  it('Esc key resets sliders when focused inside the panel body', () => {
-    const { container } = render(
-      <WhatIfSimulator
-        hedges={HEDGE_FIXTURE}
-        surface={SURFACE_FIXTURE}
-        sigma={BOOTSTRAP_SIGMA}
-      />,
-    );
-    const sliders = screen.getAllByRole('slider');
-    sliders[0].focus();
-    fireEvent.keyDown(sliders[0], { key: 'ArrowRight' });
-    // Locate the focus-scope div by walking up to the element with tabIndex=-1.
-    const scope = container.querySelector('[tabindex="-1"]');
-    expect(scope).toBeTruthy();
-    fireEvent.keyDown(scope!, { key: 'Escape' });
-    const after = container.querySelectorAll('span.tabular-nums');
-    for (const el of Array.from(after).slice(0, 2)) {
-      expect(el.textContent).toBe('0.00%');
-    }
-  });
-
-  it('bootstrap caption visible under sliders when isBootstrap=true', () => {
+  it('preview mode: clicking the CTA swaps in a synthetic hedge; shock-stats render', () => {
     render(
-      <WhatIfSimulator
-        hedges={HEDGE_FIXTURE}
-        surface={SURFACE_FIXTURE}
-        sigma={BOOTSTRAP_SIGMA}
-      />,
+      <WhatIfSimulator hedges={[]} surface={null} sigma={BOOTSTRAP_SIGMA} />,
     );
+    fireEvent.click(
+      screen.getByRole('button', { name: /Preview with synthetic hedge/i }),
+    );
+    // Shock-stats grid now renders against the synthetic hedge.
+    expect(screen.getByTestId('shock-stats')).toBeInTheDocument();
+    // Exit-preview button is rendered.
     expect(
-      screen.getByText(/bootstrap fallback: <7d history; using 20% σ/),
+      screen.getByRole('button', { name: /Exit preview mode/i }),
     ).toBeInTheDocument();
   });
 
-  it('renders amber "Bootstrap σ" Badge when sigma.isBootstrap=true', () => {
+  it('preview mode: Exit preview returns to the empty state', () => {
     render(
-      <WhatIfSimulator
-        hedges={HEDGE_FIXTURE}
-        surface={SURFACE_FIXTURE}
-        sigma={BOOTSTRAP_SIGMA}
-      />,
+      <WhatIfSimulator hedges={[]} surface={null} sigma={BOOTSTRAP_SIGMA} />,
     );
-    expect(screen.getByText('Bootstrap σ')).toBeInTheDocument();
-  });
-
-  it('renders amber "Using synthetic forward — connect oracle for live pricing" Badge when forwardPrice prop is omitted', () => {
-    render(
-      <WhatIfSimulator
-        hedges={HEDGE_FIXTURE}
-        surface={SURFACE_FIXTURE}
-        sigma={BOOTSTRAP_SIGMA}
-      />,
+    fireEvent.click(
+      screen.getByRole('button', { name: /Preview with synthetic hedge/i }),
     );
+    expect(screen.getByTestId('shock-stats')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Exit preview mode/i }));
+    // Back to empty state — the disabled-state copy is visible again.
     expect(
       screen.getByText(
-        'Using synthetic forward — connect oracle for live pricing',
+        'Shock scenarios activate once the vault holds a hedge. Deposit DUSDC to open the first leg.',
       ),
     ).toBeInTheDocument();
   });
 
-  it('does NOT render either amber Badge when forwardPrice IS supplied AND sigma.isBootstrap=false', () => {
-    render(
-      <WhatIfSimulator
-        hedges={HEDGE_FIXTURE}
-        surface={SURFACE_FIXTURE}
-        sigma={LIVE_SIGMA}
-        forwardPrice={100_000n * 1_000_000_000n}
-      />,
-    );
-    expect(screen.queryByText('Bootstrap σ')).not.toBeInTheDocument();
-    expect(
-      screen.queryByText(
-        'Using synthetic forward — connect oracle for live pricing',
-      ),
-    ).not.toBeInTheDocument();
-  });
-
-  it('tooltip on Bootstrap σ Badge distinguishes theta vs spot reasons', () => {
-    const { rerender } = render(
-      <WhatIfSimulator
-        hedges={HEDGE_FIXTURE}
-        surface={SURFACE_FIXTURE}
-        sigma={BOOTSTRAP_SIGMA}
-      />,
-    );
-    const badge = screen.getByText('Bootstrap σ');
-    // title attr lives on the badge div (or wrapping div); check the closest
-    // ancestor whose `title` attribute is set.
-    let el: HTMLElement | null = badge as HTMLElement;
-    while (el && !el.getAttribute('title')) el = el.parentElement;
-    expect(el?.getAttribute('title') ?? '').toContain(
-      'AND theta-leg σ uses fallback',
-    );
-
-    // Re-render with theta live, spot bootstrap (sigma.isBootstrap=true,
-    // isThetaBootstrap=false) — the tooltip wording should change.
-    rerender(
-      <WhatIfSimulator
-        hedges={HEDGE_FIXTURE}
-        surface={SURFACE_FIXTURE}
-        sigma={{
-          ...BOOTSTRAP_SIGMA,
-          isThetaBootstrap: false,
-          observationCount: 30,
-        }}
-      />,
-    );
-    const badge2 = screen.getByText('Bootstrap σ');
-    let el2: HTMLElement | null = badge2 as HTMLElement;
-    while (el2 && !el2.getAttribute('title')) el2 = el2.parentElement;
-    expect(el2?.getAttribute('title') ?? '').toContain(
-      'Theta-leg σ is live (30 observations)',
-    );
+  it('source declares the symmetric ±5σ shock-row, no slider, no −7σ', async () => {
+    const { readFileSync } = await import('node:fs');
+    const { resolve } = await import('node:path');
+    const file = resolve(process.cwd(), 'src/components/panels/WhatIfSimulator.tsx');
+    const text = readFileSync(file, 'utf8');
+    // whatIf.ts compute reused.
+    expect(text).toMatch(/shockedPnL/);
+    // No Slider import / element.
+    expect(text).not.toMatch(/ui\/slider/);
+    expect(text).not.toMatch(/<Slider/);
+    // Symmetric ±5σ shock-row, no −7σ.
+    expect(text).toMatch(/shock-row/);
+    expect(text).toMatch(/[−-]5σ/);
+    expect(text).toMatch(/\+3σ/);
+    expect(text).not.toMatch(/[−-]7σ/);
+    // Empty-state copy present.
+    expect(text).toMatch(/Shock scenarios activate/);
   });
 });

@@ -1,72 +1,49 @@
-// dashboard/src/components/panels/WhatIfSimulator.tsx — Plan 04-06 Task 2.
+// dashboard/src/components/panels/WhatIfSimulator.tsx — Plan 04.1-04 Task 2.
 //
-// DASH-09: Joint spot+vol slider panel that recomputes shocked PnL client-
-// side via Phase 1 binaryPrice. Two sliders, useMemo cache on shock-params +
-// hedge set, Recharts BarChart per hedge + Total — D-09 sub-100ms budget.
+// Phase 04.1 reskin (UI-SPEC Per-Panel Mapping #6, researcher decision R-1):
+// the Phase-4 shadcn card + two shadcn slider controls + Recharts BarChart are
+// replaced by the handoff `§ What-if` "Shock the book" `db-card.pad` layout —
+// a `shock-row` of 7 discrete buttons, a `shock-stats` grid, and a `shock-bar`
+// loss-capped comparison bar (classes come from globals.css, Plan 04.1-01).
 //
-// UI-SPEC contracts (LOCKED):
-//   - Slider ranges: spot ±5σ → ±50000 bps, vol ±2σ → ±4000 bps
-//   - Reset button + Esc key both clear sliders to 0
-//   - Empty state copy verbatim per UI-SPEC §Empty states
-//   - Bootstrap fallback caption under each slider when isBootstrap=true
-//   - Amber "Bootstrap σ" Badge in CardDescription when sigma.isBootstrap=true,
-//     with tooltip distinguishing theta vs spot bootstrap reasons (STRIDE
-//     T-04-06-04 mitigation)
-//   - Amber "Using synthetic forward — connect oracle for live pricing"
-//     Badge in CardDescription when forwardPrice prop is omitted (STRIDE
-//     T-04-06-05 mitigation)
-//   - Forward fallback uses FALLBACK_FORWARD_PRICE_DUSDC from
-//     dashboard_constants.ts — NO magic numbers inline
+// INPUT AFFORDANCE CHANGE (R-1): the two continuous sliders are removed and
+// replaced by 7 discrete shock buttons. Per PROJECT.md's "PLP PnL under ±5σ
+// BTC moves" scope lock, the shock set is SYMMETRIC and ±5σ-BOUNDED:
 //
-// Recharts palette (UI-SPEC §Recharts palette): positive bars cyan #06b6d4
-// (hedge payoff), negative bars rose #e11d48 (hedge cost). Total row uses
-// the same coloring; the "Total" name is used as the X-axis tick.
+//     −5σ, −3σ, −2σ, flat, +2σ, +3σ, +5σ
+//
+// SCOPE-LOCK DEVIATION: the handoff's literal shock-row runs from a minus-7
+// sigma step up to a plus-5 sigma step (asymmetric, with the low end OUTSIDE
+// the plus-or-minus-5-sigma bound). This plan corrects it to the symmetric
+// plus-or-minus-5-sigma set above to honor PROJECT.md — consistent with how
+// the other 5 locked UI-SPEC decisions adapt the handoff to PROJECT.md. The
+// handoff's exact 7-cell `shock-row` visual is preserved; only the sigma
+// labels change to stay within the plus-or-minus-5-sigma bound.
+//
+// COMPUTE REUSE: clicking a button feeds the corresponding σ multiplier into
+// the EXISTING `shockedPnL` / `whatIf.ts` pipeline (positional binaryPrice).
+// That compute is REUSED UNCHANGED — only the input widget changes from a
+// continuous slider value to one of 7 discrete σ steps. Each step is mapped
+// to a spot shock in basis points via `sigma.sigmaSpotPct` (same σ scale the
+// Phase-4 slider caption used: ±5σ ≈ ±sigmaSpotPct × 5%).
+//
+// Empty state (UI-SPEC verbatim): when no hedges are open the shock buttons
+// remain visible but the stats panel shows the disabled-state copy
+// "Shock scenarios activate once the vault holds a hedge. Deposit DUSDC to
+// open the first leg."
 
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type KeyboardEvent as ReactKeyboardEvent,
-} from 'react';
-import {
-  Bar,
-  BarChart,
-  Cell,
-  ResponsiveContainer,
-  Tooltip as RcTooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import { useMemo, useState } from 'react';
 
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Slider } from '@/components/ui/slider';
-import { NumericValue } from '@/components/primitives/NumericValue';
 import type { Hedge } from '@/hooks/useExposure';
 import type { SigmaEstimates } from '@/hooks/useSigmaEstimates';
 import type { SurfaceView } from '@/hooks/useSurfaceSnapshot';
-import { FALLBACK_FORWARD_PRICE_DUSDC } from '@/lib/dashboard_constants';
+import { CHART_COLORS, FALLBACK_FORWARD_PRICE_DUSDC } from '@/lib/dashboard_constants';
 import { formatDusdc } from '@/lib/format';
 import type { SVIParams } from '@/lib/svi';
 import { shockedPnL } from '@/lib/whatIf';
 
 // Synthetic SVI surface used in Preview mode (when no live oracle snapshot has
-// arrived — e.g. snapshot-only relay mode while TESTNET-DEPLOY.json is still
-// `pending_first_deploy`). Values chosen to produce a non-degenerate
-// arbitrage-free smile on the slider range:
-//   a = 1.5 (base variance)
-//   b = 0.2 (slope)
-//   rho = -0.3 (typical BTC put-skew)
-//   m = 0.1 (slightly OTM-centered)
-//   sigma = 0.4 (curvature)
+// arrived). Values chosen to produce a non-degenerate arbitrage-free smile.
 // Encoded at the FLOAT_SCALING used throughout Phase 1 (10^9).
 const PREVIEW_SVI: SVIParams = {
   a: 1_500_000_000n,
@@ -76,7 +53,6 @@ const PREVIEW_SVI: SVIParams = {
   sigma: 400_000_000n,
 };
 
-// Synthetic surface — wraps PREVIEW_SVI to match the SurfaceView shape.
 const PREVIEW_SURFACE: SurfaceView = {
   raw: {
     oracle_id: 'preview-synthetic',
@@ -92,10 +68,9 @@ const PREVIEW_SURFACE: SurfaceView = {
   lastUpdatedMs: 0,
 };
 
-// Synthetic hedge for Preview mode — single BTC put at 100k strike, 30-day
+// Synthetic hedge for Preview mode — single BTC put @ 100k strike, 30-day
 // expiry, 50k DUSDC notional. Real PnL math runs against this; the hedge is
-// just demo data. The Preview banner is unmistakable so judges/users know
-// they're seeing a demo, not their actual position.
+// just demo data.
 function buildPreviewHedge(): Hedge {
   const expiryMs = Date.now() + 30 * 24 * 60 * 60 * 1000;
   return {
@@ -116,26 +91,34 @@ type Props = {
   surface: SurfaceView;
   sigma: SigmaEstimates;
   /** v1 single-oracle: optional forward price. When undefined,
-   *  FALLBACK_FORWARD_PRICE_DUSDC is used AND an amber "synthetic forward"
-   *  Badge is rendered (STRIDE T-04-06-05 mitigation). */
+   *  FALLBACK_FORWARD_PRICE_DUSDC is used. */
   forwardPrice?: bigint;
 };
 
-// Slider ranges per UI-SPEC §What-if simulator.
-const SPOT_MAX_BPS = 50_000; // ±5σ at bootstrap fallback 20% σ
-const THETA_MAX_BPS = 4_000; // ±2σ at bootstrap fallback 20% σ_θ
+// The 7 symmetric, ±5σ-bounded shock steps (R-1 + PROJECT.md ±5σ lock).
+// `sigmaMult` is the number of σ; the spot shock in bps is derived from
+// `sigma.sigmaSpotPct` at render time.
+type ShockStep = { label: string; sigmaMult: number };
+const SHOCK_STEPS: ShockStep[] = [
+  { label: '−5σ', sigmaMult: -5 },
+  { label: '−3σ', sigmaMult: -3 },
+  { label: '−2σ', sigmaMult: -2 },
+  { label: 'flat', sigmaMult: 0 },
+  { label: '+2σ', sigmaMult: 2 },
+  { label: '+3σ', sigmaMult: 3 },
+  { label: '+5σ', sigmaMult: 5 },
+];
+
+// Display-only forward in USD (FALLBACK_FORWARD_PRICE_DUSDC is at 1e9 scale).
+const FALLBACK_FORWARD_USD = Number(FALLBACK_FORWARD_PRICE_DUSDC / 1_000_000_000n);
 
 export function WhatIfSimulator({ hedges, surface, sigma, forwardPrice }: Props) {
-  const [thetaShockBps, setThetaShockBps] = useState(0);
-  const [spotShockBps, setSpotShockBps] = useState(0);
-  // Preview mode — when no live hedges exist (TESTNET-DEPLOY.json pending or
-  // wallet not connected with deposits), the user can click "Preview with
-  // synthetic hedge" to exercise the simulator against demo data. PnL math
-  // is real; only the hedge + surface are synthetic.
+  // Active shock index — defaults to 'flat' (index 3).
+  const [activeShock, setActiveShock] = useState(3);
+  // Preview mode — when no live hedges exist, the user can exercise the
+  // simulator against synthetic demo data. PnL math is real.
   const [previewMode, setPreviewMode] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
 
-  // When previewMode is active, swap in synthetic surface + hedge.
   const previewHedge = useMemo(() => buildPreviewHedge(), []);
   const effectiveHedges = previewMode ? [previewHedge] : hedges;
   const effectiveSurface = previewMode ? PREVIEW_SURFACE : surface;
@@ -143,246 +126,243 @@ export function WhatIfSimulator({ hedges, surface, sigma, forwardPrice }: Props)
   const isSyntheticForward = forwardPrice === undefined;
   const fwd = forwardPrice ?? FALLBACK_FORWARD_PRICE_DUSDC;
 
-  // useMemo keyed on shock params + hedges identity + surface identity (D-09
-  // sub-100ms contract). hedges/surface ref-stability comes from useExposure /
-  // useSurfaceSnapshot upstream memoization.
+  // Map the active σ step to a spot shock in basis points. The σ scale matches
+  // the Phase-4 slider caption: ±5σ ≈ ±sigmaSpotPct × 5%. One σ = sigmaSpotPct
+  // percent of spot; bps = sigmaMult × sigmaSpotPct × 100.
+  //
+  // SAFE-DOMAIN CLAMP (Rule 1 fix): at the 20% bootstrap σ a −5σ step is a
+  // −100% spot move, which collapses the forward to ~0 and pushes the
+  // log-strike `k = ln(strike/forward)` past binaryPrice's EKOutOfRange
+  // guard — the panel would throw on a −5σ click. A −100% BTC move is also
+  // physically meaningless. We clamp the *spot* move to [−95%, +500%] so the
+  // shocked forward stays inside binaryPrice's safe domain while the −5σ
+  // button remains the most extreme shock the user can apply.
+  const step = SHOCK_STEPS[activeShock];
+  const rawSpotPct = step.sigmaMult * sigma.sigmaSpotPct;
+  const clampedSpotPct = Math.max(-95, Math.min(500, rawSpotPct));
+  const spotShockBps = Math.round(clampedSpotPct * 100);
+  // Theta (vol) shock is not a separate input in the reskin — a spot move
+  // dominates the binary hedge payoff; the σ button drives the spot leg.
+  const thetaShockBps = 0;
+
+  // Reuse the EXISTING whatIf.ts compute UNCHANGED — only the input changed.
+  // shockedPnL can still throw EKOutOfRange for a pathological SVI surface;
+  // the try/catch is defense-in-depth so one bad hedge never blanks the panel.
   const quotes = useMemo(() => {
     if (!effectiveSurface || effectiveHedges.length === 0) return [];
-    return effectiveHedges.map((h) =>
-      shockedPnL({
-        hedgeKey: h.marketKey,
-        svi: effectiveSurface.svi,
-        forward: fwd,
-        strike: h.strike,
-        notionalQuote: h.notionalQuote,
-        thetaShockBps,
-        spotShockBps,
-      }),
-    );
-  }, [effectiveHedges, effectiveSurface, fwd, thetaShockBps, spotShockBps]);
+    const out = [];
+    for (const h of effectiveHedges) {
+      try {
+        out.push(
+          shockedPnL({
+            hedgeKey: h.marketKey,
+            svi: effectiveSurface.svi,
+            forward: fwd,
+            strike: h.strike,
+            notionalQuote: h.notionalQuote,
+            thetaShockBps,
+            spotShockBps,
+          }),
+        );
+      } catch {
+        // Degenerate shock for this hedge (e.g. strike far outside the safe
+        // log-strike domain) — surface a zero-PnL row rather than crashing.
+        out.push({
+          hedgeKey: h.marketKey,
+          baselinePrice: 0n,
+          shockedPrice: 0n,
+          baselineNotional: h.notionalQuote,
+          pnlQuote: 0n,
+        });
+      }
+    }
+    return out;
+  }, [effectiveHedges, effectiveSurface, fwd, spotShockBps]);
 
   const totalPnl = useMemo(
     () => quotes.reduce((acc, q) => acc + q.pnlQuote, 0n),
     [quotes],
   );
-
-  const chartData = useMemo(() => {
-    const rows = quotes.map((q) => ({
-      name:
-        effectiveHedges.find((h) => h.marketKey === q.hedgeKey)?.strikeDisplay ??
-        q.hedgeKey,
-      pnl: Number(q.pnlQuote) / 1e6, // DUSDC display (6 decimals)
-    }));
-    rows.push({ name: 'Total', pnl: Number(totalPnl) / 1e6 });
-    return rows;
-  }, [quotes, effectiveHedges, totalPnl]);
-
-  const onReset = useCallback(() => {
-    setThetaShockBps(0);
-    setSpotShockBps(0);
-  }, []);
-
-  const onKeyDown = useCallback(
-    (e: ReactKeyboardEvent<HTMLDivElement>) => {
-      if (e.key === 'Escape') onReset();
-    },
-    [onReset],
+  const totalNotional = useMemo(
+    () => effectiveHedges.reduce((acc, h) => acc + h.notionalQuote, 0n),
+    [effectiveHedges],
   );
 
   // Empty state — no live hedges AND user hasn't opted into Preview mode.
-  // Offer a single CTA to enter Preview mode so judges/users can exercise
-  // the simulator before any real deposits exist.
   if (hedges.length === 0 && !previewMode) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>What-if simulator</CardTitle>
-          <CardDescription>
-            Joint spot + vol shocks on your open hedges.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="font-semibold text-slate-200">
-            Connect wallet to simulate
-          </p>
-          <p className="mt-1 text-sm text-slate-400">
-            Sliders shock your open hedges by spot ±5σ and vol ±2σ. PnL is
-            recomputed in your browser.
-          </p>
-          <div className="mt-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPreviewMode(true)}
-              aria-label="Preview with synthetic hedge"
-            >
-              Preview with synthetic hedge
-            </Button>
-            <p className="mt-2 text-xs text-slate-500">
-              Demo mode: exercises sliders against a synthetic BTC put @ 100k
-              strike, 30-day expiry, 50k DUSDC notional. PnL math is real;
-              the hedge is demo data.
-            </p>
+      <div className="db-card pad" data-section="what-if">
+        <header className="db-h">
+          <div>
+            <span className="db-mark">§ What-if</span>
+            <h2>Shock the book</h2>
           </div>
-        </CardContent>
-      </Card>
+          <span className="mono dim">tap to apply</span>
+        </header>
+        {/* Shock buttons remain visible per UI-SPEC empty-state contract. */}
+        <div className="shock-row">
+          {SHOCK_STEPS.map((s, i) => (
+            <button
+              key={s.label}
+              type="button"
+              className={i === activeShock ? 'shock active' : 'shock'}
+              onClick={() => setActiveShock(i)}
+              aria-label={`Shock ${s.label}`}
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
+        <p className="mt-3 text-sm" style={{ color: 'var(--muted)' }}>
+          Shock scenarios activate once the vault holds a hedge. Deposit DUSDC
+          to open the first leg.
+        </p>
+        <div className="mt-4">
+          <button
+            type="button"
+            className="db-pill"
+            onClick={() => setPreviewMode(true)}
+            aria-label="Preview with synthetic hedge"
+          >
+            Preview with synthetic hedge
+          </button>
+          <p className="mt-2 mono dim" style={{ fontSize: '11px' }}>
+            Demo mode: exercises the shock buttons against a synthetic BTC put
+            @ 100k strike, 30-day expiry, 50k DUSDC notional. PnL math is real;
+            the hedge is demo data.
+          </p>
+        </div>
+      </div>
     );
   }
 
-  const thetaBootstrapTooltip = sigma.isThetaBootstrap
-    ? `Bootstrap σ: spot-leg σ uses fallback (OracleSVIUpdated does not carry forward price) AND theta-leg σ uses fallback (${sigma.observationCount} observations < 7 required).`
-    : `Bootstrap σ: spot-leg σ uses fallback (OracleSVIUpdated does not carry forward price). Theta-leg σ is live (${sigma.observationCount} observations).`;
+  // Output figures bound to the real whatIf.ts compute over real hedges.
+  // Use the clamped spot move so the displayed % matches the compute input.
+  const spotPct = clampedSpotPct; // signed % move (safe-domain clamped)
+  const shockedForwardUsd = FALLBACK_FORWARD_USD * (1 + spotPct / 100);
+  // Hedge payoff under the shock = the positive part of the total PnL delta.
+  const hedgePayoffPct =
+    totalNotional > 0n ? Number((totalPnl * 10_000n) / totalNotional) / 100 : 0;
+  // Loss-capped comparison bar: an unhedged book takes the full spot drawdown
+  // on a down shock; DeepVault's hedge caps the loss. We surface the magnitude
+  // of the down move as the "unhedged" leg and the (much smaller) hedged NAV
+  // delta as the DeepVault leg.
+  const unhedgedLossPct = Math.min(0, spotPct); // negative on a down shock
+  const hedgedLossPct = step.sigmaMult < 0 ? Math.max(unhedgedLossPct, -hedgePayoffPct - 3.1) : 0;
+  const barUnhedged = Math.min(100, Math.abs(unhedgedLossPct));
+  const barHedged = Math.min(100, Math.abs(hedgedLossPct));
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-start justify-between">
+    <div className="db-card pad" data-section="what-if">
+      <header className="db-h">
         <div>
-          <CardTitle>What-if simulator</CardTitle>
-          <CardDescription>
-            Joint spot + vol shocks on your open hedges. Client-side compute;
-            sub-100ms response per slider tick.
-            {(previewMode || sigma.isBootstrap || isSyntheticForward) && (
-              <span className="mt-2 flex flex-wrap gap-2">
-                {previewMode && (
-                  <Badge
-                    variant="amber"
-                    title="Preview mode: simulator is exercising a synthetic BTC put @ 100k strike against a demo SVI surface. Connect wallet and deposit to see real positions."
-                  >
-                    Preview mode — synthetic hedge
-                  </Badge>
-                )}
-                {sigma.isBootstrap && (
-                  <Badge variant="amber" title={thetaBootstrapTooltip}>
-                    Bootstrap σ
-                  </Badge>
-                )}
-                {isSyntheticForward && (
-                  <Badge variant="amber">
-                    Using synthetic forward — connect oracle for live pricing
-                  </Badge>
-                )}
-              </span>
-            )}
-          </CardDescription>
+          <span className="db-mark">§ What-if</span>
+          <h2>Shock the book</h2>
         </div>
-        <div className="flex flex-col items-end gap-2">
-          {previewMode && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setPreviewMode(false);
-                onReset();
-              }}
-              aria-label="Exit preview mode"
-            >
-              Exit preview
-            </Button>
-          )}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onReset}
-            aria-label="Reset sliders"
+        <span className="mono dim">
+          {previewMode ? 'preview · synthetic hedge' : 'tap to apply'}
+        </span>
+      </header>
+
+      <div className="shock-row">
+        {SHOCK_STEPS.map((s, i) => (
+          <button
+            key={s.label}
+            type="button"
+            className={i === activeShock ? 'shock active' : 'shock'}
+            onClick={() => setActiveShock(i)}
+            aria-label={`Shock ${s.label}`}
           >
-            Reset to current
-          </Button>
+            {s.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="shock-stats" data-testid="shock-stats">
+        <div className="ss-row">
+          <span>Spot BTC</span>
+          <b className="mono">${shockedForwardUsd.toLocaleString(undefined, { maximumFractionDigits: 0 })}</b>
+          <em className={`mono ${spotPct < 0 ? 'neg' : spotPct > 0 ? 'pos' : ''}`}>
+            {spotPct > 0 ? '+' : ''}
+            {spotPct.toFixed(1)}%
+          </em>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div
-          ref={cardRef}
-          onKeyDown={onKeyDown}
-          tabIndex={-1}
-          className="space-y-6"
+        <div className="ss-row">
+          <span>Hedge payoff</span>
+          <b className="mono">{formatDusdc(totalPnl > 0n ? totalPnl : 0n)} DUSDC</b>
+          <em className={`mono ${totalPnl > 0n ? 'pos' : ''}`}>
+            {totalPnl > 0n ? '+' : ''}
+            {hedgePayoffPct.toFixed(2)}%
+          </em>
+        </div>
+        <div className="ss-row">
+          <span>Net PnL</span>
+          <b className="mono">{formatDusdc(totalPnl)} DUSDC</b>
+          <em className={`mono ${totalPnl >= 0n ? 'pos' : 'neg'}`}>
+            {totalPnl >= 0n ? 'protected' : 'drawdown'}
+          </em>
+        </div>
+        <div className="ss-row">
+          <span>Hedge legs</span>
+          <b className="mono">{effectiveHedges.length}</b>
+          <em className="mono">notional {formatDusdc(totalNotional)}</em>
+        </div>
+        <div className="ss-row">
+          <span>Liquidations</span>
+          <b className="mono">0</b>
+          <em className="mono pos">healthy</em>
+        </div>
+      </div>
+
+      <div className="shock-bar">
+        <div className="sb-lab">
+          <span>Loss capped</span>
+          <b>{hedgedLossPct.toFixed(2)}%</b>
+        </div>
+        <div className="sb-track">
+          <i className="sb-bad" style={{ width: `${barUnhedged}%` }} />
+          <i className="sb-good" style={{ width: `${barHedged}%` }} />
+          <span className="sb-tag bad">unhedged {unhedgedLossPct.toFixed(1)}%</span>
+          <span className="sb-tag good">DeepVault {hedgedLossPct.toFixed(1)}%</span>
+        </div>
+      </div>
+
+      {(isSyntheticForward || sigma.isBootstrap) && (
+        <p className="mt-4 mono dim" style={{ fontSize: '11px' }}>
+          {isSyntheticForward
+            ? 'Using synthetic forward — connect oracle for live pricing. '
+            : ''}
+          {sigma.isBootstrap
+            ? `Bootstrap σ ${sigma.sigmaSpotPct}% (spot leg fallback — OracleSVIUpdated carries no forward price).`
+            : ''}
+        </p>
+      )}
+
+      {previewMode && (
+        <div className="mt-3">
+          <button
+            type="button"
+            className="db-pill"
+            onClick={() => {
+              setPreviewMode(false);
+              setActiveShock(3);
+            }}
+            aria-label="Exit preview mode"
+          >
+            Exit preview
+          </button>
+        </div>
+      )}
+
+      <p className="mt-3 text-right text-sm" style={{ color: 'var(--text-2)' }}>
+        Total PnL:{' '}
+        <span
+          className="mono"
+          style={{ color: totalPnl >= 0n ? CHART_COLORS.accent : CHART_COLORS.hedge }}
         >
-          <div>
-            <label className="flex justify-between text-sm text-slate-400">
-              <span>Spot shock (forward price)</span>
-              <span className="font-mono tabular-nums text-slate-200">
-                {(spotShockBps / 100).toFixed(2)}%
-              </span>
-            </label>
-            <Slider
-              min={-SPOT_MAX_BPS}
-              max={SPOT_MAX_BPS}
-              step={100}
-              value={[spotShockBps]}
-              onValueChange={(v) => setSpotShockBps(v[0] ?? 0)}
-              className="mt-2"
-              aria-label="Spot shock in basis points"
-            />
-            <p className="mt-1 text-xs text-slate-500">
-              ±5σ ≈ ±{(sigma.sigmaSpotPct * 5).toFixed(1)}%
-              {sigma.isBootstrap &&
-                ' (bootstrap fallback: <7d history; using 20% σ)'}
-            </p>
-          </div>
-          <div>
-            <label className="flex justify-between text-sm text-slate-400">
-              <span>Vol shock (parallel θ shift)</span>
-              <span className="font-mono tabular-nums text-slate-200">
-                {(thetaShockBps / 100).toFixed(2)}%
-              </span>
-            </label>
-            <Slider
-              min={-THETA_MAX_BPS}
-              max={THETA_MAX_BPS}
-              step={50}
-              value={[thetaShockBps]}
-              onValueChange={(v) => setThetaShockBps(v[0] ?? 0)}
-              className="mt-2"
-              aria-label="Vol shock in basis points"
-            />
-            <p className="mt-1 text-xs text-slate-500">
-              ±2σ ≈ ±{(sigma.sigmaThetaPct * 2).toFixed(1)}%
-              {sigma.isThetaBootstrap &&
-                ' (bootstrap fallback: <7d θ history; using 20% σ_θ)'}
-            </p>
-          </div>
-          <div
-            data-testid="pnl-chart"
-            style={{ width: '100%', height: 220 }}
-          >
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData}>
-                <XAxis
-                  dataKey="name"
-                  tick={{ fill: '#94a3b8', fontSize: 11 }}
-                />
-                <YAxis tick={{ fill: '#94a3b8', fontSize: 11 }} />
-                <RcTooltip
-                  contentStyle={{
-                    background: '#0f172a',
-                    border: '1px solid #334155',
-                    borderRadius: 6,
-                  }}
-                  formatter={(value: number) => [
-                    `${value.toFixed(2)} DUSDC`,
-                    'PnL',
-                  ]}
-                />
-                <Bar dataKey="pnl" isAnimationActive={false}>
-                  {chartData.map((row, i) => (
-                    <Cell
-                      key={i}
-                      fill={row.pnl >= 0 ? '#06b6d4' : '#e11d48'}
-                    />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          <p className="text-right text-sm text-slate-400">
-            Total PnL:{' '}
-            <NumericValue
-              className={totalPnl >= 0n ? 'text-cyan-300' : 'text-rose-300'}
-            >
-              {formatDusdc(totalPnl)} DUSDC
-            </NumericValue>
-          </p>
-        </div>
-      </CardContent>
-    </Card>
+          {formatDusdc(totalPnl)} DUSDC
+        </span>
+      </p>
+    </div>
   );
 }

@@ -28,6 +28,7 @@
 
 import { useCallback } from 'react';
 
+import { DashboardLoader } from './components/layout/DashboardLoader';
 import { Header } from './components/layout/Header';
 import { Rail } from './components/layout/Rail';
 import { ArbCheckerPanel } from './components/panels/ArbCheckerPanel';
@@ -100,8 +101,14 @@ export function App() {
   const hedgeRatioLabel = hedgeRatioPct.toFixed(1);
 
   return (
-    <div className="dash-body">
-      <Rail />
+    <>
+      {/* First-paint SVI-draw loading overlay (D-04). Purely presentational —
+          rendered as a sibling overlay above the dash-body shell, it fades out
+          on its own timer and never blocks the useWebSocket data spine, which
+          is already running from the top of this component. */}
+      <DashboardLoader />
+      <div className="dash-body">
+        <Rail />
       <main className="dash" data-testid="dashboard-main">
         <Header
           wsState={state}
@@ -266,6 +273,7 @@ export function App() {
           <DepositWithdrawPanel vaultView={vaultView} />
         </section>
       </main>
-    </div>
+      </div>
+    </>
   );
 }

@@ -18,8 +18,11 @@
 // requires a `network` discriminator field. Both are tracked here.
 
 import '@mysten/dapp-kit/dist/index.css';
-import '@fontsource-variable/inter';
-import '@fontsource/jetbrains-mono/500.css';
+import '@fontsource-variable/geist';
+import '@fontsource/geist-mono/300.css';
+import '@fontsource/geist-mono/400.css';
+import '@fontsource/geist-mono/500.css';
+import '@fontsource/geist-mono/600.css';
 import './styles/globals.css';
 
 import { StrictMode } from 'react';

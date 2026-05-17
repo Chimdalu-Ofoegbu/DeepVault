@@ -1,89 +1,955 @@
-/* dashboard/src/styles/globals.css — shadcn `new-york` + `slate` base preset.
+/* dashboard/src/styles/globals.css — Phase 04.1 reskin.
  *
- * CSS-variable definitions for light + dark themes. Variable names match
- * the canonical shadcn registry contract (background, foreground, card,
- * primary, secondary, muted, accent, destructive, border, input, ring,
- * radius). Component primitives added later via `pnpm dlx shadcn add ...`
- * consume these tokens automatically.
+ * Token foundation for the DeepVault Risk Studio dashboard reskin. This file
+ * carries TWO things:
+ *   1. The Claude Design handoff's OKLCH design-token system (transcribed
+ *      verbatim from DeepVault-handoff/project/styles.css:9-54), plus the
+ *      shadcn semantic aliases re-pointed at the OKLCH values so the 13
+ *      installed shadcn primitives inherit the reskin with no per-component
+ *      edit (UI-SPEC R-3).
+ *   2. The transcribed handoff component-class layer (.db-card, .rail,
+ *      .db-bar, .pos-table, .bucket, .oracles, .shock-row, .ev-list, ...),
+ *      transcribed from DeepVault-handoff/project/dashboard.css. Downstream
+ *      panel-reskin plans (Waves 2-5) apply these classes by name.
  *
- * Dark mode is toggled by `next-themes` (attribute="class" on <html>),
- * which is wired in main.tsx per Pitfall 10's provider order.
+ * Theme mechanism: next-themes attribute="class" toggles `.dark` / `.light`
+ * on <html> (main.tsx ThemeProvider). The handoff dark `:root` values are
+ * placed in BOTH `:root` AND `.dark` so a no-class first paint is still
+ * dark (dark is the demo default). The handoff `[data-theme="paper"]` light
+ * override is applied under the `.light` selector — because next-themes
+ * attribute="class" toggles the `.light` class (not a `[data-theme]`
+ * attribute), `.light` is the selector that actually fires.
  */
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* === Handoff OKLCH token system (transcribed from styles.css:9-54) ======= */
+
 @layer base {
+  /* Dark canvas — the demo default. Lives in :root so a no-class first
+     paint is already dark. */
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* --- handoff-named tokens (verbatim from styles.css:9-40) --- */
+    /* canvas */
+    --bg:           oklch(0.135 0.008 250);
+    --bg-2:         oklch(0.165 0.008 250);
+    --surface:      oklch(0.205 0.008 250);
+    --surface-2:    oklch(0.235 0.008 250);
+    --border:       oklch(0.285 0.008 250);
+    --border-2:     oklch(0.38  0.008 250);
+    /* text */
+    --text:         oklch(0.965 0.005 80);
+    --text-2:       oklch(0.78  0.008 80);
+    --muted:        oklch(0.60  0.012 250);
+    --dim:          oklch(0.46  0.012 250);
+    /* accent */
+    --accent:       oklch(0.88 0.18 155);
+    --accent-2:     oklch(0.78 0.16 155);
+    --hedge:        oklch(0.70 0.18 28);
+    --hedge-2:      oklch(0.60 0.17 28);
+    /* radii */
+    --r-1: 4px;
+    --r-2: 8px;
+    --r-3: 14px;
+    --r-4: 22px;
+    /* type */
+    --f-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+    --f-mono: "Geist Mono", ui-monospace, monospace;
+    --f-accent: "Geist", ui-sans-serif, system-ui, sans-serif;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
+    /* --- shadcn semantic aliases re-pointed at OKLCH values (UI-SPEC R-3) ---
+       The 13 installed shadcn primitives consume these names. Pointing them
+       at the handoff OKLCH tokens reskins every primitive with no per-file
+       edit. Note: these hold full color() values, NOT HSL triplets — the
+       Tailwind config consumes them as raw var(--token), not hsl(var()). */
+    --background:           var(--bg);
+    --foreground:           var(--text);
+    --card:                 var(--bg-2);
+    --card-foreground:       var(--text);
+    --popover:              var(--bg-2);
+    --popover-foreground:    var(--text);
+    --primary:              var(--accent);
+    --primary-foreground:    oklch(0.18 0.02 155);
+    --secondary:            var(--surface);
+    --secondary-foreground:  var(--text);
+    --muted-foreground:      var(--muted);
+    --accent-foreground:     var(--text);
+    --destructive:          var(--hedge);
+    --destructive-foreground: oklch(0.965 0.005 80);
+    --input:                var(--border);
+    --ring:                 var(--accent);
+    --radius: 14px; /* matches --r-3, the db-card radius */
   }
 
+  /* Dark — explicit class block. Same values as :root so next-themes
+     toggling `.dark` is a no-op visual-wise but keeps the class mechanism
+     honest. */
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --bg:           oklch(0.135 0.008 250);
+    --bg-2:         oklch(0.165 0.008 250);
+    --surface:      oklch(0.205 0.008 250);
+    --surface-2:    oklch(0.235 0.008 250);
+    --border:       oklch(0.285 0.008 250);
+    --border-2:     oklch(0.38  0.008 250);
+    --text:         oklch(0.965 0.005 80);
+    --text-2:       oklch(0.78  0.008 80);
+    --muted:        oklch(0.60  0.012 250);
+    --dim:          oklch(0.46  0.012 250);
+    --accent:       oklch(0.88 0.18 155);
+    --accent-2:     oklch(0.78 0.16 155);
+    --hedge:        oklch(0.70 0.18 28);
+    --hedge-2:      oklch(0.60 0.17 28);
+  }
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+  /* Paper (light) — handoff [data-theme="paper"] override (styles.css:43-54).
+     Applied under `.light` because next-themes attribute="class" toggles the
+     `.light` class on <html>. */
+  .light {
+    --bg:        oklch(0.965 0.006 80);
+    --bg-2:      oklch(0.945 0.006 80);
+    --surface:   oklch(0.92  0.006 80);
+    --surface-2: oklch(0.89  0.006 80);
+    --border:    oklch(0.82  0.008 80);
+    --border-2:  oklch(0.66  0.01  80);
+    --text:      oklch(0.18  0.01  80);
+    --text-2:    oklch(0.32  0.01  80);
+    --muted:     oklch(0.46  0.012 80);
+    --dim:       oklch(0.58  0.012 80);
   }
 }
 
 @layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
   * {
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
-    font-feature-settings: 'rlig' 1, 'calt' 1;
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--f-sans);
+    font-size: 15px;
+    line-height: 1.55;
+    /* Geist stylistic sets — keep per UI-SPEC §Typography */
+    font-feature-settings: "ss01", "ss02", "cv11";
+  }
+  /* No italics — handoff uses <i>/<em> as styling hooks only (Design Prompt
+     mandate). Keep them upright globally; component rules override per-use. */
+  i, em {
+    font-style: normal;
+  }
+}
+
+/* === Handoff component-class layer (transcribed from dashboard.css) =======
+ * Placed in @layer components so panel markup using className="db-card" etc.
+ * resolves and the rules are not purged. Transcribed largely verbatim — the
+ * handoff dashboard.css already references the OKLCH tokens as var(--bg),
+ * var(--accent), var(--r-3), color-mix(...) so the classes resolve to the
+ * Task-1 token block above.
+ *
+ * EXCLUDED per locked decisions: the Greeks panel class group (LD-1 — Greeks
+ * panel dropped) and the live backtest-replay class group (LD-3 — backtest is
+ * a static link card, not a live SVG widget). Those classes are simply omitted.
+ */
+
+@layer components {
+  /* ---- SHELL --------------------------------------------- */
+  .dash-body {
+    display: grid;
+    grid-template-columns: 232px 1fr;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ---- RAIL ---------------------------------------------- */
+  .rail {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    border-right: 1px solid var(--border);
+    background: var(--bg-2);
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    overflow-y: auto;
+  }
+  .rail-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: -0.018em;
+  }
+  .rail-brand .brand-mark {
+    width: 22px;
+    height: 22px;
+    color: var(--text);
+  }
+  .rail-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .rail-k {
+    font-family: var(--f-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 18px 0 6px;
+  }
+  .rail-nav a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 10px;
+    font-size: 13px;
+    color: var(--text-2);
+    border-radius: 6px;
+    transition: background 0.12s, color 0.12s;
+  }
+  .rail-nav a:hover {
+    background: var(--surface);
+    color: var(--text);
+  }
+  .rail-nav a.active {
+    background: color-mix(in oklab, var(--accent) 10%, transparent);
+    color: var(--text);
+  }
+  .rail-nav a.active .ri-dot {
+    background: var(--accent);
+  }
+  .ri-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--border-2);
+    display: inline-block;
+  }
+  .rail-foot {
+    margin-top: auto;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .rail-back {
+    font-family: var(--f-mono);
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+  .rail-back:hover {
+    color: var(--text);
+  }
+  .rail-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* ---- DASH MAIN ----------------------------------------- */
+  .dash {
+    padding: 0 28px 80px;
+  }
+
+  /* TOP BAR */
+  .db-bar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 28px;
+    background: color-mix(in oklab, var(--bg) 80%, transparent);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    margin: 0 -28px;
+  }
+  .db-bar-l,
+  .db-bar-r {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .crumb {
+    font-family: var(--f-mono);
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+  .crumb a {
+    color: var(--text-2);
+  }
+  .crumb a:hover {
+    color: var(--text);
+  }
+  .crumb em {
+    color: var(--border-2);
+    font-style: normal;
+    margin: 0 6px;
+  }
+  .crumb b {
+    color: var(--text);
+    font-weight: 500;
+  }
+  .db-pill {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-2);
+    padding: 7px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: var(--f-sans);
+    transition: border-color 0.15s, color 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .db-pill.mono {
+    font-family: var(--f-mono);
+    font-size: 11.5px;
+  }
+  .db-pill:hover {
+    border-color: var(--text-2);
+    color: var(--text);
+  }
+  .btn.sm {
+    padding: 7px 12px;
+    font-size: 12.5px;
+  }
+  .db-avatar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 7px 12px;
+    border-radius: 6px;
+    font-family: var(--f-mono);
+    font-size: 11.5px;
+  }
+
+  /* HEADLINE */
+  .db-headline {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 40px;
+    align-items: end;
+    padding: 36px 0 32px;
+    border-bottom: 1px solid var(--border);
+  }
+  .dh-eye {
+    font-family: var(--f-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+  .db-headline h1 {
+    font-size: clamp(34px, 4vw, 56px);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    font-weight: 500;
+    margin: 0;
+    text-wrap: balance;
+    max-width: 18ch;
+  }
+  .dh-stats {
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--r-2);
+    overflow: hidden;
+  }
+  .dh-stat {
+    padding: 14px 22px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: var(--bg-2);
+  }
+  .dh-stat:last-child {
+    border-right: none;
+  }
+  .dh-k {
+    font-family: var(--f-mono);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+  }
+  .dh-v {
+    font-size: 28px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+  .dh-v i {
+    font-style: normal;
+    font-size: 16px;
+    color: var(--muted);
+  }
+  .dh-trend {
+    font-family: var(--f-mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+  .dh-trend.pos {
+    color: var(--accent);
+  }
+
+  /* ROWS */
+  .db-row {
+    display: grid;
+    gap: 20px;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .r1 {
+    grid-template-columns: 1.6fr 1fr;
+  }
+  .r2 {
+    grid-template-columns: 1.6fr 1fr;
+  }
+  .r3 {
+    grid-template-columns: 1.6fr 1fr;
+  }
+
+  /* CARD */
+  .db-card {
+    border: 1px solid var(--border);
+    border-radius: var(--r-3);
+    background: var(--bg-2);
+    overflow: hidden;
+  }
+  .db-card.pad {
+    padding: 20px 22px;
+  }
+  .db-h {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    margin-bottom: 18px;
+  }
+  .db-card:not(.pad) .db-h {
+    padding: 16px 22px 0;
+    margin-bottom: 14px;
+  }
+  .db-mark {
+    font-family: var(--f-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 6px;
+  }
+  .db-h h2,
+  .db-h h3 {
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.018em;
+    margin: 0;
+    line-height: 1;
+  }
+  .db-h h3 {
+    font-size: 16px;
+  }
+  .db-tabs {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+  .db-tabs em {
+    font-family: var(--f-mono);
+    font-size: 11.5px;
+    font-style: normal;
+    color: var(--muted);
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    padding-bottom: 4px;
+  }
+  .db-tabs em.on {
+    color: var(--text);
+    border-bottom: 1px solid var(--accent);
+  }
+  .db-tabs em.dim {
+    color: var(--dim);
+  }
+  .db-foot {
+    padding: 12px 22px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--f-mono);
+    font-size: 11px;
+    color: var(--text-2);
+    letter-spacing: 0.02em;
+  }
+  .db-foot .dim {
+    color: var(--muted);
+  }
+  .db-foot em {
+    font-style: normal;
+  }
+  .db-foot .sw {
+    margin-right: 6px;
+  }
+  .db-foot span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* SVI CARD */
+  .svi-card .svi-plot {
+    padding: 0 18px 12px;
+  }
+  .svi-params {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 0 22px 14px;
+    font-family: var(--f-mono);
+    font-size: 12px;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+  }
+  .svi-params i {
+    color: var(--muted);
+    margin-right: 4px;
+    font-style: normal;
+  }
+  .svi-params .ok {
+    color: var(--accent);
+  }
+  .svi-params .right {
+    margin-left: auto;
+  }
+  .svi-params .dim {
+    color: var(--muted);
+  }
+
+  /* SIDE PANELS */
+  .db-side {
+    display: grid;
+    gap: 20px;
+    align-content: start;
+  }
+
+  /* BUCKET */
+  .bucket {
+    display: grid;
+    gap: 10px;
+  }
+  .bucket-num {
+    font-family: var(--f-mono);
+    font-size: 44px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--text);
+  }
+  .bucket-num i {
+    font-size: 22px;
+    color: var(--muted);
+    margin-left: 2px;
+    font-style: normal;
+  }
+  .bucket-l {
+    color: var(--muted);
+    font-size: 12.5px;
+  }
+  .bucket-bar {
+    height: 6px;
+    background: var(--surface);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .bucket-bar i {
+    display: block;
+    height: 100%;
+    background: var(--accent);
+  }
+  .bucket-foot {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--f-mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* ORACLES */
+  .oracles {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 12px;
+  }
+  .oracles li {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--f-mono);
+    font-size: 12px;
+    position: relative;
+  }
+  .oracles li span {
+    color: var(--text);
+  }
+  .oracles li b {
+    color: var(--text);
+    font-weight: 500;
+  }
+  .oracles li .bar {
+    grid-column: 1 / -1;
+    height: 3px;
+    background: var(--surface);
+    border-radius: 2px;
+    display: block;
+    position: relative;
+  }
+  .oracles li .bar::after {
+    content: "";
+    display: block;
+    height: 100%;
+    width: var(--w);
+    background: var(--accent);
+    border-radius: 2px;
+  }
+
+  /* POSITIONS */
+  .positions {
+    padding: 0;
+  }
+  .positions .db-h {
+    padding: 18px 22px 0;
+  }
+  .pos-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--f-mono);
+    font-size: 12.5px;
+  }
+  .pos-table thead th {
+    text-align: left;
+    font-family: var(--f-mono);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    font-weight: 400;
+    padding: 10px 12px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .pos-table thead th.r {
+    text-align: right;
+  }
+  .pos-table tbody td {
+    padding: 12px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  .pos-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+  .pos-table tbody tr:hover td {
+    background: color-mix(in oklab, var(--surface) 60%, transparent);
+  }
+  .pos-table td.num {
+    font-variant-numeric: tabular-nums;
+  }
+  .pos-table td.r {
+    text-align: right;
+  }
+  .pos-table td.pos {
+    color: var(--accent);
+  }
+  .pos-table td.neg {
+    color: var(--hedge);
+  }
+  .pos-table td.dim {
+    color: var(--muted);
+  }
+  .leg-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--hedge);
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+  .leg-dot.src {
+    background: var(--accent);
+  }
+  .chip {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 100px;
+    font-family: var(--f-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    border: 1px solid var(--border-2);
+    color: var(--text-2);
+  }
+  .chip.ok {
+    color: var(--accent);
+    border-color: color-mix(in oklab, var(--accent) 50%, var(--border));
+  }
+  .chip.warn {
+    color: var(--hedge);
+    border-color: color-mix(in oklab, var(--hedge) 50%, var(--border));
+  }
+
+  /* WHAT-IF */
+  .shock-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-bottom: 18px;
+  }
+  .shock {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-2);
+    padding: 9px 0;
+    font-family: var(--f-mono);
+    font-size: 12px;
+    border-radius: 6px;
+    transition: background 0.12s, border-color 0.12s, color 0.12s;
+  }
+  .shock:hover {
+    color: var(--text);
+    border-color: var(--text-2);
+  }
+  .shock.active {
+    background: color-mix(in oklab, var(--hedge) 18%, var(--surface));
+    border-color: var(--hedge);
+    color: var(--text);
+  }
+  .shock-stats {
+    display: grid;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 18px;
+  }
+  .ss-row {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr auto;
+    gap: 14px;
+    padding: 10px 12px;
+    background: var(--bg-2);
+    font-family: var(--f-mono);
+    font-size: 12px;
+    align-items: baseline;
+  }
+  .ss-row span {
+    color: var(--muted);
+  }
+  .ss-row b {
+    color: var(--text);
+    font-weight: 500;
+  }
+  .ss-row em {
+    font-style: normal;
+    text-align: right;
+  }
+  .ss-row .pos {
+    color: var(--accent);
+  }
+  .ss-row .neg {
+    color: var(--hedge);
+  }
+  .shock-bar {
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+  }
+  .sb-lab {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--f-mono);
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .sb-lab b {
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .sb-track {
+    position: relative;
+    height: 12px;
+    background: var(--surface);
+    border-radius: 6px;
+    overflow: visible;
+  }
+  .sb-bad {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background: color-mix(in oklab, var(--hedge) 40%, transparent);
+    border-right: 2px solid var(--hedge);
+    border-radius: 6px 0 0 6px;
+  }
+  .sb-good {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background: var(--accent);
+    border-radius: 6px;
+  }
+  .sb-tag {
+    position: absolute;
+    top: 18px;
+    font-family: var(--f-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.02em;
+  }
+  .sb-tag.bad {
+    right: 0;
+    color: var(--hedge);
+  }
+  .sb-tag.good {
+    left: 4%;
+    color: var(--accent);
+  }
+
+  /* EVENTS */
+  .events {
+    padding: 20px 0;
+  }
+  .events .db-h {
+    padding: 0 22px 0;
+    margin-bottom: 12px;
+  }
+  .ev-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-family: var(--f-mono);
+    font-size: 12px;
+    max-height: 320px;
+    overflow-y: auto;
+  }
+  .ev-list li {
+    display: grid;
+    grid-template-columns: 76px 80px 1fr;
+    gap: 10px;
+    padding: 9px 22px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    align-items: baseline;
+  }
+  .ev-list li i {
+    color: var(--muted);
+    font-style: normal;
+  }
+  .ev-k {
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 10.5px;
+    color: var(--muted);
+  }
+  .ev-k.acc {
+    color: var(--accent);
+  }
+  .ev-list li:hover {
+    background: color-mix(in oklab, var(--surface) 50%, transparent);
+  }
+
+  /* END */
+  .db-end {
+    margin-top: 40px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+
+  /* RESPONSIVE — verbatim breakpoints from dashboard.css:439-459 */
+  @media (max-width: 1200px) {
+    .r1,
+    .r2,
+    .r3 {
+      grid-template-columns: 1fr;
+    }
+    .dh-stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .db-headline {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    .db-bar .db-pill:nth-child(3) {
+      display: none;
+    }
+  }
+  @media (max-width: 1024px) {
+    .db-bar .db-pill.mono:first-of-type {
+      display: none;
+    }
+  }
+  @media (max-width: 900px) {
+    .dash-body {
+      grid-template-columns: 1fr;
+    }
+    .rail {
+      position: relative;
+      height: auto;
+      flex-direction: row;
+      align-items: center;
+      padding: 14px 20px;
+      gap: 18px;
+      overflow-x: auto;
+    }
+    .rail-nav {
+      flex-direction: row;
+      overflow-x: auto;
+    }
+    .rail-k {
+      display: none;
+    }
+    .rail-foot {
+      display: none;
+    }
+    .pos-table {
+      font-size: 11px;
+    }
+    .pos-table thead th,
+    .pos-table tbody td {
+      padding: 8px 8px;
+    }
+    .shock-row {
+      grid-template-columns: repeat(4, 1fr);
+    }
   }
 }

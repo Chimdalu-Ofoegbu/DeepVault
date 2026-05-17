@@ -20,6 +20,7 @@ import { ConnectButton } from '@mysten/dapp-kit';
 
 import { GlobalStalenessPill } from './GlobalStalenessPill';
 import { RelayStatusPill } from './RelayStatusPill';
+import { ThemeToggle } from './ThemeToggle';
 import type { FullSnapshot, WsState } from '@/lib/types';
 
 type Props = {
@@ -76,8 +77,8 @@ export function Header({
         <button type="button" className="db-pill mono" tabIndex={-1}>
           {utcClockLabel(now)}
         </button>
-        {/* Theme-toggle slot — Plan 05 mounts the toggle control here. */}
-        {/* <ThemeToggle /> */}
+        {/* Light/dark theme toggle (D-02) — next-themes-backed db-pill. */}
+        <ThemeToggle />
         {/* Primary CTA — opens the DepositWithdrawPanel deposit flow. */}
         <button
           type="button"

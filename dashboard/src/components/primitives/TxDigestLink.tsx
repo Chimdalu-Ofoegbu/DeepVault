@@ -4,6 +4,11 @@
 // UI-SPEC §Component Inventory: truncated `0x1234…abcd` with copy-on-click
 // Tooltip. Network defaults to testnet; mainnet variant follows the same
 // suiscan.xyz URL scheme.
+//
+// Phase 04.1 reskin (UI-SPEC #12): recolor-only — the explorer link moves
+// from the Phase-4 cyan Tailwind to the handoff mint `--accent`; the muted
+// copy-button slate moves to the `--muted`/`--text-2` OKLCH tokens. Logic
+// (clipboard copy, tooltip) is UNCHANGED.
 
 import { useState } from 'react';
 import { Copy, ExternalLink } from 'lucide-react';
@@ -45,7 +50,8 @@ export function TxDigestLink({ digest, network = 'testnet' }: Props) {
               href={url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-cyan-400 hover:underline"
+              className="hover:underline"
+              style={{ color: 'var(--accent)' }}
             >
               {truncateDigest(digest)} <ExternalLink className="inline h-3 w-3" />
             </a>
@@ -53,7 +59,8 @@ export function TxDigestLink({ digest, network = 'testnet' }: Props) {
               type="button"
               aria-label="Copy digest"
               onClick={onCopy}
-              className="text-slate-500 hover:text-slate-300"
+              className="transition-colors"
+              style={{ color: 'var(--muted)' }}
             >
               <Copy className="h-3 w-3" />
             </button>

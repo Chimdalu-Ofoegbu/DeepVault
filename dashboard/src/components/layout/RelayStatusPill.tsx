@@ -1,17 +1,22 @@
 // dashboard/src/components/layout/RelayStatusPill.tsx — sticky-header relay
 // state indicator (UI-SPEC §WebSocket reconnect).
 //
+// Phase 04.1 reskin (UI-SPEC #12): recolor-only pass — the tone tokens move
+// from the Phase-4 cyan/amber/rose Tailwind ramp to the handoff mint/coral
+// OKLCH tokens, and the connected state gains the handoff `live-dot` element
+// (the pulse keyframe lands in Plan 06's motion pass; this plan ships the
+// mint dot + color). The WsState state machine is UNCHANGED.
+//
 // Maps the WsState state machine (from useWebSocket, Plan 04-03 Task 2) to:
-//   live         → 'LIVE'           cyan
-//   connecting   → 'CONNECTING'     cyan (same tone — both are healthy)
-//   reconnecting → 'RECONNECTING IN {N}S' amber (with optional countdown)
-//   down         → 'RELAY DOWN'     rose
+//   live         → 'LIVE'                 mint + live-dot
+//   connecting   → 'CONNECTING'           mint (both states are healthy)
+//   reconnecting → 'RECONNECTING IN {N}S' coral (with optional countdown)
+//   down         → 'RELAY DOWN'           coral
 //
 // Copy strings are LOCKED per the UI-SPEC §Copywriting Contract — they MUST
 // match exactly so the demo video transcription is byte-identical.
 
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
 import type { WsState } from '@/lib/types';
 
 type Props = {
@@ -22,12 +27,20 @@ type Props = {
 };
 
 export function RelayStatusPill({ state, secondsUntilReconnect }: Props) {
-  const toneClass =
-    state === 'live' || state === 'connecting'
-      ? 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30'
-      : state === 'reconnecting'
-        ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
-        : 'bg-rose-600/15 text-rose-300 border-rose-600/30';
+  // healthy (live/connecting) → mint (--accent); reconnecting/down → coral
+  // (--hedge). UI-SPEC §Color.
+  const isHealthy = state === 'live' || state === 'connecting';
+  const toneStyle = isHealthy
+    ? {
+        background: 'color-mix(in oklab, var(--accent) 15%, transparent)',
+        color: 'var(--accent)',
+        borderColor: 'color-mix(in oklab, var(--accent) 40%, transparent)',
+      }
+    : {
+        background: 'color-mix(in oklab, var(--hedge) 15%, transparent)',
+        color: 'var(--hedge)',
+        borderColor: 'color-mix(in oklab, var(--hedge) 40%, transparent)',
+      };
 
   let text: string;
   switch (state) {
@@ -50,11 +63,24 @@ export function RelayStatusPill({ state, secondsUntilReconnect }: Props) {
 
   return (
     <Badge
-      className={cn(
-        'text-[11px] font-semibold uppercase tracking-wider border',
-        toneClass,
-      )}
+      data-tone={isHealthy ? 'mint' : 'coral'}
+      className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider border"
+      style={toneStyle}
     >
+      {/* Connected state shows the handoff live-dot (pulse keyframe lands in
+          Plan 06's motion pass). */}
+      {state === 'live' && (
+        <i
+          aria-hidden="true"
+          style={{
+            width: 5,
+            height: 5,
+            borderRadius: '50%',
+            background: 'var(--accent)',
+            display: 'inline-block',
+          }}
+        />
+      )}
       {text}
     </Badge>
   );

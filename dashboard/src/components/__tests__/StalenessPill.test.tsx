@@ -1,13 +1,15 @@
-// dashboard/src/components/__tests__/StalenessPill.test.tsx — Plan 04-03 Task 3.
+// dashboard/src/components/__tests__/StalenessPill.test.tsx — Plan 04.1-04 Task 4.
 //
-// UI-SPEC §4 staleness color contract:
-//   fresh   → cyan border  + 'LIVE'  text
-//   warning → amber border + 'STALE' text
-//   stale   → rose border  + 'STALE' text
+// Phase 04.1 reskin (UI-SPEC §Color): the tone moves from the Phase-4
+// cyan/amber/rose Tailwind ramp to the handoff mint/coral OKLCH tokens. The
+// tone is now surfaced via a `data-tone` attribute (mint | coral) since the
+// color is applied via inline style, not a class.
+//   fresh   → mint  + 'LIVE'  text
+//   warning → coral + 'STALE' text
+//   stale   → coral + 'STALE' text
 //
-// The pill consumes the useStaleness hook (already TDD'd in Task 2), so the
-// component-level test asserts only the rendered text + class names that map
-// each status to its color tone.
+// The pill consumes the useStaleness hook (unchanged), so the component test
+// asserts the rendered text + the data-tone mapping per status.
 
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
@@ -23,38 +25,38 @@ describe('<StalenessPill>', () => {
     vi.useRealTimers();
   });
 
-  it("renders 'LIVE' badge with cyan tone when fresh", () => {
+  it("renders 'LIVE' badge with mint tone when fresh", () => {
     const now = Date.parse('2026-05-12T12:00:00Z');
     vi.setSystemTime(now);
     render(<StalenessPill lastUpdatedMs={now - 5_000} />);
     const badge = screen.getByText('LIVE');
     expect(badge).toBeInTheDocument();
-    expect(badge.className).toMatch(/cyan/);
+    expect(badge.getAttribute('data-tone')).toBe('mint');
   });
 
-  it("renders 'STALE' badge with amber tone when warning", () => {
+  it("renders 'STALE' badge with coral tone when warning", () => {
     const now = Date.parse('2026-05-12T12:00:00Z');
     vi.setSystemTime(now);
     render(<StalenessPill lastUpdatedMs={now - 35_000} />);
     const badge = screen.getByText('STALE');
     expect(badge).toBeInTheDocument();
-    expect(badge.className).toMatch(/amber/);
+    expect(badge.getAttribute('data-tone')).toBe('coral');
   });
 
-  it("renders 'STALE' badge with rose tone when stale", () => {
+  it("renders 'STALE' badge with coral tone when stale", () => {
     const now = Date.parse('2026-05-12T12:00:00Z');
     vi.setSystemTime(now);
     render(<StalenessPill lastUpdatedMs={now - 70_000} />);
     const badge = screen.getByText('STALE');
     expect(badge).toBeInTheDocument();
-    expect(badge.className).toMatch(/rose/);
+    expect(badge.getAttribute('data-tone')).toBe('coral');
   });
 
-  it("renders 'STALE' with rose tone + 'no data yet' caption when null", () => {
+  it("renders 'STALE' with coral tone + 'no data yet' caption when null", () => {
     render(<StalenessPill lastUpdatedMs={null} />);
     const badge = screen.getByText('STALE');
     expect(badge).toBeInTheDocument();
-    expect(badge.className).toMatch(/rose/);
+    expect(badge.getAttribute('data-tone')).toBe('coral');
     expect(screen.getByText(/no data yet/i)).toBeInTheDocument();
   });
 

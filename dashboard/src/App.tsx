@@ -24,7 +24,7 @@
 // The 3-row grid (UI-SPEC §Main grid):
 //   r1: SVI surface card  | side column { Token bucket, Per-oracle exposure }
 //   r2: Positions card    | What-if "Shock the book" card
-//   r3: Backtest link card (static, LD-3) | Event-stream slot (Plan 05 mounts)
+//   r3: Backtest link card (static, LD-3) | Event-stream card (EventStreamPanel)
 
 import { useCallback } from 'react';
 
@@ -33,6 +33,7 @@ import { Rail } from './components/layout/Rail';
 import { ArbCheckerPanel } from './components/panels/ArbCheckerPanel';
 import { BucketGauge } from './components/panels/BucketGauge';
 import { DepositWithdrawPanel } from './components/panels/DepositWithdrawPanel';
+import { EventStreamPanel } from './components/panels/EventStreamPanel';
 import { ExposurePanel } from './components/panels/ExposurePanel';
 import { PositionViewer } from './components/panels/PositionViewer';
 import { SurfacePanel } from './components/panels/SurfacePanel';
@@ -251,9 +252,12 @@ export function App() {
               </a>
             </div>
           </section>
-          {/* Event-stream panel slot — Plan 05 creates EventStreamPanel and
-              mounts it here. Placeholder only; do not import a missing module. */}
-          <div data-section-placeholder="event-stream" />
+          {/* Event-stream card (Plan 05, UI-SPEC #9). Consumes the live relay
+              ring buffer from the useWebSocket spine — same prop-slice pattern
+              as every other panel; no new hook or socket. */}
+          <section data-section="event-stream">
+            <EventStreamPanel events={snapshot?.ring_buffer ?? []} />
+          </section>
         </section>
 
         {/* Deposit / withdraw — kept below the row grid; the data-section attr

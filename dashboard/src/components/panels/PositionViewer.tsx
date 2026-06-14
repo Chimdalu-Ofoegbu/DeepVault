@@ -144,7 +144,12 @@ export function PositionViewer({ positions }: Props) {
           <span className="chip">BTC</span>
         </header>
         <p className="px-[22px] pb-5 text-sm" style={{ color: 'var(--text-2)' }}>
-          No position yet. Deposit DUSDC to receive vault shares.
+          No live hedge legs yet. Testnet Predict lists only intraday BTC
+          markets, while the vault's hedge targets a 14-day tenor — so the
+          live mint has no matching market on testnet today. The full
+          deposit → hedge → redeem mechanics are proven in the audited
+          backtest; mainnet deploy is gated on multi-day Predict markets
+          (see <code>docs/MAINNET-READINESS.md</code>).
         </p>
       </div>
     );

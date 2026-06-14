@@ -63,7 +63,9 @@ export function ExposurePanel({ hedges }: Props) {
             </li>
           </ul>
           <p className="mt-3 text-sm" style={{ color: 'var(--muted)' }}>
-            BTC oracle · 0% exposure — no hedge legs open yet.
+            BTC oracle · 0% exposure — no live hedge legs. Testnet Predict
+            offers only intraday BTC markets; the vault's 14-day hedge has no
+            matching market today (full mechanics shown in the audited backtest).
           </p>
         </>
       )}

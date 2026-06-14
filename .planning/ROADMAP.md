@@ -160,7 +160,7 @@ Drop in this order, never reverse:
 **Goal:** The DeepVault dashboard reskinned in-place to faithfully match the Claude Design handoff (per 04.1-UI-SPEC.md): OKLCH token system, Geist type, the rail + headline + 3-row card layout, all 8 panels reskinned, a new live EventStreamPanel, a working light/dark theme toggle, and a full motion pass — without regressing any Phase 4 verified behavior.
 **Requirements**: D-01, D-02, D-03, D-04 (CONTEXT.md decisions — decimal phase, no REQ-ID mapping)
 **Depends on:** Phase 4
-**Plans:** 5/6 plans executed
+**Plans:** 6/6 plans complete
 
 Plans:
 - [x] 04.1-01-PLAN.md (Wave 1) — Design token foundation: OKLCH :root + paper-light into globals.css, tailwind.config off hsl(var()), Geist self-host, CHART_COLORS constants
@@ -168,7 +168,7 @@ Plans:
 - [x] 04.1-03-PLAN.md (Wave 3) — Panel reskin A: SurfacePanel, ArbCheckerPanel (g(k) retained), VaultPanel — db-card chrome + mint chart colors
 - [x] 04.1-04-PLAN.md (Wave 3) — Panel reskin B: BucketGauge, ExposurePanel (BTC-only), WhatIfSimulator (7 shock buttons), PositionViewer (BTC-only), DepositWithdrawPanel chrome, 5 status primitives
 - [x] 04.1-05-PLAN.md (Wave 4) — EventStreamPanel (live relay ring-buffer ticker) + theme toggle control
-- [ ] 04.1-06-PLAN.md (Wave 5) — Motion pass: SVI-draw loader, pulse dots, hover transitions, shock toggle, event flash
+- [x] 04.1-06-PLAN.md (Wave 5) — Motion pass: SVI-draw loader, pulse dots, hover transitions, shock toggle, event flash
 
 ### Phase 5: Testnet Demo Hardening + Mainnet-Readiness Toolkit
 **Goal**: Testnet `deepvault` vault hardened to judge-presentable demo quality with a reproducible staged smoke test (dual ±10 bps NAV gate), and a complete mainnet-readiness toolkit (preflight + deploy + smoke-test scripts + predict-mainnet check + runbook) written and audited but NOT executed — ready to ship in 30 minutes when DeepBook Predict goes live on mainnet (post-submission, contingent on DeepVault winning or otherwise pursuing mainnet launch).
@@ -214,7 +214,7 @@ Decimal phases (e.g., 2.1) reserved for urgent insertions and execute between th
 | 2. Vault Move Package + Testnet Deploy | 0/9 | Not started | - |
 | 3. Backtest Harness + Two-Protocol PTB | 4/9 | In Progress|  |
 | 4. PLP Risk Studio Dashboard + Relay | 0/TBD | Not started | - |
-| 04.1 Dashboard Visual Polish | 5/6 | In Progress|  |
+| 04.1 Dashboard Visual Polish | 6/6 | Complete   | 2026-06-14 |
 | 5. Testnet Demo Hardening + Mainnet-Readiness Toolkit | 2/5 | In progress | - |
 | 6. Submission Package | 0/TBD | Not started | - |
 

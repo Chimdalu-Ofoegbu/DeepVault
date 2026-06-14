@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
 status: executing
-stopped_at: Completed Plan 04.1-05 (EventStreamPanel + theme toggle)
-last_updated: "2026-05-17T06:35:00.000Z"
-last_activity: 2026-05-17
+stopped_at: Completed Plan 04.1-06 (motion pass) — Phase 04.1 complete, ready for verification
+last_updated: "2026-06-14T00:00:00.000Z"
+last_activity: 2026-06-14
 progress:
   total_phases: 8
   completed_phases: 6
   total_plans: 53
-  completed_plans: 52
-  percent: 98
+  completed_plans: 53
+  percent: 100
 ---
 
 # Project State
@@ -25,11 +25,11 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 
 ## Current Position
 
-Phase: 04.1 (dashboard-visual-polish) — EXECUTING
-Plan: 6 of 6
-Status: Ready to execute
+Phase: 04.1 (dashboard-visual-polish) — COMPLETE (6/6 plans), ready for verification
+Plan: 6 of 6 — complete
+Status: Phase 04.1 closed; awaiting phase verification, then Phase 6
 Next phase: Phase 6 — Submission Package (demo video + README cold-read + architecture diagram + whitepaper + Devpost submission)
-Last activity: 2026-05-17
+Last activity: 2026-06-14
 
 Progress: [█████████████████] 100% Phase 1 / 100% milestone
 
@@ -98,6 +98,7 @@ Progress: [█████████████████] 100% Phase 1 / 1
 | Phase 04.1 P04.1-03 | 8min | 3 tasks | 6 files |
 | Phase 04.1 P04.1-04 | ~22min | 4 tasks | 15 files |
 | Phase 04.1 P04.1-05 | ~12min | 3 tasks | 4 files |
+| Phase 04.1 P04.1-06 | ~14min | 3 tasks (auto) + 1 checkpoint | 4 files |
 
 ## Accumulated Context
 
@@ -235,6 +236,7 @@ Recent decisions affecting current work:
 - [Phase ?]: Plan 04.1-02: Dashboard layout shell landed — App.tsx restructured into dash-body 232px rail + 1fr main grid; Rail.tsx scroll-anchor nav; Header.tsx db-bar reskin; headline dh-stats strip fed by useVaultState; VaultPanel feeder-only; Row-3 backtest link card. Data spine byte-identical; tsc + pnpm build clean.
 - [Phase ?]: [Phase 04.1]: Plan 04.1-03: SurfacePanel + ArbCheckerPanel reskinned to handoff db-card chrome; g(k) plot retained (R-2); VaultPanel converted to pure data feeder (re-exports useVaultState/VaultView + vaultStats selector, no card). Chart colors via CHART_COLORS/MINT_COLORSCALE — zero hardcoded hex. 431/431 dashboard tests pass.
 - [Phase 04.1]: Plan 04.1-05: D-02 + D-03 closed. EventStreamPanel (new) consumes the existing useWebSocket snapshot.ring_buffer (RingEvent[]) — no new hook/socket; newest-first, 14-row cap, 700ms accent flash via React render state; event strings rendered as escaped React children (no raw-HTML injection — T-04.1-13). ThemeToggle (new) reuses the existing next-themes provider (useTheme/setTheme), hydration-mismatch guard, mounted in the Header db-bar pill row. Both wired into the Plan-02 layout shell; data spine unchanged; 427/427 dashboard tests pass; tsc + pnpm build clean.
+- [Phase 04.1]: Plan 04.1-06 — PHASE 04.1 CLOSED (6/6 plans). D-04 full motion pass landed: DashboardLoader.tsx (first-paint SVI-draw overlay, self-dismisses on timer, never gates useWebSocket — T-04.1-16 mitigation), globals.css @keyframes pulse + dash + .12s rail/card/table-row/ev-list/shock/db-tabs hover transitions recolored to OKLCH (no raw hex), prefers-reduced-motion guard, live-dot pulse on RelayStatusPill. Landing-page lineDraw/fade-in/scroll-reveal deliberately excluded (index.html only per UI-SPEC). Human-verify checkpoint VERIFIED via orchestrator preview inspection on Vite :5174 + live relay :8080: zero console errors, OKLCH tokens byte-exact, BTC-only (LD-2), honest LD-5 empty states, symmetric ±5σ shock row, live OracleSVIUpdated ticker, theme toggle flips to paper token + persists to localStorage. CAVEAT (honest): headless raster screenshot hangs on the Plotly WebGL canvas (known capture limitation) — time-based motion smoothness left for human eyeball at localhost:5174; non-blocking, all objective checks passed. Dashboard demo-ready; Phase 6 (Submission Package) takes the baton.
 
 ### Pending Todos
 
@@ -275,6 +277,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-05-17T06:35:00.000Z
-Stopped at: Completed Plan 04.1-05 (EventStreamPanel + theme toggle)
+Last session: 2026-06-14T00:00:00.000Z
+Stopped at: Completed Plan 04.1-06 (motion pass) — Phase 04.1 complete (6/6), ready for verification
 Resume file: None

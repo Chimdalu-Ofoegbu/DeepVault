@@ -24,7 +24,7 @@ import sys
 from pathlib import Path
 
 from .data_ingest import load_window
-from .pnl_attribution import compute_attribution, compute_risk_metrics
+from .pnl_attribution import compute_risk_metrics
 from .walk_forward import (
     compute_drawdown_max_sharpe_sortino,
     run_walk_forward,
@@ -109,7 +109,22 @@ def _cmd_walk_forward(args) -> int:
     result = run_walk_forward(data, hedge_ratio=0.10)
     sens = sensitivity_table(data)
     dd_metrics = compute_drawdown_max_sharpe_sortino(result.equity_curve)
-    attribution_df = compute_attribution(result.actions, data)
+
+    # 3-way strategy attribution (Plan 03-10) — the headline decomposition the
+    # report renders: PLP yield, PLP LVR drag, hedge cost, hedge payoff.
+    att = result.attribution
+    attribution_summary = {
+        "plp_yield": float(att.get("plp_yield", 0.0)),
+        "plp_lvr": float(att.get("plp_lvr", 0.0)),
+        "hedge_cost": float(att.get("hedge_cost", 0.0)),
+        "hedge_payoff": float(att.get("hedge_payoff", 0.0)),
+        "total_return": float(att.get("total_return", 0.0)),
+    }
+
+    # Downsample the OOS equity curve for the report (full hourly series is
+    # ~2.6k points; the report plots fine at a few hundred). Keep endpoints.
+    equity_curve_points = _downsample_series(result.equity_curve, max_points=400)
+    drawdown_curve_points = _drawdown_curve(result.equity_curve, max_points=400)
 
     summary = {
         "window_days": int(args.window_days),
@@ -118,18 +133,23 @@ def _cmd_walk_forward(args) -> int:
         "oos_sortino": float(dd_metrics.sortino),
         "oos_max_drawdown_bps": int(dd_metrics.max_drawdown_bps),
         "oos_underwater_bars": int(dd_metrics.underwater_bars),
+        "oos_apy": float(result.oos_apy),
+        "unhedged_max_drawdown_bps": int(result.unhedged_max_dd_bps),
         "sensitivity_table": sens.to_dict(orient="records"),
-        "pnl_attribution_summary": {
-            "total_bps_mean": (
-                float(attribution_df["total_bps"].mean()) if len(attribution_df) > 0 else 0.0
-            ),
-            "total_bps_min": (
-                float(attribution_df["total_bps"].min()) if len(attribution_df) > 0 else 0.0
-            ),
-            "total_bps_max": (
-                float(attribution_df["total_bps"].max()) if len(attribution_df) > 0 else 0.0
-            ),
+        "strategy_attribution": attribution_summary,
+        "equity_curve": equity_curve_points,
+        "drawdown_curve": drawdown_curve_points,
+        "monthly_pnls": {
+            str(k): float(v) for k, v in result.monthly_pnls.items()
         },
+        "n_hedge_cycles": len(result.actions),
+        "n_hedge_payoffs": int(
+            sum(1 for a in result.actions if a.get("payoff", 0.0) > 0.0)
+        ),
+        # Per-cycle hedge trade table for the report's Section 6.1.
+        "hedge_trades": result.actions,
+        # Back-compat: keep the bps-summary block the prior report/tests read.
+        "pnl_attribution_summary": _attribution_bps_summary(attribution_summary),
     }
     # compute_risk_metrics is the per-bar pnl variant used in Plan 03-09; we
     # invoke it here on the OOS equity-curve diff to populate a supplementary
@@ -147,6 +167,61 @@ def _cmd_walk_forward(args) -> int:
     )
     print(f"summary -> {out_path}")
     return 0
+
+
+def _downsample_series(series, max_points: int = 400) -> list[float]:
+    """Evenly downsample a NAV/equity Series to <= max_points, keeping endpoints.
+
+    The report's equity plot does not benefit from all ~2.6k hourly points;
+    a few hundred render identically and keep the summary JSON compact.
+    """
+    if series is None or len(series) == 0:
+        return []
+    vals = [float(v) for v in series.to_numpy()]
+    if len(vals) <= max_points:
+        return vals
+    import numpy as np
+
+    idx = np.linspace(0, len(vals) - 1, max_points).round().astype(int)
+    idx = sorted(set(idx.tolist()))
+    return [vals[i] for i in idx]
+
+
+def _drawdown_curve(series, max_points: int = 400) -> list[float]:
+    """Per-point drawdown fraction (<= 0) of an equity Series, downsampled."""
+    if series is None or len(series) < 1:
+        return []
+    import numpy as np
+
+    eq = np.asarray(series.to_numpy(), dtype=float)
+    if eq.size == 0 or not np.isfinite(eq).all() or (eq <= 0).any():
+        return []
+    running_max = np.maximum.accumulate(eq)
+    dd = (eq - running_max) / running_max
+    dd_series = type(series)(dd)
+    return _downsample_series(dd_series, max_points=max_points)
+
+
+def _attribution_bps_summary(attribution_summary: dict) -> dict:
+    """Express the 3-way attribution as total-window bps for the legacy block.
+
+    The historical ``pnl_attribution_summary`` carried mean/min/max bps of a
+    per-action table. We preserve the key names but populate them from the
+    strategy attribution so older readers still parse a valid block: mean = net
+    total return (bps), min = the most negative component (the largest drag),
+    max = the most positive component (the largest contribution).
+    """
+    comps_bps = {
+        "plp_yield": attribution_summary.get("plp_yield", 0.0) * 10_000,
+        "plp_lvr": -attribution_summary.get("plp_lvr", 0.0) * 10_000,
+        "hedge_cost": -attribution_summary.get("hedge_cost", 0.0) * 10_000,
+        "hedge_payoff": attribution_summary.get("hedge_payoff", 0.0) * 10_000,
+    }
+    return {
+        "total_bps_mean": float(attribution_summary.get("total_return", 0.0) * 10_000),
+        "total_bps_min": float(min(comps_bps.values())) if comps_bps else 0.0,
+        "total_bps_max": float(max(comps_bps.values())) if comps_bps else 0.0,
+    }
 
 
 def _cmd_report(args) -> int:

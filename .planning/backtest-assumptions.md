@@ -1,7 +1,7 @@
 # DeepVault Backtest — Assumption Ledger
 
-**Last updated:** 2026-05-12
-**Owner:** Phase 3 backtest harness (Plans 03-02 .. 03-09)
+**Last updated:** 2026-06-15
+**Owner:** Phase 3 backtest harness (Plans 03-02 .. 03-10)
 **Read-first for planner per CONTEXT.md D-05.**
 
 This ledger is loaded into the institutional HTML report (Section 2 per CONTEXT.md
@@ -12,29 +12,51 @@ bearing assumption + its `available_at` semantics from this file alone.
 
 ### BTC OHLCV (BACK-01)
 
-- **Source:** CryptoDataDownload Binance — `https://www.cryptodatadownload.com/cdd/Binance_BTCUSDT_1h.csv`
-- **Window:** 365 days hourly (~8,760 bars) per CONTEXT.md D-01.
-- **Format:** `Unix,Date,Symbol,Open,High,Low,Close,Volume BTC,Volume USDT,tradecount`
-  with a "Disclaimer" prefix line (skiprows=1). Verified 2026-05-11 (RESEARCH.md
-  A6/A7). Format-drift guard: `assert df.columns[0] == 'Unix'` in
-  `backtest/src/deepvault/data_ingest.py` fails LOUDLY on any column reshape
-  (T-03-05 mitigation).
-- **Unit convention:** the CSV's `Unix` column is **seconds**. The ingest pipeline
-  renames `Unix → ts_ms` AND multiplies by 1000 so the column name matches its
-  unit and aligns with the Move side's u64 ms timestamps (vault events emit ms).
+> **2026-06-15 supersede:** the data source moved from the CryptoDataDownload
+> (CDD) Binance CSV to the **Binance public data-mirror** klines API. The CDD
+> feed shipped (a) mixed-unit timestamps and (b) 409 gaps > 1 h across its
+> history (including recurring 6-day holes) which the `load_window` gap guard
+> (T-03-06) correctly rejected. The Binance mirror is contiguous (crypto trades
+> 24/7), so the audit-integrity gap guard passes on real data with no
+> gap-filling. The CDD-specific text below (CSV format, `Unix`-seconds column,
+> `skiprows=1`, `columns[0] == 'Unix'` guard) is **obsolete** and retained only
+> as provenance.
+
+- **Source:** Binance public market-data mirror —
+  `https://data-api.binance.vision/api/v3/klines` (symbol `BTCUSDT`, interval
+  `1h`). No auth, no API key, market data only. Reachable where
+  `api.binance.com` is geo-blocked. Implemented in
+  `backtest/src/deepvault/data_ingest.py` (`fetch_btc_hourly` →
+  paginated, deduped, sorted ascending, cached to
+  `backtest/data/btcusdt_1h.parquet`).
+- **Window:** 365 days hourly (~8,760 bars) per CONTEXT.md D-01; the fetcher
+  pulls `FETCH_WINDOW_DAYS = 420` for walk-forward headroom and `load_window`
+  slices to the active window.
+- **Kline payload → canonical schema:** the raw kline array
+  `[openTime_ms, open, high, low, close, volume_btc, closeTime_ms,
+  quoteVolume_usdt, trade_count, ...]` is projected to
+  `ts_ms / open / high / low / close / volume_btc / volume_usdt / trade_count`.
+- **Unit convention:** Binance `openTime` is already **milliseconds**; it is
+  stored verbatim as `ts_ms` (NO ×1000) so the column matches its unit and
+  aligns with the Move side's u64 ms vault-event timestamps. *(This supersedes
+  the CDD-era "`Unix` is seconds, multiply by 1000" rule.)*
 - **available_at semantics:** A bar with `ts_ms = T` (the bar's OPEN timestamp)
   is observable at `available_at = T + 3_600_001` (1 hour + 1 ms — the bar
   closes at T+1h, data is queryable 1 ms after close). Every join condition in
   the backtest enforces `available_at <= decision_time`. The `@strategy_fn`
-  decorator (Plan 03-02 `backtest/src/deepvault/replay.py`) is the runtime
-  enforcement of this invariant.
+  decorator (Plan 03-02 `backtest/src/deepvault/replay.py`) and the
+  strategy-sim trailing-vol gate (Plan 03-10
+  `backtest/src/deepvault/strategy_sim.py`) are the runtime enforcement of this
+  invariant.
 - **Gap policy:** `load_window` raises RuntimeError if any consecutive gap
-  exceeds 1 hour + 60 s slack. Binance maintenance windows are rare; the goal
-  is to fail LOUDLY rather than silently backtest a holed tape (T-03-06).
+  exceeds 1 hour + 60 s slack. The goal is to fail LOUDLY rather than silently
+  backtest a holed tape (T-03-06).
 - **Why not Deribit IV history?** BACK-01 lists Deribit as "if available".
-  Skipped per CONTEXT.md Claude's Discretion: "free Deribit IV history is
-  fragmented post-2022; CryptoDataDownload Binance gives us a single clean
-  source." Adding Deribit is a v2 nice-to-have.
+  Skipped per CONTEXT.md Claude's Discretion: free Deribit IV history is
+  fragmented post-2022; the Binance mirror gives a single clean OHLCV source.
+  The consequence is documented under "Strategy Simulation Model" → hedge
+  pricing: with no IV surface, the backtest prices hedges from trailing
+  realized vol (the IV proxy). Adding Deribit IV is a v2 nice-to-have.
 
 ### SVI Surface (MATH-06)
 
@@ -56,12 +78,152 @@ bearing assumption + its `available_at` semantics from this file alone.
   sensitivity table (hedge ratio in {0.05, 0.10, 0.15, 0.20, 0.30}) exists to
   show robustness, NOT to pick the optimum (PITFALLS Pitfall 2).
 
+## Strategy Simulation Model (Plan 03-10 — `strategy_sim.py`)
+
+This is the economic model that produces the backtest's returns, drawdown, and
+PnL attribution. It is **float-based** (pandas-friendly; NOT parity-bound) and is
+intentionally separate from `vault_state.py` — that module is the Move-parity
+state machine asserted against live testnet traces within 1 wei (D-14/15/16),
+and is **not modified** by the strategy sim. Every number below is an explicit,
+defensible assumption an institutional LP can cold-read.
+
+**Normalization.** Initial deposit NAV = **1.0**. The equity curve IS the NAV
+series. Returns are reported as fractions of initial NAV.
+
+**Two sleeves** (alloc = `hedge_ratio`, e.g. 0.10):
+
+1. **PLP sleeve** = `(1 − hedge_ratio)` of capital. Per hourly bar it earns a
+   constant yield NET of an inventory drag:
+   - **PLP yield.** `PLP_APY = 0.08` (**8% APY — an ASSUMPTION**). Rationale:
+     Predict PLP vaults market double-digit APYs; we deliberately pick a modest,
+     conservative 8% so the headline is defensible rather than promotional.
+     Accrues per bar: `nav += plp_capital × ((1+PLP_APY)^(1/8760) − 1)`,
+     where `plp_capital = (1−hedge_ratio) × NAV` and 8760 = 24×365 (BTC 24/7).
+     Parameterized for v2 dynamic policies (STRAT-V2-01).
+   - **PLP LVR drag.** `PLP_LVR_COEFF = 0.25`. LP liquidity providers carry an
+     adverse-selection / inventory cost — **Loss-Versus-Rebalancing** (Milionis,
+     Moallemi & Roughgarden, 2022), the canonical AMM/LP loss term — which scales
+     with realized **variance**. Per bar: `nav −= PLP_LVR_COEFF × r_t² ×
+     plp_capital`, where `r_t` is that bar's realized log-return. On 365-day BTC
+     this is a modest ~4–5%/yr drag. It is also what gives the PLP NAV realistic
+     **per-bar variance** — a pure-yield ramp would have an unrealistically high
+     Sharpe (the sim without it produced OOS Sharpe ~7.7, flagged indefensible).
+     `r_t²` is an observation of the just-closed bar, not a forward look.
+     Coefficient is conservative and parameterized for v2 calibration against
+     live PLP pool P&L.
+
+2. **Hedge sleeve** = rolling OTM binary-put crash insurance, rolled every
+   `tenor` (14 days). Sizing is **coverage-based (insurance economics)**, NOT a
+   naive fixed-premium binary:
+   - **Why not the naive fixed-premium binary?** A binary that spends a fixed
+     premium and takes `notional = premium / p` blows up as the option price
+     `p → 0` (deep OTM, low vol): e.g. a σ≈26% cycle priced `p≈0.0009`, turning a
+     0.4% premium into a position that pays **>400% of NAV** if the strike
+     breaches. That ~1000:1 payout makes a single hedge hit a lottery jackpot and
+     is **indefensible** as "crash insurance". (This is a deliberate **deviation**
+     from a literal premium-then-notional reading of the model; it fixes an
+     economic bug — Rule 1.)
+   - **Coverage sizing (used).** Each cycle TARGETS a payout of
+     `coverage = hedge_ratio × NAV` if the −15% strike breaches (the hedge covers
+     a `hedge_ratio` slice of the book against the tail). Its fair premium is
+     `p × coverage`. To stay within the sustainable insurance budget, premium is
+     **CAPPED** at `budget = hedge_ratio × NAV × (tenor_days/365)`; when the fair
+     premium exceeds the budget (high-vol regimes) the vault buys LESS coverage
+     (`notional = budget / p`) rather than overspending. This **bounds the
+     payout** (max ≈ `hedge_ratio × NAV`, no 1/p jackpot) and makes the premium
+     vary correctly with vol (cheap when calm, dearer when stressed). The ANNUAL
+     hedge spend lands ≈ the `hedge_ratio` insurance budget (~5–6% at 10% on the
+     365-day window) — the sustainable interpretation, NOT `hedge_ratio` per
+     cycle (which would be ~26× the budget/yr).
+   - **Warm-up guard.** A cycle whose trailing window has < 48 usable bars, or a
+     zero/degenerate σ, is **SKIPPED** (no premium, no position) — this prevents
+     the bar-0 cold-start (no trailing data → σ=0 → floored p → absurd notional).
+     The rolling-hedge program effectively starts once a credible realized-vol
+     estimate exists.
+
+**Hedge pricing — realized-vol Black–Scholes digital put (the IV proxy).**
+On-chain hedges price via the audited SVI evaluator (`svi.py`, separately
+parity-validated against the Gatheral paper and the on-chain `oracle.move`). The
+**backtest** prices hedges via a **Black–Scholes digital (binary) put using
+trailing realized volatility as the IV proxy** — no historical IV surface is
+available (Deribit IV deferred to v2; see Data Sources). Specifics:
+- **Trailing realized vol σ.** Annualized stdev of hourly log-returns over a
+  trailing window of **720 bars (30 days)**: `σ_hourly = std(log(close_t /
+  close_{t−1}), ddof=1)`, `σ_ann = σ_hourly × sqrt(24×365)`. Computed ONLY from
+  bars whose `available_at ≤` the cycle-open decision time (lookahead-safe). If
+  fewer than 720 bars are observable, what's available is used (subject to the
+  48-bar warm-up minimum).
+- **Strike** `K = S0 × (1 − strike_otm)` = `S0 × 0.85` (−15% OTM).
+- **Binary put price** under **zero-drift** risk-neutral BS:
+  `d2 = (ln(S0/K) − 0.5 σ² T) / (σ √T)`, `T = tenor_days/365`, `p = Φ(−d2)`.
+  **Zero drift is an explicit assumption** — we do not impose a BTC drift on the
+  hedge leg. Guards: σ>0, T>0; `p` clamped to `[1e-6, 1−1e-6]`.
+- **Settlement — expiry-spot.** At cycle expiry (the bar `tenor` later) the spot
+  `S_T` is the realized price at that bar (an observation made at expiry, NOT a
+  forward look from cycle open). `payoff = notional if S_T < K else 0`. v1 uses
+  **expiry-spot settlement**, not path-minimum — a hedge that dips below K
+  intraperiod but recovers by expiry does NOT pay. Documented simplification;
+  path-dependent (American/barrier) settlement is a v2 fidelity item.
+
+**Net hedge PnL per cycle** = `payoff − premium`.
+
+**Lookahead safety (BACK-03/BACK-06 — headline audit claim).** Every cycle-open
+decision (σ estimate, strike, premium, notional) uses ONLY bars observable at
+that bar's decision time (`available_at` gate). Settlement reads the realized
+expiry-bar spot. The input frame is consumed **READ-ONLY** (columns copied into
+numpy, never written back), so the OOS slice is bit-identical pre/post run
+(`test_oos_never_touched_during_calibration`). A dedicated test
+(`test_future_crash_does_not_change_past_decision`) proves mutating bars AFTER a
+cycle open leaves that cycle's σ/premium/notional/strike unchanged.
+
+**Attribution identity.** The 3-way (4-component) decomposition reconstructs the
+total return exactly:
+`total_return = plp_yield − plp_lvr − hedge_cost + hedge_payoff`
+(asserted to float tolerance in `test_strategy_sim.py`). This is what the report
+renders in Section 6.
+
+**Validated numbers (365-day window, hedge_ratio = 0.10, run 2026-06-15):**
+
+| Quantity | Value |
+|---|---|
+| Realized σ_ann (priced cycles) | 26.3% – 60.3% (mean 40.4%) |
+| Binary put price p (−15% / 14d) | 0.0009 – 0.0939 (mean 0.028) |
+| Premium per cycle | ~0.21% of NAV (mean) |
+| Annual hedge cost | 5.43% of NAV |
+| PLP yield (full-window cum) | +7.14% |
+| PLP LVR drag (full-window cum) | −4.16% |
+| Hedge cost (full-window cum) | −5.43% |
+| Hedge payoff (full-window cum) | +9.98% (1 payoff fired) |
+| **Total return (full window)** | **+7.52%** |
+| Hedged max drawdown (full window) | −1.66% |
+| Unhedged buy-and-hold BTC max DD | −52.86% |
+| OOS (recent 30%) Sharpe @ 0.10 | −1.92 (no payoff in calm OOS regime; insurance is a net cost there) |
+| OOS unhedged BTC max DD | −28.02% (vs hedged −0.99%) |
+
+The OOS window saw no hedge payoff (BTC ranged sideways), so the insurance is a
+net cost there — the honest cost of carry. Over the full window, where a −15%
+breach fired, the payoff dominates and the strategy is net positive while
+cutting drawdown ~32× vs holding spot. This asymmetry — small steady bleed,
+large tail protection — is the intended "PLP yield minus crash insurance"
+profile.
+
 ## PnL Attribution Model (D-09)
 
+> **2026-06-15 note (Plan 03-10):** the on-chain six-column model below
+> (`pnl_attribution.py`) is the per-*action* trace accountant retained for the
+> testnet trace-replay path. The **backtest's** return decomposition is now the
+> 3-way **strategy attribution** documented under "Strategy Simulation Model"
+> (PLP yield − PLP LVR − hedge cost + hedge payoff), surfaced by
+> `walk_forward.run_walk_forward()` and rendered in report Section 6. The
+> `plp_yield_bps = 0` note below describes the *on-chain action* accountant, not
+> the backtest — in the backtest, PLP yield is non-zero and explicitly modeled.
+
 Six columns sum to total return per bar:
-- `plp_yield_bps`: PLP per-block accrual. **v1 model: 0 everywhere** (we BUY
-  hedges via `predict::mint`, not provide PLP via `predict::supply` — RESEARCH.md
-  A3 + WAVE0-DECISION.md Q3). Column exists for v2 STRAT-V2-01 expansion.
+- `plp_yield_bps`: PLP per-block accrual in the **on-chain action accountant**.
+  **0 everywhere in that accountant** (on-chain we BUY hedges via
+  `predict::mint`, not provide PLP via `predict::supply` — RESEARCH.md A3 +
+  WAVE0-DECISION.md Q3). The backtest's PLP yield is modeled separately (see
+  Strategy Simulation Model). Column exists for v2 STRAT-V2-01 expansion.
 - `hedge_cost_bps`: Premium paid per bar (cost basis of new hedges + new rolls).
 - `hedge_payoff_bps`: Settlement payoffs received per bar.
 - `fees_bps`: Strategy-level fees. **v1 = 0 per Phase 2 D-13.**
@@ -134,8 +296,8 @@ Six columns sum to total return per bar:
 - Per-second hedge re-mark — v2 backtest-fidelity question.
 - Minute-bar resolution — hourly only at v1.
 - Multi-asset (ETH, SOL) — BTC-only.
-- 365+ day history — current scope is 365 days; pre-Binance-launch (Jul 2017)
-  data is patchy from free CSV sources.
+- 365+ day history — current scope is 365 days (the Binance data-mirror serves
+  contiguous recent history; very deep history is out of scope at v1).
 - Dynamic hedge sizing — STRAT-V2 territory.
 - Deribit IV history — see "Why not Deribit?" above.
 

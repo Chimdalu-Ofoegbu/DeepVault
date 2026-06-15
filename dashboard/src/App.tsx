@@ -26,11 +26,12 @@
 //   r2: Positions card    | What-if "Shock the book" card
 //   r3: Backtest link card (static, LD-3) | Event-stream card (EventStreamPanel)
 
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 import { DashboardLoader } from './components/layout/DashboardLoader';
 import { Header } from './components/layout/Header';
 import { Rail } from './components/layout/Rail';
+import { Tabs, TabsList, TabsTrigger } from './components/ui/tabs';
 import { ArbCheckerPanel } from './components/panels/ArbCheckerPanel';
 import { BucketGauge } from './components/panels/BucketGauge';
 import { DepositWithdrawPanel } from './components/panels/DepositWithdrawPanel';
@@ -66,12 +67,26 @@ export function App() {
   const sigma = useSigmaEstimates(snapshot);
   const positions = usePositions(snapshot);
 
+  // View mode (Phase 04.2, LD-1 / LD-2). Default = Vault (deposit-first front
+  // door). Client-side React state ONLY — no router, no persistence; a refresh
+  // returns to Vault. Declared BELOW the useWebSocket spine + the 5 derived
+  // hooks above, so toggling the mode (which unmounts one subtree) never tears
+  // down the data spine (LD-3 spine-above-conditional invariant).
+  const [mode, setMode] = useState<'vault' | 'risk'>('vault');
+
   // The top-bar `Deposit DUSDC` button scrolls to the deposit/withdraw section
-  // so the user lands on the existing 3-step deposit flow. The panel owns its
+  // so the user lands on the existing 3-step deposit flow. The deposit section
+  // only mounts in vault mode, so switch to vault FIRST, then scroll after the
+  // mode-switched render commits (Anchor Integrity rule 3). The panel owns its
   // own dialog open-state (Phase 4) — this is the non-regressive coordination.
   const handleDepositClick = useCallback(() => {
-    const el = document.querySelector('[data-section="deposit-withdraw"]');
-    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setMode('vault');
+    // The deposit section only mounts in vault mode; defer the scroll one frame
+    // so the mode-switched render commits before we query the anchor.
+    requestAnimationFrame(() => {
+      const el = document.querySelector('[data-section="deposit-withdraw"]');
+      el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
   }, []);
 
   // ---- Headline `dh-stats` derived figures (UI-SPEC Data Binding table) ----
@@ -146,9 +161,17 @@ export function App() {
         {/* HEADLINE — eyebrow + h1 + 4-cell dh-stats strip (UI-SPEC #7). */}
         <section className="db-headline">
           <div>
-            <div className="dh-eye">PLP Risk Studio</div>
+            <div className="dh-eye">
+              {mode === 'vault' ? 'Vault' : 'PLP Risk Studio'}
+            </div>
             <h1>
-              {hasHedges ? (
+              {mode === 'vault' ? (
+                <>
+                  Earn PLP yield with built-in crash protection — deposit DUSDC,
+                  the vault provides DeepBook liquidity and automatically buys
+                  downside <span className="hl-serif">insurance</span>.
+                </>
+              ) : hasHedges ? (
                 <>
                   Vault is healthy. <span className="hl-serif">Hedge</span> is in
                   position.
@@ -194,84 +217,135 @@ export function App() {
           </div>
         </section>
 
-        {/* ROW 1 — SVI surface card | side column (Token bucket + Exposure).
-            Greeks card dropped per LD-1. */}
-        <section className="db-row r1">
-          <section data-section="hero">
-            <SurfacePanel surface={surface} />
-            <ArbCheckerPanel surface={surface} />
-          </section>
-          <div className="db-side">
-            <BucketGauge />
-            <section data-section="exposure">
-              <ExposurePanel hedges={hedges} vault={snapshot?.vault ?? null} />
+        {/* MODE TOGGLE — segmented Vault | Risk Studio control (Phase 04.2,
+            LD-1, OQ-1). Controlled Radix Tabs (value={mode}) for the control
+            chrome + a11y (role=tablist, aria-selected, ←/→/Home/End roving
+            focus). The two view subtrees are rendered as conditionally-mounted
+            SIBLINGS below — NOT inside TabsContent — so the inactive mode is
+            fully unmounted (avoids two Plotly trees) while the spine above
+            stays live (LD-3). Wrapper margin comes from the .db-mode-row CSS
+            class (Task 1), not an inline style. */}
+        <Tabs
+          value={mode}
+          onValueChange={(v) => setMode(v as 'vault' | 'risk')}
+          className="db-mode-row"
+        >
+          <TabsList className="db-mode" aria-label="Dashboard view mode">
+            <TabsTrigger className="db-mode-trigger" value="vault">
+              Vault
+            </TabsTrigger>
+            <TabsTrigger className="db-mode-trigger" value="risk">
+              Risk Studio
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+
+        {mode === 'vault' ? (
+          /* VAULT VIEW (default landing, LD-4) — single-column onboarding
+             stack: Deposit/Redeem → Your position → hedge-status line. */
+          <>
+            {/* Deposit/Redeem promoted to the TOP (today it rendered last).
+                data-section is the Header CTA + rail Deposit anchor target. */}
+            <section data-section="deposit-withdraw" style={{ paddingTop: '0' }}>
+              <DepositWithdrawPanel vaultView={vaultView} />
             </section>
-          </div>
-        </section>
-
-        {/* ROW 2 — Positions / Hedge ladder | What-if "Shock the book". */}
-        <section className="db-row r2">
-          <section data-section="position-viewer">
-            <PositionViewer
-              positions={positions}
-              vault={snapshot?.vault ?? null}
-            />
-          </section>
-          <section data-section="what-if">
-            <WhatIfSimulator hedges={hedges} surface={surface} sigma={sigma} />
-          </section>
-        </section>
-
-        {/* ROW 3 — Backtest static-link card (LD-3) | event-stream slot. */}
-        <section className="db-row r3">
-          <section data-section="backtest">
-            <div className="db-card pad">
-              <header className="db-h">
-                <div>
-                  <span className="db-mark">§ Backtest</span>
-                  <h2>Backtest report</h2>
+            {/* Your position — the single live PositionViewer mount (D-1 /
+                R-2 path a). NOT also mounted in Risk. Internals byte-identical
+                (its longer runtime testnet copy is unchanged). */}
+            <section
+              data-section="position-viewer"
+              style={{ paddingTop: '24px' }}
+            >
+              <PositionViewer
+                positions={positions}
+                vault={snapshot?.vault ?? null}
+              />
+            </section>
+            {/* One-line hedge-status summary (LD-4 #5) — reuses hasHedges. */}
+            <p
+              className="mono"
+              style={{
+                color: 'var(--text-2)',
+                fontSize: '12.5px',
+                paddingTop: '16px',
+              }}
+            >
+              {hasHedges
+                ? 'Hedge in position — downside protection active.'
+                : 'Hedge engages on first deposit.'}
+            </p>
+          </>
+        ) : (
+          /* RISK STUDIO VIEW (LD-5) — the existing quant grid, minus the
+             trailing deposit section (moved to Vault) and minus PositionViewer
+             (moved to Vault). EventStream pulled into r2's left cell so no
+             empty cell is left (UI-SPEC R-2 path a). */
+          <>
+            {/* ROW 1 — SVI surface | side column (Token bucket + Exposure). */}
+            <section className="db-row r1">
+              <section data-section="hero">
+                <SurfacePanel surface={surface} />
+                <ArbCheckerPanel surface={surface} />
+              </section>
+              <div className="db-side">
+                <BucketGauge />
+                <section data-section="exposure">
+                  <ExposurePanel hedges={hedges} vault={snapshot?.vault ?? null} />
+                </section>
+              </div>
+            </section>
+            {/* ROW 2 — Activity (event stream) | What-if. PositionViewer moved
+                to Vault view (R-2 path a); EventStream pulled left to fill the
+                cell. */}
+            <section className="db-row r2">
+              <section data-section="event-stream">
+                <EventStreamPanel events={snapshot?.ring_buffer ?? []} />
+              </section>
+              <section data-section="what-if">
+                <WhatIfSimulator hedges={hedges} surface={surface} sigma={sigma} />
+              </section>
+            </section>
+            {/* ROW 3 — Backtest static-link card (LD-3). Lone card in r3 is
+                acceptable for this phase (no fictional filler — 04.1 LD-5). */}
+            <section className="db-row r3">
+              <section data-section="backtest">
+                <div className="db-card pad">
+                  <header className="db-h">
+                    <div>
+                      <span className="db-mark">§ Backtest</span>
+                      <h2>Backtest report</h2>
+                    </div>
+                  </header>
+                  {/* Static link card — NO live data binding (LD-3, LD-5). */}
+                  <p style={{ color: 'var(--text-2)', lineHeight: 1.55 }}>
+                    12-cycle replay · lookahead-audited. Full institutional
+                    report renders drawdown, NAV, and premium-drag tables.
+                  </p>
+                  <p
+                    className="mono"
+                    style={{
+                      color: 'var(--dim)',
+                      fontSize: '11.5px',
+                      marginTop: '8px',
+                    }}
+                  >
+                    Report renders from the nightly backtest run.
+                  </p>
+                  <a
+                    href="/reports/full-365d-report.html"
+                    style={{
+                      display: 'inline-block',
+                      marginTop: '14px',
+                      color: 'var(--accent)',
+                    }}
+                  >
+                    Open backtest report ↗
+                  </a>
                 </div>
-              </header>
-              {/* Static link card — NO live data binding (LD-3, LD-5). */}
-              <p style={{ color: 'var(--text-2)', lineHeight: 1.55 }}>
-                12-cycle replay · lookahead-audited. Full institutional report
-                renders drawdown, NAV, and premium-drag tables.
-              </p>
-              <p
-                className="mono"
-                style={{
-                  color: 'var(--dim)',
-                  fontSize: '11.5px',
-                  marginTop: '8px',
-                }}
-              >
-                Report renders from the nightly backtest run.
-              </p>
-              <a
-                href="/reports/full-365d-report.html"
-                style={{
-                  display: 'inline-block',
-                  marginTop: '14px',
-                  color: 'var(--accent)',
-                }}
-              >
-                Open backtest report ↗
-              </a>
-            </div>
-          </section>
-          {/* Event-stream card (Plan 05, UI-SPEC #9). Consumes the live relay
-              ring buffer from the useWebSocket spine — same prop-slice pattern
-              as every other panel; no new hook or socket. */}
-          <section data-section="event-stream">
-            <EventStreamPanel events={snapshot?.ring_buffer ?? []} />
-          </section>
-        </section>
-
-        {/* Deposit / withdraw — kept below the row grid; the data-section attr
-            is the rail's Wallet anchor target. */}
-        <section data-section="deposit-withdraw" style={{ paddingTop: '24px' }}>
-          <DepositWithdrawPanel vaultView={vaultView} />
-        </section>
+              </section>
+            </section>
+          </>
+        )}
       </main>
       </div>
     </>

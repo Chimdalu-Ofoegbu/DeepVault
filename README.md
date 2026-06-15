@@ -7,9 +7,16 @@
 
 ## Status
 
-**Phase 0 (Setup & Ground Rules): COMPLETE.** Monorepo scaffolded, codegen wired (single-source `shared/strategy.toml` to Move/Python/TS), CI 5-job matrix in place, policy docs locked (CONTRIBUTING, HEDGE-POLICY, MAINNET-FUNDING, DEV-BOOTSTRAP, CI-BRANCH-PROTECTION), DeepBookV3 fork vendored at SHA `1159d79a`, weekly Monday Predict-diff sweep scheduled, hedge-ratio policy frozen (10% / -15% OTM / 14-day tenor / fixed sizing).
+**Submission-ready for Sui Overflow 2026 (DeepBook track).** Phases 0 through 5 are complete plus the PLP Risk Studio dashboard (Phase 04.1 reskin + Phase 04.2 `Vault | Risk Studio` mode split):
 
-**Phase 1 (Math Foundation — SVI Parity Gate) is next-up:** three-runtime SSVI evaluator (Move + Python + TypeScript) with bit-for-bit golden-vector parity gating every later phase.
+- **Phase 0 — Setup & Ground Rules:** monorepo scaffolded, single-source `shared/strategy.toml` codegen to Move/Python/TS, 5-job CI matrix, policy docs locked, DeepBookV3 fork vendored at SHA `1159d79a`, hedge-ratio policy frozen (10% / -15% OTM / 14-day tenor / fixed sizing).
+- **Phase 1 — Math Foundation:** three-runtime raw 5-param SVI evaluator (Move + Python + TypeScript) gated by 141 bit-for-bit golden vectors (21 from Gatheral & Jacquier 2014).
+- **Phase 2 — Vault Move package:** deposit / redeem / rebalance with atomic on-chain hedge mint, token-bucket withdrawal limiter, inflation defense, worst-case LTV. **Deployed to Sui testnet 2026-05-16** (addresses below).
+- **Phase 3 — Backtest + two-protocol PTB:** 365-day walk-forward with OOS holdout + lookahead-bias audit; the 5-call Margin+Predict+vault single-PTB shape proven via the `mock_margin_pool` integration test.
+- **Phase 4 — Dashboard:** React + Vite SVI Risk Studio (11 panels: live 3D SVI surface, arb-checker, exposure, what-if simulator, event stream) with a `Vault | Risk Studio` mode split.
+- **Phase 5 — Testnet hardening + mainnet-readiness toolkit:** `make demo` smoke test green end-to-end with a dual ±10 bps NAV gate; the mainnet toolkit is committed and lint-clean for a post-submission deploy.
+
+Mainnet deploy is **deferred to post-submission** (DeepBook Predict has not shipped on mainnet during the submission window — see [`docs/MAINNET-READINESS.md`](docs/MAINNET-READINESS.md)). The codebase is **not** audited.
 
 **Ship target:** 2026-06-16 (Sui Overflow 2026 submission). Hard ship: 39 days from 2026-05-09. Code freeze: 2026-05-30.
 
@@ -38,7 +45,7 @@ The flagship demo is a single Programmable Transaction Block (PTB) that opens th
 | [`.planning/ROADMAP.md`](.planning/ROADMAP.md) | 7-phase plan (Setup → Math → Vault → Backtest+PTB → Dashboard → Mainnet → Submission), success criteria, hard policy locks |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Five hard policy locks: code freeze, no-refactor, no-dashboard-before-vault, hedge ratio, weekly Monday sweep |
 | [`docs/HEDGE-POLICY.md`](docs/HEDGE-POLICY.md) | Locked hedge-ratio ADR (10% / -15% OTM / 14-day / fixed) — strategy frozen against hindsight tuning |
-| [`docs/MAINNET-FUNDING.md`](docs/MAINNET-FUNDING.md) | Phase 5 mechanical playbook: $80 budget, two-wallet split, Cetus DEX swap path, AdminCap discipline |
+| [`docs/MAINNET-READINESS.md`](docs/MAINNET-READINESS.md) | Why mainnet is deferred + the post-submission ≤30-min deploy procedure (preserves the original funding playbook: budget, two-wallet split, AdminCap discipline) |
 | [`docs/CI-BRANCH-PROTECTION.md`](docs/CI-BRANCH-PROTECTION.md) | One-time GitHub setup: 5 required status checks, UI + gh CLI paths |
 | [`docs/DEV-BOOTSTRAP.md`](docs/DEV-BOOTSTRAP.md) | One-shot dev-machine setup (Sui CLI, pnpm, uv, wallets) |
 
@@ -121,16 +128,16 @@ The 7 staged `[CHECKPOINT PASS]` markers + the final dual-gate verdict (`ratio_b
 
 ### Testnet contracts
 
-Live testnet deployment captured in [`.planning/phases/02-vault-move-package-testnet-deploy/TESTNET-DEPLOY.json`](.planning/phases/02-vault-move-package-testnet-deploy/TESTNET-DEPLOY.json). Field-by-field references (auto-cited from the JSON; placeholders show `PENDING` until Phase 2's testnet deploy actually runs):
+Live on Sui testnet since **2026-05-16**, captured verbatim in [`.planning/phases/02-vault-move-package-testnet-deploy/TESTNET-DEPLOY.json`](.planning/phases/02-vault-move-package-testnet-deploy/TESTNET-DEPLOY.json):
 
 | Object | Sui testnet explorer |
 |--------|---------------------|
-| `deepvault` package | `https://suiscan.xyz/testnet/object/<package_id>` |
-| Vault shared object | `https://suiscan.xyz/testnet/object/<vault_id>` |
-| AdminCap | `https://suiscan.xyz/testnet/object/<admin_cap_id>` |
-| Deploy tx | `https://suiscan.xyz/testnet/tx/<deploy_tx_digest>` |
+| `deepvault` package | [`0xbc9aaeaa…d6e862`](https://suiscan.xyz/testnet/object/0xbc9aaeaa237400179e4c55cf49209dcf6ed0492be6eeb0088677e754ebd6e862) |
+| Vault shared object | [`0x2824d97e…f7a911`](https://suiscan.xyz/testnet/object/0x2824d97e221413660fd9f8e23155bd4d1d459c06a893b1d350eb279c3bf7a911) |
+| AdminCap | [`0x9e40150e…aba3e7`](https://suiscan.xyz/testnet/object/0x9e40150e07ce223019afbaca425cb08b84c541ad402b428ee4a9942dfaaba3e7) |
+| Deploy tx | [`ETYPnLemp…uBBCS`](https://suiscan.xyz/testnet/tx/ETYPnLemp761HsXeWigdh7h5hMvqEa2id4KDm8auBBCS) |
 
-The literal addresses populate after `bash scripts/e2e-vault-deploy.sh` runs on testnet (Phase 2 deliverable). `make demo` (Phase 5) consumes the same JSON.
+`make demo` consumes the same `TESTNET-DEPLOY.json`, so the deployed vault above is exactly what the smoke test exercises.
 
 ## Repository layout
 
@@ -143,7 +150,7 @@ The literal addresses populate after `bash scripts/e2e-vault-deploy.sh` runs on 
 | `shared/` | `strategy.toml` (source of truth), `golden-vectors.json` | Phase 0 + 1 |
 | `scripts/` | `codegen.py`, `predict-diff.sh`, vendored DeepBookV3 fork | Phase 0 |
 | `config/` | `testnet.toml`, `mainnet.toml` (TBD slots filled in Phases 2/5) | Phase 0 |
-| `docs/` | CONTRIBUTING, HEDGE-POLICY, MAINNET-FUNDING, DEV-BOOTSTRAP, CI-BRANCH-PROTECTION | Phase 0 |
+| `docs/` | CONTRIBUTING, HEDGE-POLICY, MAINNET-READINESS, DEV-BOOTSTRAP, CI-BRANCH-PROTECTION, WHITEPAPER, architecture.svg | Phase 0 + 6 |
 | `.github/workflows/` | CI (5-job matrix) + Monday Predict sweep cron | Phase 0 |
 
 ## Hosting
@@ -181,7 +188,7 @@ The architecture is **mainnet-compatible via a single config flip** in [`config/
 - **No refactor after vault ships** (Pitfall 18 mitigation): `CONTRIBUTING.md §"No refactor after vault ships"`
 - **No dashboard before vault** (Pitfall 19 mitigation): `CONTRIBUTING.md §"No dashboard work before vault feature-complete"`
 - **Weekly Monday Predict sweep** (Pitfall 6 mitigation): `CONTRIBUTING.md §"Weekly Monday Predict sweep"`
-- **Mainnet redeploy mechanical playbook**: `docs/MAINNET-FUNDING.md`
+- **Mainnet redeploy mechanical playbook**: `docs/MAINNET-READINESS.md`
 
 ## Build log
 
@@ -210,7 +217,7 @@ Append-only weekly bullets per `CONTRIBUTING.md` build-log discipline. Never edi
 
 - **For developers:** `docs/DEV-BOOTSTRAP.md` (one-shot setup), `CONTRIBUTING.md` (rules)
 - **For judges:** Laypitch above, `docs/HEDGE-POLICY.md` (strategy lock), demo video (Phase 6)
-- **For deploy:** `docs/MAINNET-FUNDING.md` (Phase 5 playbook), `docs/CI-BRANCH-PROTECTION.md` (one-time CI setup)
+- **For deploy:** `docs/MAINNET-READINESS.md` (why-deferred + post-submission playbook), `docs/CI-BRANCH-PROTECTION.md` (one-time CI setup)
 - **For research:** `.planning/research/SUMMARY.md`, `.planning/research/STACK.md`, `.planning/research/PITFALLS.md`
 - **For roadmap:** `.planning/ROADMAP.md`, `.planning/REQUIREMENTS.md`
 

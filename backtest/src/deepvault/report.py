@@ -51,6 +51,41 @@ TEMPLATE_DIR = REPO_ROOT / "backtest" / "templates"
 TEMPLATE_FILE = "report.html.j2"
 
 
+def _pct(fraction: float) -> float:
+    """Render a NAV-fraction return as a signed percentage rounded to 2dp."""
+    return round(float(fraction) * 100.0, 2)
+
+
+def _hedge_trades_to_rows(hedge_trades: list[dict]) -> list[dict]:
+    """Map per-cycle hedge economics (Plan 03-10 ``hedge_trades``) onto the
+    report's per-trade-table column schema.
+
+    The report table expects the six-column bps schema. For a hedge cycle we
+    populate hedge_cost_bps (premium, as bps of NAV at cycle open ≈ premium*1e4
+    since NAV≈1.0) and hedge_payoff_bps (payoff*1e4); the PLP/fees/slippage/gas
+    columns are 0 at the cycle granularity (PLP accrues per-bar, not per-trade).
+    Returns an empty list when no hedge trades are present.
+    """
+    rows: list[dict] = []
+    for t in hedge_trades or []:
+        premium_bps = int(round(float(t.get("premium", 0.0)) * 10_000))
+        payoff_bps = int(round(float(t.get("payoff", 0.0)) * 10_000))
+        rows.append(
+            {
+                "ts_ms": int(t.get("ts_ms", 0)),
+                "kind": str(t.get("kind", "hedge_cycle")),
+                "plp_yield_bps": 0,
+                "hedge_cost_bps": -premium_bps,
+                "hedge_payoff_bps": payoff_bps,
+                "fees_bps": 0,
+                "slippage_bps": 0,
+                "gas_bps": 0,
+                "total_bps": payoff_bps - premium_bps,
+            }
+        )
+    return rows
+
+
 def matplotlib_to_base64_png(fig: plt.Figure) -> str:
     """Convert a matplotlib Figure to a base64-encoded PNG data URI."""
     buf = BytesIO()
@@ -164,55 +199,91 @@ def render_html_from_summary(input_path: str | Path, output_path: str | Path) ->
     else:
         ledger_text = "# Assumption Ledger\n\n(file not found at runtime)\n"
 
-    # Minimal viable plots — the CLI path is for nightly artifacts where the
-    # full per-bar replay isn't surfaced. Plot beauty is a v2 polish item.
-    fig_surface = _go.Figure(data=_go.Surface(z=[[0.0, 0.0], [0.0, 0.0]]))
-    fig_equity = _go.Figure(
-        data=_go.Scatter(x=[0, 1], y=[1.0, 1.0 + float(summary.get("oos_sharpe", 0.0)) / 100.0])
-    )
-    fig_drawdown = _go.Figure(
-        data=_go.Scatter(
-            x=[0, 1],
-            y=[0, float(summary.get("oos_max_drawdown_bps", 0)) / 10_000.0],
+    # ---- REAL equity + drawdown curves from the walk_forward summary -------- #
+    # Plan 03-10 extends the summary JSON with the actual OOS equity_curve and
+    # drawdown_curve (downsampled). Fall back to a flat line only if a legacy
+    # summary lacks them.
+    equity_pts = [float(v) for v in summary.get("equity_curve", [])]
+    if len(equity_pts) >= 2:
+        fig_equity = _go.Figure(
+            data=_go.Scatter(
+                x=list(range(len(equity_pts))), y=equity_pts, mode="lines", name="NAV"
+            )
         )
-    )
+        fig_equity.update_layout(
+            xaxis_title="OOS bar (downsampled)", yaxis_title="NAV (start = 1.0)"
+        )
+    else:
+        fig_equity = _go.Figure(data=_go.Scatter(x=[0, 1], y=[1.0, 1.0]))
+
+    dd_pts = [float(v) for v in summary.get("drawdown_curve", [])]
+    if len(dd_pts) >= 2:
+        fig_drawdown = _go.Figure(
+            data=_go.Scatter(x=list(range(len(dd_pts))), y=dd_pts, mode="lines", name="Drawdown")
+        )
+        fig_drawdown.update_layout(
+            xaxis_title="OOS bar (downsampled)", yaxis_title="Drawdown (fraction)"
+        )
+    else:
+        fig_drawdown = _go.Figure(
+            data=_go.Scatter(
+                x=[0, 1], y=[0, float(summary.get("oos_max_drawdown_bps", 0)) / 10_000.0]
+            )
+        )
+
+    fig_surface = _go.Figure(data=_go.Surface(z=[[0.0, 0.0], [0.0, 0.0]]))
+
+    # ---- PnL histogram: distribution of per-bar equity returns ------------- #
     fig_pnl_hist = _plt.figure()
+    if len(equity_pts) >= 3:
+        import numpy as _np
+
+        eq = _np.asarray(equity_pts, dtype=float)
+        rets = _np.diff(eq) / eq[:-1]
+        _plt.hist(rets * 10_000, bins=40, color="#0066cc", edgecolor="white")
+        _plt.xlabel("per-bar return (bps)")
+        _plt.ylabel("frequency")
+    else:
+        _plt.text(0.5, 0.5, "no equity series", ha="center", va="center")
+
+    # ---- Sensitivity bar chart (regime panel reused for sensitivity) ------- #
     sens = summary.get("sensitivity_table", [])
+    fig_regime = _plt.figure()
     if sens:
         _plt.bar(
             [str(row.get("hedge_ratio", "?")) for row in sens],
             [float(row.get("oos_sharpe", 0.0)) for row in sens],
+            color="#0066cc",
         )
+        _plt.axhline(0.0, color="#888", linewidth=0.8)
         _plt.xlabel("hedge_ratio")
         _plt.ylabel("oos_sharpe")
     else:
         _plt.text(0.5, 0.5, "no sensitivity rows", ha="center", va="center")
-    fig_regime = _plt.figure()
-    _plt.imshow([[1, 2], [3, 4]])
 
-    pnl_summary = summary.get("pnl_attribution_summary", {})
+    # ---- REAL 3-way strategy attribution table (Plan 03-10) ---------------- #
+    att = summary.get("strategy_attribution", {})
     pnl_df = _pd.DataFrame(
         [
-            {
-                "metric": "mean (bps)",
-                "value": float(pnl_summary.get("total_bps_mean", 0.0)),
-            },
-            {
-                "metric": "min (bps)",
-                "value": float(pnl_summary.get("total_bps_min", 0.0)),
-            },
-            {
-                "metric": "max (bps)",
-                "value": float(pnl_summary.get("total_bps_max", 0.0)),
-            },
+            {"component": "PLP yield", "return_pct": _pct(att.get("plp_yield", 0.0))},
+            {"component": "PLP LVR drag", "return_pct": _pct(-att.get("plp_lvr", 0.0))},
+            {"component": "Hedge premium", "return_pct": _pct(-att.get("hedge_cost", 0.0))},
+            {"component": "Hedge payoff", "return_pct": _pct(att.get("hedge_payoff", 0.0))},
+            {"component": "TOTAL (OOS)", "return_pct": _pct(att.get("total_return", 0.0))},
         ]
     )
 
+    # ---- REAL per-cycle hedge trade table (Section 6.1) -------------------- #
+    per_trade_table = _hedge_trades_to_rows(summary.get("hedge_trades", []))
+
     sens_df = _pd.DataFrame(sens) if sens else _pd.DataFrame({"hedge_ratio": [], "oos_sharpe": []})
+
+    headline_apy = float(summary.get("oos_apy", 0.0))
+    unhedged_dd_bps = int(summary.get("unhedged_max_drawdown_bps", 0))
 
     render_html(
         executive_summary={
-            "headline_apy": 0.0,
+            "headline_apy": headline_apy,
             "oos_sharpe": float(summary.get("oos_sharpe", 0.0)),
         },
         assumption_ledger=ledger_text,
@@ -235,6 +306,8 @@ def render_html_from_summary(input_path: str | Path, output_path: str | Path) ->
         drawdown_metrics={
             "max_drawdown_bps": int(summary.get("oos_max_drawdown_bps", 0)),
             "underwater_bars": int(summary.get("oos_underwater_bars", 0)),
+            # Comparison baseline — hedged DD vs buy-and-hold BTC (Plan 03-10).
+            "unhedged_max_drawdown_bps": unhedged_dd_bps,
         },
         stress_event_narratives=[
             {"name": "Aug 5 2024 yen-carry", "detail": "BTC -15% intraday"},
@@ -251,6 +324,7 @@ def render_html_from_summary(input_path: str | Path, output_path: str | Path) ->
         drawdown_timeline_plot=fig_drawdown,
         pnl_histogram_fig=fig_pnl_hist,
         regime_heatmap_fig=fig_regime,
+        per_trade_table=per_trade_table,
         output_path=output_path,
     )
 

@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
-status: executing
-stopped_at: Completed 06-04 artifact (docs/DEMO-SCRIPT.md); DEPLOY-05 recording held as human-action checkpoint
-last_updated: "2026-06-15T17:30:35.604Z"
+status: Awaiting user — Devpost filing checkpoint (and the 06-04 demo recording + the user-gated git push that feed the two draft placeholders)
+stopped_at: Completed 06-05 artifact (docs/DEVPOST-SUBMISSION.md); DEPLOY-10 portal filing held as human-action checkpoint
+last_updated: "2026-06-15T17:40:33.282Z"
 last_activity: 2026-06-15
 progress:
   total_phases: 9
-  completed_phases: 8
+  completed_phases: 9
   total_plans: 60
-  completed_plans: 60
+  completed_plans: 61
   percent: 100
 ---
 
@@ -26,12 +26,12 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 06 — Submission Package — EXECUTING
-Plan: 4 of 5 — complete (06-02: docs/WHITEPAPER.md shipped, DEPLOY-08 done; window-labeled numbers traced to NUMBERS-CANONICAL.md, honesty bar LD-1 held)
-Status: Ready to execute
-Next phase: Phase 6 plans 03–05 (README cold-read, demo-video script, Devpost draft)
+Plan: 5 of 5 — artifact complete (06-05: docs/DEVPOST-SUBMISSION.md shipped — complete paste-ready Devpost draft; window-labeled numbers traced to NUMBERS-CANONICAL.md, honesty bar LD-1 held). DEPLOY-10 portal filing HELD as a human-action checkpoint (external publishing — needs the user's account + the recorded demo-video URL); resume signal: "filed".
+Status: Awaiting user — Devpost filing checkpoint (and the 06-04 demo recording + the user-gated git push that feed the two draft placeholders)
+Next phase: Phase 6 closeout once DEPLOY-05 (recording) + DEPLOY-10 (filing) human-action checkpoints clear
 Last activity: 2026-06-15
 
-Progress: [██████████] 97% milestone (58/60 plans)
+Progress: [██████████] 100% milestone (all phase-06 artifacts shipped; 2 human-action checkpoints held)
 
 ## Performance Metrics
 
@@ -105,6 +105,7 @@ Progress: [██████████] 97% milestone (58/60 plans)
 | Phase 06 P02 | 5min | 2 tasks | 1 files |
 | Phase 06 P03 | 5min | 2 tasks | 1 files |
 | Phase 06 P04 | 8min | 1 tasks | 1 files |
+| Phase 06 P05 | 8min | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -271,6 +272,7 @@ Open verification gaps to resolve in Phase 0/1:
 - Task 4 of Plan 00-02 BLOCKED-on-human: testnet + mainnet Sui wallet provisioning per D-06; resume-signal in 00-02-SUMMARY.md
 - Task 4 of Plan 00-07 BLOCKED-on-human: gh repo create deepvault --public, git branch -M main, git push -u origin main, configure branch protection (5 required status checks); resume-signal in 00-07-SUMMARY.md "Resume Signal" section
 - Task 3 of Plan 00-08 BLOCKED-on-human: fresh-clone end-to-end verification (clean clone + make install/codegen/test/lint exit 0 + idempotency + 5-criterion ROADMAP cross-check). Depends on Plan 07 Task 4 landing first (repo must be on GitHub). Resume-signal in 00-08-SUMMARY.md "Resume signal" section.
+- DEPLOY-10 portal filing held (human-action): user must fill the demo-video URL + repo URL placeholders in docs/DEVPOST-SUBMISSION.md, then paste into the Devpost / Sui Overflow portal and submit. Resume signal: 'filed'.
 
 ## Hard Policy Locks (from ROADMAP.md)
 
@@ -294,6 +296,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-06-15T17:30:35.571Z
+Last session: 2026-06-15T17:39:02.417Z
 Stopped at: Completed 06-04 artifact (docs/DEMO-SCRIPT.md); DEPLOY-05 recording held as human-action checkpoint
-Resume file: 06-04-PLAN.md recording task — resume on user 'recorded' + video URL
+Resume file: None

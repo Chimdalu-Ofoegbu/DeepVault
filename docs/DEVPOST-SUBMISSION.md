@@ -1,10 +1,10 @@
 # DeepVault
 
 > **Paste-ready Devpost / Sui Overflow 2026 submission draft (DEPLOY-10).**
-> Every field below is filled. **Two tokens are deliberate placeholders** the
-> filer must replace before submitting: `<REPO-URL-PLACEHOLDER>` (after the
-> user-gated `git push`) and `<DEMO-VIDEO-URL-PLACEHOLDER>` (the share URL from
-> the demo recording, `docs/DEMO-SCRIPT.md`). **Do not invent either.**
+> Every field below is filled. **One token remains a deliberate placeholder** the
+> filer must replace before submitting: `<DEMO-VIDEO-URL-PLACEHOLDER>` (the share
+> URL from the demo recording, `docs/DEMO-SCRIPT.md`). The repository URL is
+> filled (`https://github.com/Chimdalu-Ofoegbu/DeepVault`). **Do not invent the video URL.**
 >
 > **Honesty bar (LD-1):** every number here is window-labeled and traces to a
 > committed artifact via `.planning/phases/06-submission-package/NUMBERS-CANONICAL.md`.
@@ -225,8 +225,7 @@ live today rather than faking them.
   redeem; emits `Supplied` + `HedgeMinted`; tx digest viewable on Suiscan.
 - **Demo video:** `<DEMO-VIDEO-URL-PLACEHOLDER>`  *(fill with the recording's
   share URL — see `docs/DEMO-SCRIPT.md`)*
-- **Repository:** `<REPO-URL-PLACEHOLDER>`  *(fill after the user-gated GitHub
-  push)*
+- **Repository:** https://github.com/Chimdalu-Ofoegbu/DeepVault
 
 ### Deployed testnet contracts (real, from `TESTNET-DEPLOY.json`)
 
@@ -265,8 +264,7 @@ Before submitting on the portal:
 - [ ] **Replace `<DEMO-VIDEO-URL-PLACEHOLDER>`** with the recorded demo's share
       URL (the recording is the human-action step from the demo plan; see
       `docs/DEMO-SCRIPT.md`).
-- [ ] **Replace `<REPO-URL-PLACEHOLDER>`** with the GitHub repository URL (after
-      the user-gated `git push`).
+- [x] **Repository URL filled** — `https://github.com/Chimdalu-Ofoegbu/DeepVault`.
 - [ ] **Keep every number's window label** when pasting — do **not** put the
       full-window **+7.52%** next to the OOS **−1.87 Sharpe** as a single
       unlabeled claim.

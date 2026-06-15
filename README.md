@@ -2,7 +2,7 @@
 
 > A composable structured-product vault on Sui DeepBook Predict that fuses PLP yield with automated tail-risk hedging, paired with an institutional-grade SVI volatility-surface dashboard. Built for Sui Overflow 2026.
 
-[![CI](https://github.com/<owner>/deepvault/actions/workflows/ci.yml/badge.svg)](https://github.com/<owner>/deepvault/actions/workflows/ci.yml)
+[![CI](https://github.com/Chimdalu-Ofoegbu/DeepVault/actions/workflows/ci.yml/badge.svg)](https://github.com/Chimdalu-Ofoegbu/DeepVault/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ## Status
@@ -70,7 +70,7 @@ Full architecture diagram — the four tiers (Move package · event relay/indexe
 After Phase 0 closes (this commit), the repo is fully reproducible from a fresh clone. Once it lives on GitHub (`gh repo create` is a Phase 0 outstanding human-action checkpoint, see SUMMARY) and CI has run once on `main`, this sequence works end-to-end:
 
 ```bash
-git clone https://github.com/<owner>/deepvault.git
+git clone https://github.com/Chimdalu-Ofoegbu/DeepVault.git
 cd deepvault
 
 # Install all toolchains (Move, TS, Python) — see docs/DEV-BOOTSTRAP.md if first time

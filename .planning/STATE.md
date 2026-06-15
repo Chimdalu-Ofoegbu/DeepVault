@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04.2-02-PLAN.md (rail + header declutter)
-last_updated: "2026-06-15T16:46:10.660Z"
-last_activity: 2026-06-15 -- Phase 6 planning complete
+stopped_at: Completed 06-01-PLAN.md (report commit + numbers ledger + architecture SVG)
+last_updated: "2026-06-15T16:57:55.231Z"
+last_activity: 2026-06-15 -- Completed 06-01 (upstream artifacts)
 progress:
   total_phases: 9
   completed_phases: 8
   total_plans: 60
-  completed_plans: 56
-  percent: 93
+  completed_plans: 57
+  percent: 95
 ---
 
 # Project State
@@ -21,17 +21,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-08)
 
 **Core value:** A working PLP+Hedge vault on DeepBook Predict with a credible, auditable risk dashboard, deployed on mainnet by 2026-06-16. Quality of vault math, backtest, and dashboard polish > component count.
-**Current focus:** Phase 04.2 — dashboard-onboarding-declutter
+**Current focus:** Phase 06
 
 ## Current Position
 
-Phase: 04.2 — COMPLETE
-Plan: 2 of 2 — complete (04.2-02: rail + header declutter — 6-item mode-coupled rail, search-less mode-aware header, D-2/D-3 closed)
-Status: Ready to execute
-Next phase: Phase 6 — Submission Package (demo video + README cold-read + architecture diagram + whitepaper + Devpost submission)
-Last activity: 2026-06-15 -- Phase 6 planning complete
+Phase: 06 — Submission Package — EXECUTING
+Plan: 1 of 5 — complete (06-01: report force-commit + NUMBERS-CANONICAL.md + architecture.svg; LD-1 honesty-bar gate open, DEPLOY-07 done)
+Status: Ready to execute (next: 06-02)
+Next phase: Phase 6 plans 02–05 (whitepaper, README cold-read, demo-video script, Devpost draft)
+Last activity: 2026-06-15 -- Completed 06-01 (upstream artifacts)
 
-Progress: [██████████] 100% milestone (56/56 plans)
+Progress: [██████████] 95% milestone (57/60 plans)
 
 ## Performance Metrics
 
@@ -101,6 +101,7 @@ Progress: [██████████] 100% milestone (56/56 plans)
 | Phase 04.1 P04.1-06 | ~14min | 3 tasks (auto) + 1 checkpoint | 4 files |
 | Phase 04.2 P04.2-01 | ~10min | 3 tasks (2 code + 1 build gate) | 2 files |
 | Phase 04.2 P02 | 11min | 4 tasks | 4 files |
+| Phase 06 P01 | 5min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -244,6 +245,8 @@ Recent decisions affecting current work:
 - [Phase 04.2]: Plan 04.2-01: .db-mode segmented-control CSS added to globals.css (inherited OKLCH tokens only; sibling of .rail-nav in @layer base). Mint active state = color-mix(in oklab, var(--accent) 12%, var(--surface)) — same accent reservation family as the active rail item; coral (--hedge) deliberately absent (mint-only toggle discipline). Active label weight stays 400 (color+bg carry state). Toggle wrapper margin from .db-mode-row class (margin: 24px 0), NOT an inline style. focus-visible ring on var(--ring). ui/tabs.tsx primitive untouched (className override only). Deviation: Task-2 verify regex data-section="deposit-withdraw" over-counts (matches the mandated handleDepositClick querySelector too) — real D-1 invariant (one rendered <section> anchor) confirmed via section-scoped regex; baseline match count unchanged.
 - [Phase ?]: [Phase 04.2]: Plan 04.2-02: Rail decluttered 13 items/4 groups -> 6 live items/2 groups (Vault: Overview/Deposit/Your position; Risk Studio: SVI surface/What-if/Backtest); 4 disabled stubs + 3 duplicate anchors removed, disabled-item kind + all Tooltip imports/wrapper retired (LD-6). Each NavItem carries a mode; cross-mode click setMode(item.mode) then deferred scrollToSection via requestAnimationFrame (OQ-3, scroll always lands). Mode-keyed OBSERVED_BY_MODE reconciled to App anchors: event-stream observed (D-2 fix), stale exposure mapping dropped (R-4); observer effect re-runs on [mode]; active state mode-gated.
 - [Phase ?]: [Phase 04.2]: Plan 04.2-02: Header decluttered (LD-7) — dead command-palette search pill deleted; UTC clock got a stable db-clock class; breadcrumb middle crumb mode-aware (Vault/Risk Studio, R-3); six controls survive (RelayStatusPill, GlobalStalenessPill, clock, ThemeToggle, Deposit DUSDC CTA, ConnectButton). D-3 closed: globals.css <=1200px .db-pill:nth-child(3) re-pointed to .db-clock; the dead <=1024px .db-pill.mono:first-of-type media block removed ENTIRELY (redundant with the wider clock hide) — no empty media block; .db-mode toggle CSS intact. App.tsx call sites wired: <Rail mode setMode/>, <Header ... mode/>; handleDepositClick unchanged (Plan 01 already setMode('vault')-then-scroll). Build gate green: tsc 0, build 0, vitest 427/427. Phase 04.2 D-1/D-2/D-3 + runtime-copy landmines all closed across Plans 01+02 (no panel files touched).
+- [Phase ?]: [Phase 06]: Plan 06-01: Force-added backtest/reports/full-365d.{json,html} past .gitignore:54 (git add -f, NOT un-ignored) — LD-1 honesty-bar gate; report NOT regenerated (walk_forward re-fetches live BTC). Every downstream number now traces to a committed file.
+- [Phase ?]: [Phase 06]: Plan 06-01: NUMBERS-CANONICAL.md is the single window-labeled numbers ledger — full-window +7.52% cited to backtest-assumptions.md (NOT in JSON); OOS -2.30% / Sharpe -1.87 cited to full-365d.json (prefer JSON over ledger drift -2.37 / -1.92). docs/architecture.svg (4 tiers + single-PTB, mock/pending annotated per Pitfall 3) for DEPLOY-07.
 
 ### Pending Todos
 
@@ -284,6 +287,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-06-15T15:54:27.271Z
-Stopped at: Completed 04.2-02-PLAN.md (rail + header declutter)
+Last session: 2026-06-15T16:56:38.301Z
+Stopped at: Completed 06-01-PLAN.md (report commit + numbers ledger + architecture SVG)
 Resume file: None

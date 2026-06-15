@@ -98,12 +98,17 @@
 <!-- 3. Strategy Description                                                -->
 <!-- ====================================================================== -->
 <h2>3. Strategy Description</h2>
-<p>DeepVault sells PLP-style hedged exposure: each supply allocates
-  <strong>{{ strategy.allocation_bps / 100 }}%</strong> of the deposit to a single
-  SVI-priced binary hedge at <strong>{{ strategy.strike_otm_bps / 100 }}% OTM</strong>
-  with <strong>{{ strategy.tenor_seconds / 86400 }} days</strong> tenor.
-  The remaining {{ (10_000 - strategy.allocation_bps) / 100 }}% sits as deposited
-  quote liquidity inside the vault. Locked parameters per Phase 0 D-01..D-05.</p>
+<p>DeepVault sells PLP-style hedged exposure across two sleeves. The
+  <strong>{{ (10_000 - strategy.allocation_bps) / 100 }}%</strong> PLP sleeve earns a
+  constant documented PLP yield <em>net of</em> a realized-variance LP inventory
+  cost (LVR). The <strong>{{ strategy.allocation_bps / 100 }}%</strong> hedge sleeve rolls
+  a <strong>{{ strategy.strike_otm_bps / 100 }}% OTM</strong> binary put every
+  <strong>{{ strategy.tenor_seconds / 86400 }} days</strong>, sized as coverage
+  (target payout = hedge-ratio × NAV) with the premium capped at the per-cycle
+  insurance budget. On-chain the binary is priced by the audited SVI evaluator;
+  the backtest prices it via a Black–Scholes digital put using trailing realized
+  volatility as the IV proxy (no historical IV surface exists — see ledger).
+  Locked parameters per Phase 0 D-01..D-05.</p>
 <p class="caption">Hedge sizing is fixed-ratio in v1; dynamic policy is STRAT-V2-01 territory.</p>
 
 <!-- ====================================================================== -->
@@ -113,7 +118,8 @@
 <p>Window: <strong>{{ data_ledger.window_start }}</strong> to
   <strong>{{ data_ledger.window_end }}</strong>
   (<strong>{{ data_ledger.bars }} hourly bars</strong>).
-  Source: CryptoDataDownload Binance BTCUSDT 1h CSV.
+  Source: Binance public data-mirror (<code>data-api.binance.vision</code>) BTCUSDT 1h klines —
+  gap-free, mixed-unit-normalized.
   Gap policy: <code>load_window</code> raises on any consecutive gap exceeding 1h + 60s slack.</p>
 
 <!-- ====================================================================== -->
@@ -133,13 +139,15 @@
 <!-- 6. PnL Attribution                                                     -->
 <!-- ====================================================================== -->
 <h2>6. PnL Attribution</h2>
-<p>Six columns per CONTEXT.md D-09 sum to total return per bar.
-  <code>plp_yield_bps</code> is identically zero in v1 (we BUY hedges via
-  <code>predict::mint</code>, not provide PLP).</p>
+<p>Strategy attribution over the OOS holdback decomposes the total return into
+  four additive components — PLP yield, the PLP LVR (Loss-Versus-Rebalancing)
+  inventory drag, the rolling-hedge premium spend, and the hedge payoff:
+  <code>total = plp_yield − plp_lvr − hedge_cost + hedge_payoff</code>.</p>
 {{ pnl_attribution | safe }}
 <div><img src="{{ pnl_histogram_png }}" alt="PnL distribution histogram"></div>
-<p class="caption">Figure: PnL distribution per bar. Negative tail reflects hedge-cost
-  bleed; positive tail concentrates on payoff bars at stress events.</p>
+<p class="caption">Figure: distribution of per-bar OOS NAV returns (bps). The PLP
+  sleeve's LVR drag spreads the mass; hedge premium bleeds the left tail; payoff
+  bars at stress events populate the right tail.</p>
 
 <!-- W6: Per-trade table appendix (D-11 chart 5) -->
 <h3>6.1 Per-trade PnL appendix (trade-table)</h3>
@@ -173,11 +181,16 @@
 <!-- 7. Drawdown + Risk Metrics                                             -->
 <!-- ====================================================================== -->
 <h2>7. Drawdown + Risk Metrics</h2>
-<p>Max drawdown: <strong>{{ drawdown.max_drawdown_bps }} bps</strong>;
-   underwater duration: <strong>{{ drawdown.underwater_bars }} bars</strong>.</p>
+<p>Hedged max drawdown: <strong>{{ drawdown.max_drawdown_bps }} bps</strong>;
+   underwater duration: <strong>{{ drawdown.underwater_bars }} bars</strong>.
+   {% if drawdown.unhedged_max_drawdown_bps is defined and drawdown.unhedged_max_drawdown_bps < 0 %}
+   Buy-and-hold BTC over the same OOS window:
+   <strong>{{ drawdown.unhedged_max_drawdown_bps }} bps</strong> — the rolling hedge
+   materially shrinks tail drawdown.{% endif %}</p>
 <div>{{ drawdown_timeline | safe }}</div>
 <p class="caption">Figure: Drawdown timeline (depth + duration). Underwater duration =
-  longest consecutive run of drawdown &lt; 0.</p>
+  longest consecutive run of drawdown &lt; 0. The unhedged-BTC baseline is the
+  comparison point: insurance trades a small premium bleed for a far shallower tail.</p>
 
 <!-- ====================================================================== -->
 <!-- 8. Stress Event Narrative                                              -->

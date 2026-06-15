@@ -48,3 +48,7 @@ contracts/traces/
 
 # Phase 3 backtest cache (gitignored — large parquet, fetched on demand)
 backtest/data/
+
+# Phase 3 backtest generated reports (regenerated on demand via
+# `python -m deepvault walk_forward` / `report`; multi-MB HTML, not source)
+backtest/reports/

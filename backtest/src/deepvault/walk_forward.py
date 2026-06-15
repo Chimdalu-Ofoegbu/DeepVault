@@ -32,8 +32,7 @@ from typing import Any, NamedTuple
 import numpy as np
 import pandas as pd
 
-from .replay import simulate
-from .vault_state import VaultState
+from .strategy_sim import simulate_strategy, unhedged_max_drawdown_bps
 
 OOS_FRACTION: float = 0.30
 BARS_PER_YEAR: int = 8_760  # RESEARCH.md A9 — BTC trades 24/7.
@@ -54,7 +53,9 @@ class WalkForwardResult(NamedTuple):
     """Output of run_walk_forward.
 
     Exposes equity_curve and actions for the __main__ CLI (Task 3 W4 lock) and
-    Plan 03-09's HTML report renderer.
+    Plan 03-09's HTML report renderer. ``attribution`` carries the 3-way PLP /
+    hedge-cost / hedge-payoff decomposition (Plan 03-10) and ``unhedged_max_dd_bps``
+    is the buy-and-hold-BTC drawdown baseline for the report's comparison panel.
     """
 
     in_sample_sharpe: float
@@ -66,6 +67,8 @@ class WalkForwardResult(NamedTuple):
     monthly_pnls: pd.Series
     equity_curve: pd.Series
     actions: list[dict]
+    attribution: dict
+    unhedged_max_dd_bps: int
 
 
 def split_walk_forward(
@@ -109,29 +112,37 @@ def run_walk_forward(
     """
     n = len(data)
     cutoff_idx = int(n * (1 - OOS_FRACTION))
-    in_sample = data.iloc[:cutoff_idx].copy()
-    oos_slice = data.iloc[cutoff_idx:].copy()
+    # NOTE: .iloc[...] returns a VIEW; simulate_strategy consumes it READ-ONLY
+    # (it copies columns into numpy arrays and never writes back), so the OOS
+    # purity invariant (D-03, test_oos_never_touched_during_calibration) holds
+    # without a defensive .copy().
+    in_sample = data.iloc[:cutoff_idx]
+    oos_slice = data.iloc[cutoff_idx:]
 
-    # In-sample simulation.
-    in_sample_vault = VaultState.new_seeded()
-    in_sample_result = simulate(in_sample, in_sample_vault, hedge_ratio)
-    in_sample_nav = pd.Series(in_sample_result["per_bar_nav"], dtype="float64")
-    in_sample_equity = _equity_from_nav(in_sample_nav)
+    # In-sample simulation — the real PLP+hedge strategy (Plan 03-10).
+    in_sample_result = simulate_strategy(in_sample, hedge_ratio)
+    in_sample_equity = _equity_from_nav(in_sample_result["equity_curve"])
     in_sample_dd = compute_drawdown_max_sharpe_sortino(in_sample_equity)
 
     # OOS simulation — uses the SAME hedge_ratio (no per-window tuning in v1).
-    oos_vault = VaultState.new_seeded()
-    oos_result = simulate(oos_slice, oos_vault, hedge_ratio)
-    oos_nav = pd.Series(oos_result["per_bar_nav"], dtype="float64")
-    oos_equity = _equity_from_nav(oos_nav)
+    oos_result = simulate_strategy(oos_slice, hedge_ratio)
+    oos_equity = _equity_from_nav(oos_result["equity_curve"])
     oos_dd = compute_drawdown_max_sharpe_sortino(oos_equity)
 
-    bars = max(int(oos_result.get("bars", 0)), 1)
+    bars = max(len(oos_slice), 1)
     total_return = float(oos_result.get("total_return", 0.0))
-    oos_apy = (1.0 + total_return) ** (BARS_PER_YEAR / bars) - 1.0 if bars > 0 else 0.0
+    # APY guards against a wipe-out (1+total_return <= 0) which would make the
+    # fractional power complex/NaN; floor the base at a tiny positive number.
+    base = max(1.0 + total_return, 1e-9)
+    oos_apy = base ** (BARS_PER_YEAR / bars) - 1.0 if bars > 0 else 0.0
 
-    # Plan 03-09's report renders per-month aggregation; stubbed here.
-    monthly_pnls = pd.Series([0.0])
+    # Real per-month PnL aggregation over the OOS window (replaces the [0.0]
+    # stub). Each month's PnL = product of that month's per-bar returns − 1.
+    monthly_pnls = _monthly_pnls_from_oos(oos_slice, oos_result["equity_curve"])
+
+    # Per-cycle hedge actions surfaced for the report's trade table + the CLI
+    # PnL-attribution summary (replaces the empty actions list).
+    actions = _actions_from_attribution(oos_result["attribution"])
 
     return WalkForwardResult(
         in_sample_sharpe=in_sample_dd.sharpe,
@@ -142,7 +153,9 @@ def run_walk_forward(
         oos_apy=float(oos_apy),
         monthly_pnls=monthly_pnls,
         equity_curve=oos_equity,
-        actions=[],
+        actions=actions,
+        attribution=oos_result["attribution"],
+        unhedged_max_dd_bps=unhedged_max_drawdown_bps(oos_slice),
     )
 
 
@@ -248,6 +261,62 @@ def compute_drawdown_max_sharpe_sortino(equity_curve: pd.Series) -> DrawdownResu
 
 
 # ----------------------------------------------------------------------- helpers
+
+
+def _monthly_pnls_from_oos(oos_slice: pd.DataFrame, nav_series: pd.Series) -> pd.Series:
+    """Aggregate the OOS per-bar NAV into calendar-month PnL fractions.
+
+    Each month's PnL = (NAV at month end / NAV at month start) − 1, derived
+    from the per-bar NAV series indexed by the OOS bars' ts_ms. Returns an
+    empty Series when ts_ms is unavailable or the window is degenerate. This
+    replaces the historical ``pd.Series([0.0])`` stub (Plan 03-10).
+    """
+    if (
+        nav_series is None
+        or len(nav_series) < 2
+        or "ts_ms" not in getattr(oos_slice, "columns", [])
+        or len(oos_slice) != len(nav_series)
+    ):
+        return pd.Series([], dtype="float64")
+    nav = pd.Series(nav_series.to_numpy(), dtype="float64")
+    months = pd.to_datetime(np.asarray(oos_slice["ts_ms"]), unit="ms").to_period("M")
+    grp = pd.DataFrame({"month": months, "nav": nav.to_numpy()})
+    # First and last NAV within each month → intra-month return.
+    monthly = grp.groupby("month")["nav"].agg(["first", "last"])
+    pnl = (monthly["last"] / monthly["first"]) - 1.0
+    pnl.index = monthly.index.astype(str)
+    return pnl.astype("float64")
+
+
+def _actions_from_attribution(attribution: dict) -> list[dict]:
+    """Flatten the per-cycle attribution DataFrame into a report-friendly list.
+
+    Each priced (non-warm-up) hedge cycle becomes one dict carrying the cycle's
+    economics (spot, strike, σ, binary price, premium, notional, payoff). The
+    report's per-trade table and the CLI's attribution summary consume these.
+    Warm-up-skip cycles (no position opened) are excluded.
+    """
+    cycles = attribution.get("cycles")
+    if cycles is None or len(cycles) == 0:
+        return []
+    out: list[dict] = []
+    for _, row in cycles.iterrows():
+        if bool(row.get("warmup_skip", False)):
+            continue
+        out.append(
+            {
+                "kind": "hedge_cycle",
+                "ts_ms": int(row["ts_ms"]),
+                "spot_open": float(row["spot_open"]),
+                "strike": float(row["strike"]),
+                "sigma_ann": float(row["sigma_ann"]),
+                "binary_price": float(row["binary_price"]),
+                "premium": float(row["premium"]),
+                "notional": float(row["notional"]),
+                "payoff": float(row["payoff"]),
+            }
+        )
+    return out
 
 
 def _equity_from_nav(nav_series: pd.Series) -> pd.Series:

@@ -101,9 +101,30 @@ def fetch_btc_hourly(force_redownload: bool = False) -> pd.DataFrame:
 
     # Convert CSV-seconds to milliseconds so the column name matches its unit
     # AND aligns with the Move-side u64 ms convention (vault events emit ms).
-    df["ts_ms"] = (df["ts_ms"].astype("int64")) * 1000
+    #
+    # Unit-drift guard (2026-06 fix): CryptoDataDownload's `Unix` column has
+    # drifted to MIXED units within a single file — most rows are milliseconds
+    # (13-digit, e.g. 1781391600000 = 2026-06-13), but a subset ship as
+    # microseconds (16-digit, e.g. 1741734000000000 = 2025-03-11), and the
+    # legacy format was seconds (10-digit). The previous unconditional `* 1000`
+    # assumed seconds throughout and turned the ms rows into microseconds
+    # (year-49596 garbage), silently hollowing the backtest; fixture tests never
+    # caught it. Normalise EACH row to ms by magnitude:
+    #   seconds      (< 1e12)        → * 1000
+    #   milliseconds (1e12 .. <1e14) → as-is
+    #   microseconds (>= 1e14)       → // 1000
+    _u = df["ts_ms"].astype("int64")
+    _u = _u.where(_u >= 1_000_000_000_000, _u * 1000)        # seconds → ms
+    _u = _u.where(_u < 100_000_000_000_000, _u // 1000)      # microseconds → ms
+    df["ts_ms"] = _u
 
-    df = df.sort_values("ts_ms", ascending=True).reset_index(drop=True)
+    # Drop duplicate bars: the mixed-unit rows above can map two source rows to
+    # the same hour (ms + microsecond copies). Keep the first, then sort.
+    df = (
+        df.drop_duplicates(subset="ts_ms", keep="first")
+        .sort_values("ts_ms", ascending=True)
+        .reset_index(drop=True)
+    )
 
     # available_at: a bar with open ts_ms = T closes at T + 1h; data is
     # queryable 1 ms after close, so available_at = T + 3_600_001. Every join

@@ -4,7 +4,9 @@ Per Plan 03-02 (BACK-01):
 - fetch_btc_hourly() reads from cache if exists; otherwise downloads via requests.
 - CSV has a "Disclaimer" prefix line — skiprows=1.
 - Columns normalised to ts_ms/open/high/low/close/volume_btc/volume_usdt/trade_count.
-- ts_ms stores milliseconds (CSV ships seconds — we multiply by 1000 on ingest).
+- ts_ms stores milliseconds. The CSV `Unix` column ships MIXED units (legacy
+  seconds, current milliseconds, and a microsecond subset); ingest normalises
+  each row to ms by magnitude (2026-06 unit-drift fix).
 - available_at = ts_ms + 3_600_001 (1 hour + 1 ms; bar's data is observable 1ms after close).
 - load_window() raises on consecutive gap > 1h + 1min slack.
 - assert df.columns[0] == 'Unix' is the format-drift guard (T-03-05 mitigation).

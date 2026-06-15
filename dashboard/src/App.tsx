@@ -123,12 +123,13 @@ export function App() {
           is already running from the top of this component. */}
       <DashboardLoader />
       <div className="dash-body">
-        <Rail />
+        <Rail mode={mode} setMode={setMode} />
       <main className="dash" data-testid="dashboard-main">
         <Header
           wsState={state}
           snapshot={snapshot}
           onDepositClick={handleDepositClick}
+          mode={mode}
         />
 
         {/* Relay reconnect/down inline alert — copy preserved verbatim

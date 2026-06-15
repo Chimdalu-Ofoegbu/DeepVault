@@ -1,19 +1,22 @@
 // dashboard/src/components/layout/Header.tsx — sticky top bar (`db-bar`).
 //
 // Plan 04.1-02 Task 2 (UI-SPEC #12). Reskinned from the Phase 4 flat Tailwind
-// header into the handoff `db-bar`: a left breadcrumb + a right pill row
-// (live pill, search pill, UTC clock, Deposit DUSDC button, wallet avatar).
-// All chrome classes (.db-bar, .db-bar-l, .db-bar-r, .crumb, .db-pill,
-// .db-avatar, .btn) are defined in globals.css by Plan 04.1-01.
+// header into the handoff `db-bar`: a left breadcrumb + a right pill row. Plan
+// 04.2-02 (LD-7, R-3, D-3) removed the dead command-palette pill and made the
+// breadcrumb middle crumb mode-aware. The six surviving controls are:
+// RelayStatusPill, GlobalStalenessPill, the UTC clock (now carrying a stable
+// clock class for the responsive hide), ThemeToggle, the primary deposit CTA,
+// and the wallet ConnectButton. All chrome classes (.db-bar, .db-bar-l,
+// .db-bar-r, .crumb, .db-pill, .db-avatar, .btn) are defined in globals.css by
+// Plan 04.1-01.
 //
 // The `wsState` + `snapshot` prop signature and the `data-testid` are preserved
 // so Phase 4 behavior and tests do not regress. RelayStatusPill +
-// GlobalStalenessPill are folded into the pill row (their internal reskin is a
-// later wave; here they are only re-placed).
+// GlobalStalenessPill are folded into the pill row.
 //
-// The `Deposit DUSDC` primary button triggers `onDepositClick` — App.tsx
-// coordinates this (it scrolls to / focuses the DepositWithdrawPanel section).
-// A placeholder slot is reserved in the pill row for the Plan 05 theme toggle.
+// The primary deposit button triggers `onDepositClick` — App.tsx coordinates
+// this (it switches to vault mode then scrolls to the deposit section). The
+// `mode` prop drives the mode-aware breadcrumb (R-3).
 
 import { useEffect, useState } from 'react';
 import { ConnectButton } from '@mysten/dapp-kit';
@@ -28,8 +31,10 @@ type Props = {
   snapshot: FullSnapshot | null;
   /** Optional countdown to next reconnect attempt for the relay pill. */
   secondsUntilReconnect?: number;
-  /** Invoked by the `Deposit DUSDC` primary button. App.tsx coordinates. */
+  /** Invoked by the primary deposit button. App.tsx coordinates. */
   onDepositClick?: () => void;
+  /** Active view mode (Phase 04.2, R-3) — drives the mode-aware breadcrumb. */
+  mode: 'vault' | 'risk';
 };
 
 /** Live `YYYY-MM-DD · HH:MM UTC` string, recomputed each render tick. */
@@ -45,6 +50,7 @@ export function Header({
   snapshot,
   secondsUntilReconnect,
   onDepositClick,
+  mode,
 }: Props) {
   // UTC clock — updates once per minute (client-side, per Data Binding table).
   const [now, setNow] = useState<Date>(() => new Date());
@@ -57,7 +63,8 @@ export function Header({
     <header className="db-bar">
       <div className="db-bar-l">
         <span className="crumb">
-          <a href="/">DeepVault</a> <em>/</em> <a href="#">Risk Studio</a>{' '}
+          <a href="/">DeepVault</a> <em>/</em>{' '}
+          <a href="#">{mode === 'vault' ? 'Vault' : 'Risk Studio'}</a>{' '}
           <em>/</em> <b>Overview</b>
         </span>
       </div>
@@ -69,12 +76,10 @@ export function Header({
         />
         {/* Surface-data staleness pill. */}
         <GlobalStalenessPill snapshot={snapshot} />
-        {/* Static visual-only search affordance (handoff db-pill mono). */}
-        <button type="button" className="db-pill mono" tabIndex={-1}>
-          ⌘K · Search
-        </button>
-        {/* Live UTC clock pill. */}
-        <button type="button" className="db-pill mono" tabIndex={-1}>
+        {/* Live UTC clock pill. The trailing clock class is a stable hook for
+            the responsive hide (≤1200px) so it no longer depends on child
+            position (D-3). */}
+        <button type="button" className="db-pill mono db-clock" tabIndex={-1}>
           {utcClockLabel(now)}
         </button>
         {/* Light/dark theme toggle (D-02) — next-themes-backed db-pill. */}

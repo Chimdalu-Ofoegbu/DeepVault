@@ -208,14 +208,12 @@ describe('<ExposurePanel>', () => {
     vi.useRealTimers();
   });
 
-  it('renders the BTC-only empty-state copy verbatim when hedges is empty', () => {
+  it('renders the BTC-only empty-state copy with the testnet-oracle note when hedges is empty', () => {
     render(<ExposurePanel hedges={[]} vault={null} />);
-    // UI-SPEC Copywriting verbatim empty-state row for Per-oracle exposure.
-    expect(
-      screen.getByText(
-        'BTC oracle · 0% exposure — no hedge legs open yet.',
-      ),
-    ).toBeInTheDocument();
+    // Empty-state row annotated with the testnet-oracle limitation (no live
+    // hedge legs because testnet Predict has no matching multi-day market).
+    expect(screen.getByText(/no live hedge legs/i)).toBeInTheDocument();
+    expect(screen.getByText(/intraday BTC markets/i)).toBeInTheDocument();
     // The §Per-oracle header still renders.
     expect(screen.getByText('§ Per-oracle')).toBeInTheDocument();
   });

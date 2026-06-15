@@ -83,12 +83,13 @@ describe('<PositionViewer>', () => {
     ).toBeInTheDocument();
   });
 
-  it('renders connected-no-position empty state (UI-SPEC verbatim copy)', () => {
+  it('renders connected-no-position empty state with the testnet-oracle note', () => {
     mockUseCurrentAccount.mockReturnValue({ address: '0xUSER' });
     render(<PositionViewer positions={[]} vault={vault} />);
-    expect(
-      screen.getByText('No position yet. Deposit DUSDC to receive vault shares.'),
-    ).toBeInTheDocument();
+    // Empty-state annotated with the testnet-oracle limitation (the live hedge
+    // mint has no matching multi-day Predict market on testnet today). The copy
+    // includes an inline <code> ref, so match the distinctive leading text.
+    expect(screen.getByText(/No live hedge legs yet/i)).toBeInTheDocument();
   });
 
   it('renders the pos-table with PnL attribution columns + a disabled BTC chip', () => {

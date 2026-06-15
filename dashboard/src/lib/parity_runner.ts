@@ -20,9 +20,13 @@
 // pure-bigint per shared/svi-spec.md §"Op-order canonical form" rounding rule.
 
 import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { binaryPrice, totalVariance, type SVIParams } from './svi';
 
+// ESM has no __dirname. Derive it from import.meta.url so the runner works under
+// `tsx` (ESM) AND when CI invokes it via `pnpm exec tsx src/lib/parity_runner.ts`.
+const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '../../..');
 const JSON_PATH = resolve(REPO_ROOT, 'shared/golden-vectors.json');
 

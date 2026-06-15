@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
 status: executing
-stopped_at: Completed 06-03-PLAN.md (README cold-read polish)
-last_updated: "2026-06-15T17:18:58.683Z"
+stopped_at: Completed 06-04 artifact (docs/DEMO-SCRIPT.md); DEPLOY-05 recording held as human-action checkpoint
+last_updated: "2026-06-15T17:30:35.604Z"
 last_activity: 2026-06-15
 progress:
   total_phases: 9
   completed_phases: 8
   total_plans: 60
-  completed_plans: 59
-  percent: 98
+  completed_plans: 60
+  percent: 100
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 06 — Submission Package — EXECUTING
-Plan: 3 of 5 — complete (06-02: docs/WHITEPAPER.md shipped, DEPLOY-08 done; window-labeled numbers traced to NUMBERS-CANONICAL.md, honesty bar LD-1 held)
+Plan: 4 of 5 — complete (06-02: docs/WHITEPAPER.md shipped, DEPLOY-08 done; window-labeled numbers traced to NUMBERS-CANONICAL.md, honesty bar LD-1 held)
 Status: Ready to execute
 Next phase: Phase 6 plans 03–05 (README cold-read, demo-video script, Devpost draft)
 Last activity: 2026-06-15
@@ -104,6 +104,7 @@ Progress: [██████████] 97% milestone (58/60 plans)
 | Phase 06 P01 | 5min | 3 tasks | 4 files |
 | Phase 06 P02 | 5min | 2 tasks | 1 files |
 | Phase 06 P03 | 5min | 2 tasks | 1 files |
+| Phase 06 P04 | 8min | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -251,6 +252,8 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 06]: Plan 06-01: NUMBERS-CANONICAL.md is the single window-labeled numbers ledger — full-window +7.52% cited to backtest-assumptions.md (NOT in JSON); OOS -2.30% / Sharpe -1.87 cited to full-365d.json (prefer JSON over ledger drift -2.37 / -1.92). docs/architecture.svg (4 tiers + single-PTB, mock/pending annotated per Pitfall 3) for DEPLOY-07.
 - [Phase ?]: [Phase 06]: Plan 06-02: docs/WHITEPAPER.md shipped (DEPLOY-08) — raw 5-param SVI (not SSVI, Pitfall 5) + arXiv:1204.0646; binary digital-put price + EPredictMisquote abstain; locked sizing bounds verbatim; worst-case-Predict liquidation (compound -60% -> risk_ratio 8_101 bps); honest window-labeled numbers (full-window +7.52% / OOS -2.30%) traced to NUMBERS-CANONICAL.md; unaudited/single-key/testnet disclosed, no audit implied.
 - [Phase ?]: 06-03: README polished for DEPLOY-06 cold-read — all 5 MAINNET-FUNDING links repointed to MAINNET-READINESS.md, real testnet addresses filled, status corrected to Phases 0-5+dashboard submission-ready, links to whitepaper/report/SVG added, demo scoped honestly (make demo = supply+real-hedge+redeem; two-protocol PTB mock-proven/pending)
+- [Phase ?]: 06-04: Demo-video script (docs/DEMO-SCRIPT.md) storyboards ONLY the honestly-filmable make-demo flow; two-protocol Margin PTB framed as mock-proven/live-on-testnet-pending with a live LoanBorrowed shot marked FORBIDDEN (Pitfall 3 / T-06-10).
+- [Phase ?]: 06-04: DEPLOY-05 recording held as a human-action checkpoint (autonomous: false), NOT marked complete — needs a human + funded testnet wallet on camera; the video URL feeds Plan 06-05 Devpost filing.
 
 ### Pending Todos
 
@@ -291,6 +294,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-06-15T17:18:58.642Z
-Stopped at: Completed 06-03-PLAN.md (README cold-read polish)
-Resume file: None
+Last session: 2026-06-15T17:30:35.571Z
+Stopped at: Completed 06-04 artifact (docs/DEMO-SCRIPT.md); DEPLOY-05 recording held as human-action checkpoint
+Resume file: 06-04-PLAN.md recording task — resume on user 'recorded' + video URL

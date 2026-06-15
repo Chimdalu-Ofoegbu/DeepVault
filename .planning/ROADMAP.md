@@ -160,11 +160,11 @@ Drop in this order, never reverse:
 **Goal:** Reorganize the existing Phase 4 / 04.1 dashboard so a first-time LP can onboard a deposit without wading through the quant — a deposit-first Vault view becomes the default landing, the risk panels move behind a Vault | Risk Studio toggle, and the navigation rail + dead header chrome are decluttered. Reorganization + declutter only; the useWebSocket data spine and every panel internal stay byte-identical (CONTEXT LD-3).
 **Requirements**: TBD
 **Depends on:** Phase 04
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [x] 04.2-01-PLAN.md (Wave 1) — Mode toggle + App.tsx Vault/Risk subtree split (controlled Radix Tabs, mode lifted above the data spine, deposit-first Vault view, mode-aware headline, .db-mode CSS)
-- [ ] 04.2-02-PLAN.md (Wave 2) — Rail declutter 13->6 (mode-coupled) + Header declutter (remove the search pill, mode-aware crumb) + D-3 responsive CSS reconciliation + mode-prop wiring + build/test gate
+- [x] 04.2-02-PLAN.md (Wave 2) — Rail declutter 13->6 (mode-coupled) + Header declutter (remove the search pill, mode-aware crumb) + D-3 responsive CSS reconciliation + mode-prop wiring + build/test gate
 
 ### Phase 04.1: Dashboard Visual Polish (INSERTED)
 

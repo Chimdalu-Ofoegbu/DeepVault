@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04.2-01-PLAN.md (Vault | Risk Studio mode toggle + App.tsx split)
-last_updated: "2026-06-15T15:33:33.192Z"
-last_activity: 2026-06-15 -- Phase 04.2 Plan 01 executed (mode toggle landed)
+stopped_at: Completed 04.2-02-PLAN.md (rail + header declutter)
+last_updated: "2026-06-15T15:54:27.297Z"
+last_activity: 2026-06-15
 progress:
   total_phases: 9
-  completed_phases: 7
-  total_plans: 57
-  completed_plans: 55
-  percent: 96
+  completed_phases: 8
+  total_plans: 56
+  completed_plans: 56
+  percent: 100
 ---
 
 # Project State
@@ -25,13 +25,13 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 
 ## Current Position
 
-Phase: 04.2 (dashboard-onboarding-declutter) — IN PROGRESS (1/2 plans)
-Plan: 1 of 2 — complete (04.2-01: Vault | Risk Studio mode toggle + App.tsx Vault/Risk split)
-Status: Executing — Plan 04.2-02 (rail + header declutter) next
+Phase: 04.2 (dashboard-onboarding-declutter) — COMPLETE (2/2 plans)
+Plan: 2 of 2 — complete (04.2-02: rail + header declutter — 6-item mode-coupled rail, search-less mode-aware header, D-2/D-3 closed)
+Status: Phase 04.2 complete — Phase 6 (Submission Package) next
 Next phase: Phase 6 — Submission Package (demo video + README cold-read + architecture diagram + whitepaper + Devpost submission)
-Last activity: 2026-06-15 -- Phase 04.2 Plan 01 executed (mode toggle landed)
+Last activity: 2026-06-15 -- Phase 04.2 Plan 02 executed (rail + header declutter landed; Phase 04.2 closed)
 
-Progress: [████████████████░] 96% milestone (55/57 plans)
+Progress: [██████████] 100% milestone (56/56 plans)
 
 ## Performance Metrics
 
@@ -100,6 +100,7 @@ Progress: [████████████████░] 96% milestone (5
 | Phase 04.1 P04.1-05 | ~12min | 3 tasks | 4 files |
 | Phase 04.1 P04.1-06 | ~14min | 3 tasks (auto) + 1 checkpoint | 4 files |
 | Phase 04.2 P04.2-01 | ~10min | 3 tasks (2 code + 1 build gate) | 2 files |
+| Phase 04.2 P02 | 11min | 4 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -241,6 +242,8 @@ Recent decisions affecting current work:
 - [Phase 04.2]: Plan 04.2-01: Vault | Risk Studio mode toggle landed (LD-1). Controlled Radix Tabs (value={mode}) supplies control chrome + a11y ONLY (role=tablist, aria-selected, ←/→/Home/End roving focus, aria-label="Dashboard view mode"); the two view subtrees render as conditionally-mounted SIBLINGS, NOT inside TabsContent, so the inactive view fully unmounts (no double Plotly tree). const [mode,setMode]=useState<'vault'|'risk'>('vault') declared BELOW the useWebSocket spine + 5 derived hooks (LD-3 spine-above-conditional — toggling never tears down the data spine). Vault is the default landing. App.tsx +156/-82; tsc + build + 427/427 vitest all exit 0; PositionViewer/ExposurePanel/tabs.tsx byte-identical (zero diff).
 - [Phase 04.2]: Plan 04.2-01: R-2 path a chosen — PositionViewer mounts in EXACTLY ONE place (Vault view), NOT dual-mounted (D-1: no second position-viewer anchor). Freed Risk r2 left cell filled by pulling EventStreamPanel up; Risk grid collapses to 2 rows (r1 surface+side, r2 event-stream|what-if, r3 lone backtest card — acceptable, no fictional filler per 04.1 LD-5). event-stream is now a real mounted Risk r2 anchor (resolves D-2 drift target for Plan 04.2-02's observer reconciliation, R-4). Mounted [data-section] anchors: vault={deposit-withdraw, position-viewer}; risk={hero, exposure, event-stream, what-if, backtest}.
 - [Phase 04.2]: Plan 04.2-01: .db-mode segmented-control CSS added to globals.css (inherited OKLCH tokens only; sibling of .rail-nav in @layer base). Mint active state = color-mix(in oklab, var(--accent) 12%, var(--surface)) — same accent reservation family as the active rail item; coral (--hedge) deliberately absent (mint-only toggle discipline). Active label weight stays 400 (color+bg carry state). Toggle wrapper margin from .db-mode-row class (margin: 24px 0), NOT an inline style. focus-visible ring on var(--ring). ui/tabs.tsx primitive untouched (className override only). Deviation: Task-2 verify regex data-section="deposit-withdraw" over-counts (matches the mandated handleDepositClick querySelector too) — real D-1 invariant (one rendered <section> anchor) confirmed via section-scoped regex; baseline match count unchanged.
+- [Phase ?]: [Phase 04.2]: Plan 04.2-02: Rail decluttered 13 items/4 groups -> 6 live items/2 groups (Vault: Overview/Deposit/Your position; Risk Studio: SVI surface/What-if/Backtest); 4 disabled stubs + 3 duplicate anchors removed, disabled-item kind + all Tooltip imports/wrapper retired (LD-6). Each NavItem carries a mode; cross-mode click setMode(item.mode) then deferred scrollToSection via requestAnimationFrame (OQ-3, scroll always lands). Mode-keyed OBSERVED_BY_MODE reconciled to App anchors: event-stream observed (D-2 fix), stale exposure mapping dropped (R-4); observer effect re-runs on [mode]; active state mode-gated.
+- [Phase ?]: [Phase 04.2]: Plan 04.2-02: Header decluttered (LD-7) — dead command-palette search pill deleted; UTC clock got a stable db-clock class; breadcrumb middle crumb mode-aware (Vault/Risk Studio, R-3); six controls survive (RelayStatusPill, GlobalStalenessPill, clock, ThemeToggle, Deposit DUSDC CTA, ConnectButton). D-3 closed: globals.css <=1200px .db-pill:nth-child(3) re-pointed to .db-clock; the dead <=1024px .db-pill.mono:first-of-type media block removed ENTIRELY (redundant with the wider clock hide) — no empty media block; .db-mode toggle CSS intact. App.tsx call sites wired: <Rail mode setMode/>, <Header ... mode/>; handleDepositClick unchanged (Plan 01 already setMode('vault')-then-scroll). Build gate green: tsc 0, build 0, vitest 427/427. Phase 04.2 D-1/D-2/D-3 + runtime-copy landmines all closed across Plans 01+02 (no panel files touched).
 
 ### Pending Todos
 
@@ -281,6 +284,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-06-15T15:33:33.176Z
-Stopped at: Completed 04.2-01-PLAN.md (Vault | Risk Studio mode toggle + App.tsx Vault/Risk split)
-Resume file: .planning/phases/04.2-dashboard-onboarding-declutter/04.2-02-PLAN.md
+Last session: 2026-06-15T15:54:27.271Z
+Stopped at: Completed 04.2-02-PLAN.md (rail + header declutter)
+Resume file: None

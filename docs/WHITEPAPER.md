@@ -250,3 +250,256 @@ out-of-sample number instead of a re-tuned flattering one: the locked 10% ratio 
 *(Source: `docs/HEDGE-POLICY.md` §"Re-tuning policy", L54–68; the quoted principle is L68.)*
 
 ---
+
+## 5. Backtest Results
+
+> **Honest framing (read this first).** Over the full 365-day window the strategy returned
+> **+7.52%** (one −15% breach fired; payoff **+9.98%**); in the calm out-of-sample 30% holdout the
+> hedge was a **net cost** (APY **−2.30%**, Sharpe **−1.87**) — the honest cost-of-carry of crash
+> insurance. Over the full window, where a −15% breach fired, the tail payoff dominates and the
+> strategy is net positive while cutting max drawdown to **−1.66%** versus **−52.86%** for
+> buy-and-hold BTC (~32× tighter). In the OOS holdout BTC ranged sideways, no breach fired, and the
+> insurance was pure premium bleed. This asymmetry — a small steady bleed in calm regimes, large
+> protection in a crash — *is* the "PLP yield minus crash insurance" profile, presented without
+> inflation.
+
+Two distinct backtest windows exist, and **they must never be mixed**: a return from one window
+placed next to a Sharpe from the other describes a run that never happened. Every figure below
+carries its window label and its committed source.
+
+### 5.1 Full-window (365-day) block
+
+*Source: `.planning/backtest-assumptions.md` (git-tracked ledger, "Validated numbers, 365-day
+window, hedge_ratio = 0.10, run 2026-06-15"). These full-window figures are **not** in
+`full-365d.json` — the JSON reports only the OOS holdout.*
+
+| Figure | Value | Window |
+|--------|-------|--------|
+| Total return | **+7.52%** | full-window 365d |
+| PLP yield | +7.14% | full-window 365d |
+| PLP LVR drag | −4.16% | full-window 365d |
+| Hedge cost | −5.43% | full-window 365d |
+| Hedge payoff | +9.98% (1 payoff fired) | full-window 365d |
+| Hedged max drawdown | −1.66% | full-window 365d |
+| Unhedged buy-and-hold BTC max DD | −52.86% | full-window 365d |
+
+The full-window total return decomposes exactly:
+
+```
+total_return = plp_yield − plp_lvr − hedge_cost + hedge_payoff
+             = +7.14%   − 4.16%   − 5.43%      + 9.98%
+             = +7.52%
+```
+
+### 5.2 Out-of-sample holdout (recent 30%) block
+
+*Source: `backtest/reports/full-365d.json` (force-committed in Plan 06-01 — the machine-generated
+snapshot; its top-level keys report the out-of-sample 30% holdout). These are the preferred OOS
+values.*
+
+| Figure | Value | Window |
+|--------|-------|--------|
+| OOS APY | **−2.30%** | OOS holdout |
+| OOS Sharpe | **−1.87** | OOS holdout |
+| OOS Sortino | −0.71 | OOS holdout |
+| OOS hedged max DD | −0.98% | OOS holdout |
+| OOS unhedged BTC max DD | −28.02% | OOS holdout |
+| OOS hedge cycles / payoffs | 7 / 0 (calm regime) | OOS holdout |
+| OOS total return | −0.69% | OOS holdout |
+
+### 5.3 Hedge-ratio sensitivity (out-of-sample)
+
+*Source: `backtest/reports/full-365d.json` `sensitivity_table[]`.*
+
+| hedge_ratio | in-sample Sharpe | OOS Sharpe | OOS max-DD bps | OOS APY |
+|-------------|------------------|------------|----------------|---------|
+| 0.05 | 1.3696 | +0.5721 | −36 | +0.36% |
+| **0.10 (LOCKED v1)** | 1.0841 | −1.8690 | −98 | −2.30% |
+| 0.15 | 0.9884 | −2.6953 | −165 | −4.89% |
+| 0.20 | 0.9402 | −3.1089 | −238 | −7.42% |
+| 0.30 | 0.8913 | −3.5221 | −392 | −12.28% |
+
+The table shows a **monotonic insurance cost-of-carry**, not an overfit peak: more hedge spend buys
+more drawdown protection at strictly more premium bleed in the calm OOS regime. Critically, the
+locked v1 ratio of **0.10 is *not* the OOS-optimal row** — `0.05` is (OOS Sharpe +0.5721, APY +0.36%).
+By the [§4.1 re-tuning policy](#41-re-tuning-policy--the-honest-framing) we do **not** retro-fit the
+locked ratio to the holdout; we ship the principled choice committed before the backtest opened and
+disclose the gap. This is the integrity cost we pay for a credible number.
+
+*(All §5 figures are quoted verbatim from `NUMBERS-CANONICAL.md` (Plan 06-01), the single
+window-labeled numbers ledger; full-window claims cite `backtest-assumptions.md`, OOS claims cite
+`backtest/reports/full-365d.json`. Nothing here was recomputed.)*
+
+---
+
+## 6. Model Assumptions
+
+The backtest returns above come from an economic simulation (`strategy_sim.py`), **not** from the
+on-chain SVI pricing path. The model is deliberately conservative; its load-bearing assumptions are
+disclosed here in full so a reader can judge the numbers honestly.
+
+- **PLP yield = 8% APY is an assumption, not a measured Predict yield.** `PLP_APY = 0.08` is a
+  conservative placeholder (Predict PLP markets quote double-digit; we picked a defensible value
+  over a promotional one). It is *not* a realized on-chain return.
+  *(Source: `strategy_sim.py:88`; `backtest-assumptions.md` §"Strategy Simulation Model".)*
+- **LP inventory drag = 0.25 LVR coefficient.** `PLP_LVR_COEFF = 0.25` models variance-scaled
+  Loss-Versus-Rebalancing (Milionis, Moallemi & Roughgarden, 2022) — roughly 4–5%/yr on BTC. It
+  injects realistic per-bar NAV variance; without it the OOS Sharpe was an indefensible ~7.7.
+  *(Source: `strategy_sim.py:98`; ledger.)*
+- **Two different pricing paths — stated explicitly.** The **backtest** prices each hedge with a
+  zero-drift Black–Scholes digital put using **trailing-30-day realized volatility as the IV
+  proxy** (there is no historical IV surface for testnet BTC; a Deribit feed is deferred to v2). The
+  **on-chain** vault prices hedges with the audited **raw-SVI evaluator** of [§2](#2-the-binary-hedge-price).
+  These are *different pricing paths*: the backtest approximates IV from realized vol, while
+  production reads the SVI slice from the Predict oracle. We do not claim the backtest priced
+  through the on-chain SVI evaluator.
+  *(Source: `strategy_sim.py:47-62, 138-158`; ledger §"Strategy Simulation Model".)*
+- **Coverage-based sizing.** Target payout = `hedge_ratio × NAV`, with premium capped at
+  `hedge_ratio × NAV × (tenor / 365)`. (A naive `notional = premium / p` produced ~1000:1 jackpots
+  at low `p` — an economic bug that was fixed.)
+- **Other v1 conventions:** settlement = **expiry-spot** (a hedge that dips below the strike
+  intraperiod but recovers does *not* pay — a v1 simplification, not path-minimum); `fees_bps = 0`;
+  `gas = 1 bp/PTB`; `rf = 0`; `BARS_PER_YEAR = 8760`.
+
+### 6.1 Lookahead-bias audit
+
+The backtest passes a lookahead-bias audit. The audit machinery is
+`backtest/src/deepvault/lookahead_audit.py`, with results recorded in `backtest-assumptions.md`
+§"Lookahead-Bias Audit":
+
+- **Shuffled-label sanity (gate D-06):** a shuffled-label test confirms `|alpha| ≤ 0.005` — i.e. the
+  strategy earns no return on randomized labels, so it is not peeking at future bars.
+- **Hand-recompute (gate D-07):** a 3-row hand-recompute (seed 42) reconciles the engine output to
+  the wei.
+
+> **Provenance note (honesty):** the HTML report's "shuffled-label" and "hand-recompute" summary
+> blocks are **rendered stubs** in the summary-based render path and are *not* the audit. The
+> lookahead-audit claim above is grounded in the `lookahead_audit.py` module, its tests, and the
+> assumptions ledger — **not** the HTML stub block.
+
+*(Source: `backtest/src/deepvault/lookahead_audit.py` + `backtest-assumptions.md` §"Lookahead-Bias
+Audit"; renderer-stub caveat per phase research §1.)*
+
+---
+
+## 7. Liquidation Under Worst-Case Predict Outcome
+
+DeepVault's hedge book interacts with a Margin position, so the relevant solvency question is:
+*what happens to NAV-per-share if every open hedge is worthless at once?* The vault answers this with
+a deliberately pessimistic valuation.
+
+### 7.1 Worst-case NAV-per-share
+
+Under the worst-case Predict outcome, **all open binaries expire worthless**, so the worst-case
+NAV-per-share collapses to the **liquid quote balance ÷ total shares** — it does *not* count the
+hedge cost basis, because "all hedges expire worthless" means "the cost-basis quote that was sent to
+Predict is gone." The computation calls **no** SVI evaluator on this path (zero blast radius for the
+Margin liquidation path) and applies no time-decay discount (instantaneous):
+
+```move
+public fun worst_case_nav_per_share<Quote>(vault: &Vault<Quote>): u64 {
+    let total_shares = vault::total_shares(vault);
+    assert!(total_shares > 0, EZeroShares);
+    math::mul_div_round_down(
+        vault::balance_value(vault),     // LIQUID balance only — hedges assumed worthless
+        strategy_constants::nav_scale(), // 1e9
+        total_shares,
+    )
+}
+```
+
+*(Source: `contracts/sources/ltv.move:60-68`.)*
+
+### 7.2 The compound −60% shock
+
+A pure −30% balance shock at the 50% LTV-open cap does *not* algebraically cross the liquidation
+gate (`risk_ratio = 0.7 / 0.5 = 14,000 bps > 11,500 bps`). The realistic worst case compounds two
+adverse events — **all open binaries expire worthless AND vault collateral takes a 30% haircut** —
+into a **−60% effective magnitude** on the liquid balance. Under that compound shock:
+
+```
+risk_ratio_bps = 8_101  <  11_500  (LIQUIDATION_LTV_BPS)  ⇒  liquidation fires
+```
+
+This is proven **bit-equal across Move and Python** with hardcoded 1-wei parity anchors:
+
+| Anchor | Value | Meaning |
+|--------|-------|---------|
+| `wcn_pre`  | `9_009_900_990` | worst-case NAV-per-share before the −30% balance shock |
+| `wcn_post` | `6_306_930_693` | worst-case NAV-per-share after the −30% balance shock |
+
+A parametrized shock sweep from −5% to −90% confirms the formula is bit-equal across the full range,
+and a −5% healthy shock correctly **aborts** liquidation (`ENotLiquidatable`). The policy anchor is
+`worst_case_settlement_haircut_bps = 10000` (100%) — the vault assumes a *full* adverse Predict
+outcome for LTV purposes.
+
+*(Source: `contracts/sources/ltv.move`; `contracts/tests/liquidation_test.move` (3 tests);
+`backtest/tests/test_liquidation_parity.py` (11 tests); `shared/strategy.toml` `[ltv]
+worst_case_settlement_haircut_bps = 10000`, line 49.)*
+
+---
+
+## 8. Risk Disclosures
+
+DeepVault v1 is a hackathon submission. It is presented honestly; the following disclosures are
+material.
+
+- **UNAUDITED.** There is **no third-party security audit** of the Move contracts. A formal audit is
+  deferred to v2. Do not treat this code as production-grade or audited.
+- **Admin-paused, single-key.** The `AdminCap` is **key-only and non-transferable in v1**. It can
+  pause new deposits and tune a small set of strategy parameters, but it **cannot** relax Predict's
+  30-second oracle-staleness gate (that gate is enforced by Predict, not by DeepVault). Custody of
+  this single key is a centralization risk for v1.
+- **Testnet-only.** The deployed vault runs on Sui **testnet**. Predict did not ship on mainnet in
+  the submission window; the mainnet deploy is a documented, single-config-flip ≤30-minute procedure
+  deferred to post-submission (`docs/MAINNET-READINESS.md`).
+- **Fixed-ratio v1 / hedge-cost drag.** Sizing is a fixed 10% ratio (no dynamic policy in v1). As
+  [§5](#5-backtest-results) shows, in calm regimes the hedge is a steady premium bleed (OOS APY
+  −2.30%). The strategy is net positive only when a tail event actually fires.
+
+**Mitigations that *are* in place (and proven):**
+
+- **Inflation-attack defense** — virtual shares (10⁶ decimals offset) plus a 10-DUSDC seed burned to
+  `@0xdead` (an OpenZeppelin ERC-4626 v5 port).
+- **Per-hedge misquote abstain** — `EPredictMisquote` refuses any mint priced more than 0.5% above
+  the vault's own SVI fair value (see [§2.4](#24-on-chain-misquote-abstain)).
+- **Capability containment** — `TradeCap` / `TreasuryCap` never escape their modules, proven by
+  `ptb_capability_test.move`, `test_ptb_capability_grep.py`, and two Sui Prover specs.
+
+**Honest scope note on the two-protocol PTB.** DeepVault's flagship composability moment is a single
+programmable transaction block that opens a Margin position, supplies the vault, and mints the hedge
+atomically. This 5-call PTB is **architecturally proven via the `mock_margin_pool` integration test
+(the shape compiles and runs)**; the **live testnet Margin leg is pending** Mysten's DUSDC Margin
+pool (none exists on testnet today). The honestly-filmable end-to-end demo is `make demo`:
+supply + a **real on-chain hedge mint** through Predict + redeem. **We do not claim a live
+Margin-Predict PTB.**
+
+*(Sources: `shared/strategy.toml` `[inflation_defense]`; `contracts/sources/rebalance.move`;
+capability tests + Sui Prover specs per Phase 02-07; `docs/MAINNET-READINESS.md`; two-protocol PTB
+status per phase research Pitfall 3.)*
+
+---
+
+## References
+
+1. **Gatheral, J. & Jacquier, A. (2014).** *Arbitrage-free SVI volatility surfaces.* arXiv:1204.0646.
+   <https://arxiv.org/abs/1204.0646> — the raw-SVI parameterization and no-arbitrage framework.
+2. **Milionis, J., Moallemi, C. C. & Roughgarden, T. (2022).** *Automated Market Making and
+   Loss-Versus-Rebalancing.* — the LVR model behind the backtest's LP inventory drag.
+3. **W. J. Cody (1969).** Rational Chebyshev approximation of the normal CDF (as implemented in GSL
+   `gauss.c`) — the on-chain `Phi`.
+4. `shared/svi-spec.md` — the locked SVI math contract (param shape, `binary_price` pseudocode,
+   pricing conventions), cloned from vendored Predict `oracle.move` at SHA `1159d79a`.
+5. `shared/strategy.toml` + `docs/HEDGE-POLICY.md` — the locked sizing-policy bounds and the
+   re-tuning ADR.
+6. `backtest/reports/full-365d.json` — the committed backtest report (OOS holdout snapshot);
+   full-window figures in `.planning/backtest-assumptions.md`. Window-labeled and reconciled in
+   `NUMBERS-CANONICAL.md`.
+7. `contracts/sources/ltv.move`, `contracts/tests/liquidation_test.move`,
+   `backtest/tests/test_liquidation_parity.py` — the worst-case-liquidation analysis.
+
+---
+
+*DeepVault v1 — Sui Overflow 2026 (DeepBook track). Every performance figure in this document is
+window-labeled and traces to a committed artifact via `NUMBERS-CANONICAL.md` (the project's
+non-negotiable honesty bar). This v1 is unaudited, admin-paused, single-key, and testnet-only.*

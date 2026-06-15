@@ -26,7 +26,7 @@ DeepVault sells "PLP yield minus crash insurance" as a single deposit.
 
 You put USDsui in. The vault routes ~90% to DeepBook Predict's PLP for yield, and ~10% buys binary tail hedges priced from a live SVI volatility surface (Gatheral & Jacquier 2014). When BTC tanks more than ~15%, the hedges pay; otherwise you collect the PLP fees minus a small hedge cost.
 
-The flagship demo is a single Programmable Transaction Block (PTB) that opens three positions atomically — Margin borrow + vault deposit + Predict hedge mint — showcasing what "Sui composability" actually means at the protocol layer.
+The live demo (`make demo`) deposits and mints a **real on-chain Predict hedge** atomically, then redeems — on Sui testnet. The flagship composability target is a single Programmable Transaction Block (PTB) opening three positions atomically — Margin borrow + vault deposit + Predict hedge mint — which is proven via the `mock_margin_pool` integration test and pending a live testnet Margin pool (see [Demo](#demo)). Together they show what "Sui composability" means at the protocol layer.
 
 ## Glossary
 
@@ -45,6 +45,7 @@ The flagship demo is a single Programmable Transaction Block (PTB) that opens th
 | [`.planning/ROADMAP.md`](.planning/ROADMAP.md) | 7-phase plan (Setup → Math → Vault → Backtest+PTB → Dashboard → Mainnet → Submission), success criteria, hard policy locks |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Five hard policy locks: code freeze, no-refactor, no-dashboard-before-vault, hedge ratio, weekly Monday sweep |
 | [`docs/HEDGE-POLICY.md`](docs/HEDGE-POLICY.md) | Locked hedge-ratio ADR (10% / -15% OTM / 14-day / fixed) — strategy frozen against hindsight tuning |
+| [`docs/WHITEPAPER.md`](docs/WHITEPAPER.md) | Strategy whitepaper: SVI math, binary hedge-price formula, sizing bounds, worst-case liquidation, risk disclosures (all backtest numbers window-labeled) |
 | [`docs/MAINNET-READINESS.md`](docs/MAINNET-READINESS.md) | Why mainnet is deferred + the post-submission ≤30-min deploy procedure (preserves the original funding playbook: budget, two-wallet split, AdminCap discipline) |
 | [`docs/CI-BRANCH-PROTECTION.md`](docs/CI-BRANCH-PROTECTION.md) | One-time GitHub setup: 5 required status checks, UI + gh CLI paths |
 | [`docs/DEV-BOOTSTRAP.md`](docs/DEV-BOOTSTRAP.md) | One-shot dev-machine setup (Sui CLI, pnpm, uv, wallets) |
@@ -58,7 +59,11 @@ vault::supply / redeem / rebalance ──> predict::supply / mint
                                   └──> oracle_svi::OracleSVIUpdated event ──> indexer ──ws──> dashboard
 ```
 
-Full architecture diagram: `.planning/research/ARCHITECTURE.md` (Phase 6 produces a polished PNG/SVG version per DEPLOY-07).
+Full architecture diagram — the four tiers (Move package · event relay/indexer · React dashboard · Python backtest) with data-flow arrows and the two-protocol single-PTB composability moment:
+
+![DeepVault architecture: four tiers and the Margin + Predict + vault single-PTB open](docs/architecture.svg)
+
+[`docs/architecture.svg`](docs/architecture.svg) is committed (GitHub-renderable, no build step). For the prose deep-dive see [`.planning/research/ARCHITECTURE.md`](.planning/research/ARCHITECTURE.md).
 
 ## Quick Start
 
@@ -125,6 +130,8 @@ bash scripts/testnet-smoke-test.sh
 ```
 
 The 7 staged `[CHECKPOINT PASS]` markers + the final dual-gate verdict (`ratio_bps=...` Gate A + `nav_delta_bps=...` Gate B, both annotated `OK`) confirm a green run. Phase 6 records the demo video against this same `make demo` flow.
+
+**What `make demo` exercises (honest scope):** a `vault::supply` call (atomic deposit + a **real on-chain Predict hedge mint**, emitting `Supplied` + `HedgeMinted`), then `redeem_request` → 1h cooldown → `redeem_fulfill`. The flagship two-protocol single-PTB (Margin borrow + Predict + vault hedge share, atomic) is **architecturally proven via the `mock_margin_pool` integration test** and documented as **live-on-testnet pending** — there is no DUSDC Margin pool on Sui testnet yet, so the live Margin leg cannot be filmed today (the demo does **not** claim a live Margin PTB). `ORACLE_SVI_ID` is the BTC-USD `OracleSVI` shared object from the Mysten Predict testnet registry — not a value you deploy.
 
 ### Testnet contracts
 
@@ -216,7 +223,8 @@ Append-only weekly bullets per `CONTRIBUTING.md` build-log discipline. Never edi
 ## References
 
 - **For developers:** `docs/DEV-BOOTSTRAP.md` (one-shot setup), `CONTRIBUTING.md` (rules)
-- **For judges:** Laypitch above, `docs/HEDGE-POLICY.md` (strategy lock), demo video (Phase 6)
+- **For judges:** Laypitch above, [`docs/WHITEPAPER.md`](docs/WHITEPAPER.md) (SVI math + strategy), [`docs/HEDGE-POLICY.md`](docs/HEDGE-POLICY.md) (strategy lock), [`backtest/reports/full-365d-report.html`](backtest/reports/full-365d-report.html) (365-day walk-forward, OOS holdout, PnL attribution), demo video (Phase 6)
+- **For backtest numbers:** every published figure is window-labeled and sourced in [`.planning/phases/06-submission-package/NUMBERS-CANONICAL.md`](.planning/phases/06-submission-package/NUMBERS-CANONICAL.md) — full-window 365d total return **+7.52%** (one −15% breach fired) vs the calm OOS-holdout net cost (APY **−2.30%**, Sharpe −1.87): the honest cost-of-carry of crash insurance.
 - **For deploy:** `docs/MAINNET-READINESS.md` (why-deferred + post-submission playbook), `docs/CI-BRANCH-PROTECTION.md` (one-time CI setup)
 - **For research:** `.planning/research/SUMMARY.md`, `.planning/research/STACK.md`, `.planning/research/PITFALLS.md`
 - **For roadmap:** `.planning/ROADMAP.md`, `.planning/REQUIREMENTS.md`

@@ -949,12 +949,12 @@
       grid-template-columns: 1fr;
       gap: 24px;
     }
-    .db-bar .db-pill:nth-child(3) {
-      display: none;
-    }
-  }
-  @media (max-width: 1024px) {
-    .db-bar .db-pill.mono:first-of-type {
+    /* Hide the UTC clock at <=1200px (04.1 intent). Targets the stable
+       .db-clock class, NOT a child index — so removing the search pill
+       (Plan 04.2-02) no longer shifts which pill is hidden (D-3). The old
+       <=1024px positional rule hid the now-deleted search pill and was
+       redundant with this wider breakpoint, so it was removed entirely. */
+    .db-bar .db-clock {
       display: none;
     }
   }

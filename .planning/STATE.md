@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
 status: executing
-stopped_at: Phase 04.2 UI-SPEC approved
-last_updated: "2026-06-15T13:34:29.565Z"
-last_activity: 2026-06-15 -- Phase 04.2 planning complete
+stopped_at: Completed 04.2-01-PLAN.md (Vault | Risk Studio mode toggle + App.tsx split)
+last_updated: "2026-06-15T15:33:33.192Z"
+last_activity: 2026-06-15 -- Phase 04.2 Plan 01 executed (mode toggle landed)
 progress:
   total_phases: 9
   completed_phases: 7
-  total_plans: 55
-  completed_plans: 54
-  percent: 98
+  total_plans: 57
+  completed_plans: 55
+  percent: 96
 ---
 
 # Project State
@@ -21,17 +21,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-08)
 
 **Core value:** A working PLP+Hedge vault on DeepBook Predict with a credible, auditable risk dashboard, deployed on mainnet by 2026-06-16. Quality of vault math, backtest, and dashboard polish > component count.
-**Current focus:** Phase 04.1 — dashboard-visual-polish
+**Current focus:** Phase 04.2 — dashboard-onboarding-declutter
 
 ## Current Position
 
-Phase: 04.1 (dashboard-visual-polish) — COMPLETE (6/6 plans), ready for verification
-Plan: 6 of 6 — complete
-Status: Ready to execute
+Phase: 04.2 (dashboard-onboarding-declutter) — IN PROGRESS (1/2 plans)
+Plan: 1 of 2 — complete (04.2-01: Vault | Risk Studio mode toggle + App.tsx Vault/Risk split)
+Status: Executing — Plan 04.2-02 (rail + header declutter) next
 Next phase: Phase 6 — Submission Package (demo video + README cold-read + architecture diagram + whitepaper + Devpost submission)
-Last activity: 2026-06-15 -- Phase 04.2 planning complete
+Last activity: 2026-06-15 -- Phase 04.2 Plan 01 executed (mode toggle landed)
 
-Progress: [█████████████████] 100% Phase 1 / 100% milestone
+Progress: [████████████████░] 96% milestone (55/57 plans)
 
 ## Performance Metrics
 
@@ -99,6 +99,7 @@ Progress: [█████████████████] 100% Phase 1 / 1
 | Phase 04.1 P04.1-04 | ~22min | 4 tasks | 15 files |
 | Phase 04.1 P04.1-05 | ~12min | 3 tasks | 4 files |
 | Phase 04.1 P04.1-06 | ~14min | 3 tasks (auto) + 1 checkpoint | 4 files |
+| Phase 04.2 P04.2-01 | ~10min | 3 tasks (2 code + 1 build gate) | 2 files |
 
 ## Accumulated Context
 
@@ -237,6 +238,9 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 04.1]: Plan 04.1-03: SurfacePanel + ArbCheckerPanel reskinned to handoff db-card chrome; g(k) plot retained (R-2); VaultPanel converted to pure data feeder (re-exports useVaultState/VaultView + vaultStats selector, no card). Chart colors via CHART_COLORS/MINT_COLORSCALE — zero hardcoded hex. 431/431 dashboard tests pass.
 - [Phase 04.1]: Plan 04.1-05: D-02 + D-03 closed. EventStreamPanel (new) consumes the existing useWebSocket snapshot.ring_buffer (RingEvent[]) — no new hook/socket; newest-first, 14-row cap, 700ms accent flash via React render state; event strings rendered as escaped React children (no raw-HTML injection — T-04.1-13). ThemeToggle (new) reuses the existing next-themes provider (useTheme/setTheme), hydration-mismatch guard, mounted in the Header db-bar pill row. Both wired into the Plan-02 layout shell; data spine unchanged; 427/427 dashboard tests pass; tsc + pnpm build clean.
 - [Phase 04.1]: Plan 04.1-06 — PHASE 04.1 CLOSED (6/6 plans). D-04 full motion pass landed: DashboardLoader.tsx (first-paint SVI-draw overlay, self-dismisses on timer, never gates useWebSocket — T-04.1-16 mitigation), globals.css @keyframes pulse + dash + .12s rail/card/table-row/ev-list/shock/db-tabs hover transitions recolored to OKLCH (no raw hex), prefers-reduced-motion guard, live-dot pulse on RelayStatusPill. Landing-page lineDraw/fade-in/scroll-reveal deliberately excluded (index.html only per UI-SPEC). Human-verify checkpoint VERIFIED via orchestrator preview inspection on Vite :5174 + live relay :8080: zero console errors, OKLCH tokens byte-exact, BTC-only (LD-2), honest LD-5 empty states, symmetric ±5σ shock row, live OracleSVIUpdated ticker, theme toggle flips to paper token + persists to localStorage. CAVEAT (honest): headless raster screenshot hangs on the Plotly WebGL canvas (known capture limitation) — time-based motion smoothness left for human eyeball at localhost:5174; non-blocking, all objective checks passed. Dashboard demo-ready; Phase 6 (Submission Package) takes the baton.
+- [Phase 04.2]: Plan 04.2-01: Vault | Risk Studio mode toggle landed (LD-1). Controlled Radix Tabs (value={mode}) supplies control chrome + a11y ONLY (role=tablist, aria-selected, ←/→/Home/End roving focus, aria-label="Dashboard view mode"); the two view subtrees render as conditionally-mounted SIBLINGS, NOT inside TabsContent, so the inactive view fully unmounts (no double Plotly tree). const [mode,setMode]=useState<'vault'|'risk'>('vault') declared BELOW the useWebSocket spine + 5 derived hooks (LD-3 spine-above-conditional — toggling never tears down the data spine). Vault is the default landing. App.tsx +156/-82; tsc + build + 427/427 vitest all exit 0; PositionViewer/ExposurePanel/tabs.tsx byte-identical (zero diff).
+- [Phase 04.2]: Plan 04.2-01: R-2 path a chosen — PositionViewer mounts in EXACTLY ONE place (Vault view), NOT dual-mounted (D-1: no second position-viewer anchor). Freed Risk r2 left cell filled by pulling EventStreamPanel up; Risk grid collapses to 2 rows (r1 surface+side, r2 event-stream|what-if, r3 lone backtest card — acceptable, no fictional filler per 04.1 LD-5). event-stream is now a real mounted Risk r2 anchor (resolves D-2 drift target for Plan 04.2-02's observer reconciliation, R-4). Mounted [data-section] anchors: vault={deposit-withdraw, position-viewer}; risk={hero, exposure, event-stream, what-if, backtest}.
+- [Phase 04.2]: Plan 04.2-01: .db-mode segmented-control CSS added to globals.css (inherited OKLCH tokens only; sibling of .rail-nav in @layer base). Mint active state = color-mix(in oklab, var(--accent) 12%, var(--surface)) — same accent reservation family as the active rail item; coral (--hedge) deliberately absent (mint-only toggle discipline). Active label weight stays 400 (color+bg carry state). Toggle wrapper margin from .db-mode-row class (margin: 24px 0), NOT an inline style. focus-visible ring on var(--ring). ui/tabs.tsx primitive untouched (className override only). Deviation: Task-2 verify regex data-section="deposit-withdraw" over-counts (matches the mandated handleDepositClick querySelector too) — real D-1 invariant (one rendered <section> anchor) confirmed via section-scoped regex; baseline match count unchanged.
 
 ### Pending Todos
 
@@ -277,6 +281,6 @@ Open verification gaps to resolve in Phase 0/1:
 
 ## Session Continuity
 
-Last session: 2026-06-15T10:32:51.347Z
-Stopped at: Phase 04.2 UI-SPEC approved
-Resume file: .planning/phases/04.2-dashboard-onboarding-declutter/04.2-UI-SPEC.md
+Last session: 2026-06-15T15:33:33.176Z
+Stopped at: Completed 04.2-01-PLAN.md (Vault | Risk Studio mode toggle + App.tsx Vault/Risk split)
+Resume file: .planning/phases/04.2-dashboard-onboarding-declutter/04.2-02-PLAN.md

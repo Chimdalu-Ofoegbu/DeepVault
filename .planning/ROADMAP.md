@@ -155,6 +155,16 @@ Drop in this order, never reverse:
 - [ ] 04-07-PLAN.md (Wave 5) — DepositWithdrawPanel (3-step PTB flow) + PositionViewer (PnL split) + CI extension + Vercel/Render configs + DASH-13 demo checklist (DASH-11, DASH-12, DASH-13 e2e) [contains checkpoint]
 **UI hint**: yes
 
+### Phase 04.2: Dashboard Onboarding Declutter (INSERTED)
+
+**Goal:** [Urgent work - to be planned]
+**Requirements**: TBD
+**Depends on:** Phase 04
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 04.2 to break down)
+
 ### Phase 04.1: Dashboard Visual Polish (INSERTED)
 
 **Goal:** The DeepVault dashboard reskinned in-place to faithfully match the Claude Design handoff (per 04.1-UI-SPEC.md): OKLCH token system, Geist type, the rail + headline + 3-row card layout, all 8 panels reskinned, a new live EventStreamPanel, a working light/dark theme toggle, and a full motion pass — without regressing any Phase 4 verified behavior.

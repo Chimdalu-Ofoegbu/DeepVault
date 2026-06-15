@@ -257,6 +257,46 @@
     color: var(--muted);
   }
 
+  /* Mode toggle — segmented Vault | Risk Studio control (Phase 04.2).
+     Built on the installed Radix Tabs primitive; styled to the inherited
+     token system. Active state reuses the active-nav accent idiom
+     (globals.css:222). Mint only — coral MUST NOT appear here. */
+  .db-mode {
+    display: inline-flex;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r-2);
+    padding: 3px;
+    gap: 2px;
+  }
+  /* Vertical rhythm for the toggle row (replaces an inline style on the
+     Tabs wrapper — see Plan 01 Task 2 action 2d). */
+  .db-mode-row {
+    margin: 24px 0;
+  }
+  .db-mode-trigger {
+    font-family: var(--f-mono);
+    font-size: 12.5px;
+    font-weight: 400;
+    color: var(--muted);
+    padding: 7px 16px;
+    border-radius: 6px;
+    background: transparent;
+    transition: color 0.12s, background 0.12s;
+    cursor: pointer;
+  }
+  .db-mode-trigger:hover {
+    color: var(--text-2);
+  }
+  .db-mode-trigger[data-state='active'] {
+    color: var(--text);
+    background: color-mix(in oklab, var(--accent) 12%, var(--surface));
+  }
+  .db-mode-trigger:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
   /* ---- DASH MAIN ----------------------------------------- */
   .dash {
     padding: 0 28px 80px;

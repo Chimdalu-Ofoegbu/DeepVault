@@ -88,7 +88,7 @@ Requirements for the Sui Overflow 2026 submission (target 2026-06-16). Each maps
 - [x] **DEPLOY-03**: Mainnet vault-creation parameters frozen in `scripts/mainnet-deploy.sh` and verified against testnet analog (USDsui quote-type tag slot, AdminCap recipient = deployer wallet, treasury cap quarantine). Acceptance: source-code parity with `scripts/e2e-vault-deploy.sh` for the parameter-binding section. Execution deferred.
 - [x] **DEPLOY-04**: Testnet smoke test harness (`scripts/testnet-smoke-test.sh` + `.ts`) — staged $50-equivalent DUSDC deposit → hedge mint → withdrawal-request → redeem cycle with dual ±10 bps NAV verification (per-depositor return ratio ≥ 99.9% AND vault NAV drift ≤ 10 bps). Reproducible by judges via `make demo`. Green by 2026-06-12.
 - [ ] **DEPLOY-05**: Demo video (~3 min) recorded against TESTNET vault showing the single PTB opening Margin + Predict + vault share atomically, with wallet-diff visualization and tx digest visible (Sui testnet explorer); ~10-second mainnet-readiness sidebar explains the post-submission deploy procedure from `docs/MAINNET-READINESS.md`.
-- [ ] **DEPLOY-06**: README with one-paragraph laypitch, glossary, prerequisites, reproducible-run script (`make demo` → `scripts/testnet-smoke-test.sh`); cold-read tested
+- [x] **DEPLOY-06**: README with one-paragraph laypitch, glossary, prerequisites, reproducible-run script (`make demo` → `scripts/testnet-smoke-test.sh`); cold-read tested
 - [x] **DEPLOY-07**: Architecture diagram (PNG/SVG, GitHub-renderable) showing all components and data flow
 - [x] **DEPLOY-08**: Strategy whitepaper (Gatheral-style, 6-12 pages): SSVI math, hedge price formula, sizing policy bounds, liquidation-under-worst-case-Predict-outcome section, risk disclosures
 - [x] **DEPLOY-09**: `docs/MAINNET-READINESS.md` (renamed from `docs/MAINNET-FUNDING.md`) documents (a) why mainnet deploy is deferred to post-submission, (b) the ≤30-minute deploy procedure (preflight → deploy → smoke-test), (c) the architecture's mainnet compatibility — single-config-flip via `config/mainnet.toml`, (d) the original $80 funding budget retained for post-submission execution.
@@ -208,7 +208,7 @@ Phase mapping finalized by gsd-roadmapper on 2026-05-09 against ROADMAP.md. Ever
 | DEPLOY-03 | Phase 5 | Complete |
 | DEPLOY-04 | Phase 5 | Complete |
 | DEPLOY-05 | Phase 6 | Pending |
-| DEPLOY-06 | Phase 6 | Pending |
+| DEPLOY-06 | Phase 6 | Complete |
 | DEPLOY-07 | Phase 6 | Complete |
 | DEPLOY-08 | Phase 6 | Complete |
 | DEPLOY-09 | Phase 5 | Complete |

@@ -1,0 +1,178 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" role="img" aria-label="DeepVault four-tier architecture: Move package on Sui, Node event relay, React dashboard, Python backtest harness, with data-flow arrows and the two-protocol single-PTB composability moment.">
+  <title>DeepVault Architecture — four tiers + two-protocol single-PTB composability</title>
+  <desc>Tier 1 Move package (vault + Predict adapter + raw-SVI evaluator on Sui); Tier 2 Node event relay (queryEvents to WebSocket, on Render); Tier 3 React dashboard (Vault and Risk Studio modes, on Vercel); Tier 4 Python backtest harness. strategy.toml codegen feeds all three runtimes; vault Move events flow through the relay to the dashboard; the backtest replays Move traces at 1-wei parity. A single atomic PTB opens Margin borrow, vault deposit, and Predict hedge mint.</desc>
+
+  <!-- ===== definitions: arrowhead markers + styles ===== -->
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5b6472"/>
+    </marker>
+    <marker id="arrowMint" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1f9e74"/>
+    </marker>
+    <marker id="arrowCodegen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8a6d3b"/>
+    </marker>
+  </defs>
+
+  <style>
+    .bg      { fill: #0f1216; }
+    .tier    { rx: 12; stroke-width: 2; }
+    .t1      { fill: #16202b; stroke: #2f6f9f; }
+    .t2      { fill: #1b2420; stroke: #2f9f6f; }
+    .t3      { fill: #221a26; stroke: #8a4fb0; }
+    .t4      { fill: #261f16; stroke: #b08a3b; }
+    .tier-label   { fill: #e6edf3; font-size: 20px; font-weight: 700; }
+    .tier-sub     { fill: #9aa7b4; font-size: 12px; font-weight: 600; letter-spacing: 0.5px; }
+    .mod          { fill: #c9d4df; font-size: 12.5px; }
+    .mod-strong   { fill: #ffffff; font-size: 12.5px; font-weight: 700; }
+    .host         { fill: #7f8c99; font-size: 11px; font-style: italic; }
+    .flow         { stroke: #5b6472; stroke-width: 2; fill: none; }
+    .flow-mint    { stroke: #1f9e74; stroke-width: 2.5; fill: none; }
+    .flow-codegen { stroke: #8a6d3b; stroke-width: 2; fill: none; stroke-dasharray: 6 4; }
+    .flow-label       { fill: #aeb9c4; font-size: 11.5px; }
+    .flow-label-mint  { fill: #36c794; font-size: 11.5px; font-weight: 600; }
+    .flow-label-code  { fill: #c8a24e; font-size: 11.5px; font-weight: 600; }
+    .title    { fill: #ffffff; font-size: 26px; font-weight: 800; }
+    .subtitle { fill: #9aa7b4; font-size: 13px; }
+    .src      { fill: #6f7b87; font-size: 11px; }
+    .ptb-box      { fill: #10261d; stroke: #1f9e74; stroke-width: 2.5; rx: 10; }
+    .ptb-title    { fill: #36c794; font-size: 15px; font-weight: 800; }
+    .ptb-step     { fill: #d7e6df; font-size: 12px; }
+    .ptb-atomic   { fill: #ffd27f; font-size: 11.5px; font-weight: 700; }
+    .ptb-honest   { fill: #c89a4e; font-size: 11px; font-style: italic; }
+    .codegen-box  { fill: #211a10; stroke: #b08a3b; stroke-width: 2; rx: 10; }
+    .codegen-t    { fill: #e6cf9a; font-size: 13px; font-weight: 700; }
+  </style>
+
+  <!-- ===== canvas ===== -->
+  <rect class="bg" x="0" y="0" width="1200" height="800"/>
+
+  <!-- ===== header ===== -->
+  <text class="title" x="40" y="48">DeepVault — System Architecture</text>
+  <text class="subtitle" x="40" y="72">PLP yield + automated tail-risk hedge on DeepBook Predict (Sui). Four tiers, one shared math source-of-truth.</text>
+
+  <!-- ============================================================= -->
+  <!-- CODEGEN SOURCE-OF-TRUTH (top-left) -->
+  <!-- ============================================================= -->
+  <rect class="codegen-box" x="40" y="96" width="250" height="78"/>
+  <text class="codegen-t" x="56" y="122">shared/strategy.toml</text>
+  <text class="mod" x="56" y="142">+ svi-spec.md + golden-vectors.json</text>
+  <text class="mod" x="56" y="160">scripts/codegen.py  --check (CI drift)</text>
+
+  <!-- ============================================================= -->
+  <!-- TIER 1 — Move package (Sui) -->
+  <!-- ============================================================= -->
+  <rect class="tier t1" x="40" y="210" width="350" height="300"/>
+  <text class="tier-sub"   x="60" y="236">TIER 1 — ON-CHAIN</text>
+  <text class="tier-label" x="60" y="260">Move package (Sui)</text>
+  <text class="host"       x="60" y="278">contracts/sources/ — shared objects + Move events</text>
+  <text class="mod-strong" x="60" y="308">vault.move</text>
+  <text class="mod"        x="170" y="308">shared object, 18-field schema</text>
+  <text class="mod"        x="60" y="330">supply.move — atomic deposit + hedge mint</text>
+  <text class="mod"        x="60" y="350">redeem.move — request / fulfill / cancel</text>
+  <text class="mod"        x="60" y="370">rebalance.move — buy_hedge / roll_expiring</text>
+  <text class="mod"        x="60" y="390">share.move — TreasuryCap quarantine</text>
+  <text class="mod-strong" x="60" y="412">svi_view.move</text>
+  <text class="mod"        x="160" y="412">binary_price (raw 5-param SVI)</text>
+  <text class="mod-strong" x="60" y="434">ltv.move</text>
+  <text class="mod"        x="125" y="434">worst_case NAV per share</text>
+  <text class="mod"        x="60" y="456">predict_adapter.move — thin Predict ABI</text>
+  <text class="mod"        x="60" y="478">helpers/: isqrt, ln, phi, math, rate_limiter</text>
+  <text class="src"        x="60" y="498">emits: OracleSVIUpdated, Supplied, HedgeMinted, Redeem*</text>
+
+  <!-- ============================================================= -->
+  <!-- TIER 2 — Event relay (Node) -->
+  <!-- ============================================================= -->
+  <rect class="tier t2" x="430" y="210" width="330" height="300"/>
+  <text class="tier-sub"   x="450" y="236">TIER 2 — OFF-CHAIN RELAY</text>
+  <text class="tier-label" x="450" y="260">Event relay</text>
+  <text class="host"       x="450" y="278">indexer/src/ (Node) — deploys to Render</text>
+  <text class="mod-strong" x="450" y="310">pollOracleSVI.ts</text>
+  <text class="mod"        x="450" y="328">queryEvents(OracleSVIUpdated) @ 2s cadence</text>
+  <text class="mod-strong" x="450" y="352">pollVaultEvents.ts</text>
+  <text class="mod"        x="450" y="370">Supplied / HedgeMinted / Redeem* events</text>
+  <text class="mod"        x="450" y="394">cursor.ts — disk-persisted cursor (resume)</text>
+  <text class="mod"        x="450" y="414">decodeI64.ts — BCS i64 decode</text>
+  <text class="mod"        x="450" y="434">snapshot.ts — in-memory state ring buffer</text>
+  <text class="mod-strong" x="450" y="458">wsServer.ts</text>
+  <text class="mod"        x="450" y="476">WebSocket push + replay-on-connect</text>
+  <text class="src"        x="450" y="498">JSON-RPC queryEvents (no deprecated subscribeEvent)</text>
+
+  <!-- ============================================================= -->
+  <!-- TIER 3 — React dashboard -->
+  <!-- ============================================================= -->
+  <rect class="tier t3" x="800" y="210" width="360" height="300"/>
+  <text class="tier-sub"   x="820" y="236">TIER 3 — UI</text>
+  <text class="tier-label" x="820" y="260">React dashboard</text>
+  <text class="host"       x="820" y="278">dashboard/src/ (Vite + dapp-kit) — deploys to Vercel</text>
+  <text class="mod-strong" x="820" y="308">App.tsx — Vault | Risk Studio mode split</text>
+  <text class="mod"        x="820" y="328">11 panels (data spine above the toggle)</text>
+  <text class="mod"        x="820" y="350">SurfacePanel — 3D Plotly SVI surface</text>
+  <text class="mod"        x="820" y="370">ArbCheckerPanel — g(k) butterfly plot</text>
+  <text class="mod"        x="820" y="390">ExposurePanel — hedge book by oracle/strike</text>
+  <text class="mod"        x="820" y="410">WhatIfSimulator — client-side shock sim</text>
+  <text class="mod"        x="820" y="430">EventStreamPanel — live OracleSVIUpdated</text>
+  <text class="mod"        x="820" y="450">VaultPanel / DepositWithdraw / BucketGauge</text>
+  <text class="mod"        x="820" y="470">useWebSocket + 5 derived hooks</text>
+  <text class="src"        x="820" y="498">wallet: Slush / Suiet / Backpack via Wallet Standard</text>
+
+  <!-- ============================================================= -->
+  <!-- TIER 4 — Python backtest -->
+  <!-- ============================================================= -->
+  <rect class="tier t4" x="40" y="560" width="500" height="180"/>
+  <text class="tier-sub"   x="60" y="586">TIER 4 — OFF-CHAIN VALIDATION</text>
+  <text class="tier-label" x="60" y="610">Python backtest</text>
+  <text class="host"       x="60" y="628">backtest/src/deepvault/ — institutional report harness</text>
+  <text class="mod"        x="60"  y="654">strategy_sim.py — PLP + hedge economic model</text>
+  <text class="mod"        x="60"  y="674">walk_forward.py — OOS split + sensitivity table</text>
+  <text class="mod-strong" x="60"  y="696">vault_state.py</text>
+  <text class="mod"        x="170" y="696">Move-parity state machine (1-wei)</text>
+  <text class="mod"        x="60"  y="716">lookahead_audit.py — shuffled-label + hand-recompute</text>
+  <text class="mod"        x="320" y="654">report.py — HTML report</text>
+  <text class="mod"        x="320" y="674">svi.py / isqrt / ln / phi</text>
+  <text class="mod"        x="320" y="696">data_ingest.py (Binance)</text>
+  <text class="mod"        x="320" y="716">__main__.py — CLI</text>
+
+  <!-- ============================================================= -->
+  <!-- DATA-FLOW ARROWS -->
+  <!-- ============================================================= -->
+
+  <!-- codegen.toml --> Move (Tier 1) -->
+  <path class="flow-codegen" marker-end="url(#arrowCodegen)" d="M 165 174 L 165 208"/>
+  <text class="flow-label-code" x="172" y="196">codegen</text>
+
+  <!-- codegen --> dashboard (Tier 3) : long top route -->
+  <path class="flow-codegen" marker-end="url(#arrowCodegen)" d="M 290 120 L 980 120 L 980 208"/>
+  <text class="flow-label-code" x="600" y="113">strategy.toml codegen -> Move / Python / TS constants (one source, three runtimes)</text>
+
+  <!-- codegen --> backtest (Tier 4) -->
+  <path class="flow-codegen" marker-end="url(#arrowCodegen)" d="M 120 174 L 120 558"/>
+
+  <!-- Tier 1 Move events --> Tier 2 relay -->
+  <path class="flow" marker-end="url(#arrow)" d="M 392 360 L 428 360"/>
+  <text class="flow-label" x="396" y="350">Move events</text>
+  <text class="flow-label" x="396" y="378">queryEvents</text>
+
+  <!-- Tier 2 relay --> Tier 3 dashboard (WS) -->
+  <path class="flow-mint" marker-end="url(#arrowMint)" d="M 762 360 L 798 360"/>
+  <text class="flow-label-mint" x="766" y="350">WS push</text>
+  <text class="flow-label-mint" x="766" y="378">+ replay</text>
+
+  <!-- Tier 1 Move <--> Tier 4 backtest : 1-wei parity (bidirectional) -->
+  <path class="flow" marker-end="url(#arrow)" marker-start="url(#arrow)" d="M 215 512 L 215 558"/>
+  <text class="flow-label" x="225" y="538">replay Move traces — vault_state 1-wei parity</text>
+
+  <!-- ============================================================= -->
+  <!-- TWO-PROTOCOL SINGLE-PTB COMPOSABILITY CALLOUT (centerpiece) -->
+  <!-- ============================================================= -->
+  <rect class="ptb-box" x="580" y="560" width="580" height="180"/>
+  <text class="ptb-title" x="600" y="588">Composability moment — Single PTB (atomic)</text>
+  <text class="ptb-atomic" x="600" y="610">Margin borrow  ->  vault deposit  ->  Predict hedge mint  (one transaction)</text>
+  <text class="ptb-step" x="600" y="636">1. margin_manager::deposit&lt;BTC, DUSDC, BTC&gt;        collateral in</text>
+  <text class="ptb-step" x="600" y="656">2. margin_manager::borrow_quote&lt;BTC, DUSDC&gt;       borrow DUSDC</text>
+  <text class="ptb-step" x="600" y="676">3. margin_manager::withdraw&lt;...DUSDC&gt;             bridge: free Coin&lt;DUSDC&gt;</text>
+  <text class="ptb-step" x="600" y="696">4. vault::supply::supply&lt;DUSDC&gt;                   atomic deposit + hedge mint</text>
+  <text class="ptb-atomic" x="600" y="716">Any call fails -> whole PTB reverts. TradeCap never escapes the MarginManager.</text>
+  <text class="ptb-honest" x="600" y="734">architecturally proven via mock_margin_pool integration test; live on testnet pending Mysten DUSDC Margin pool</text>
+</svg>

@@ -1,100 +1,85 @@
 // dashboard/src/components/layout/Rail.tsx — 232px left navigation rail.
 //
-// Plan 04.1-02 Task 1 (UI-SPEC #11, LD-4). The handoff's `aside.rail` reskinned
-// as a SINGLE-PAGE scroll-anchor nav (not a router). All chrome classes
-// (.rail, .rail-brand, .rail-nav, .rail-k, .rail-foot, .ri-dot, .net-dot) are
-// defined in globals.css by Plan 04.1-01 — applied here by className.
+// Plan 04.1-02 Task 1 (UI-SPEC #11, LD-4) established the handoff `aside.rail`
+// as a SINGLE-PAGE scroll-anchor nav. Plan 04.2-02 (LD-6, OQ-3, R-4, D-2)
+// DECLUTTERED it from 13 items (4 groups) to 6 live items (2 groups) and
+// COUPLED it to the App-level `mode` state. All chrome classes (.rail,
+// .rail-brand, .rail-nav, .rail-k, .rail-foot, .ri-dot, .net-dot) are defined
+// in globals.css — applied here by className, unchanged.
 //
-// Navigation Contract (UI-SPEC §Navigation Contract):
-//   - 9 scroll-anchor items resolve to a [data-section] target (or 'top').
-//   - 4 disabled items (Drawdown replay, Single PTB, vUSDC share, Integrations)
-//     render with --dim text + a Radix tooltip explaining where the content is.
-//   - The active item is tracked via an IntersectionObserver over the
-//     [data-section] elements; default active = Overview.
+// Navigation Contract (04.2-UI-SPEC §Rail Declutter Contract):
+//   - 6 scroll-anchor items in 2 groups (Vault / Risk Studio); every item is
+//     LIVE (the disabled/tooltip idiom is RETIRED for this phase) and carries a
+//     `mode` it belongs to.
+//   - Cross-mode click (item.mode !== current mode): switch mode FIRST, then
+//     scroll to its [data-section] on the next frame so the target — which only
+//     mounts after the mode switch — is present (OQ-3, "scroll always lands,
+//     never no-ops"). Same-mode click: scroll directly.
+//   - The active item is tracked via an IntersectionObserver over a MODE-KEYED
+//     set of [data-section] values (OBSERVED_BY_MODE) reconciled to the anchors
+//     App.tsx actually mounts per mode — `event-stream` is observed (D-2 fix),
+//     the stale `exposure` rail mapping is dropped. An inactive-mode item is
+//     never rendered active (active gates on item.mode === mode). Default
+//     active = Overview (page top).
 
 import { useEffect, useState } from 'react';
 
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
 import { DEPLOY, isDeployed } from '@/lib/ptbDeploy';
 
-/** A scroll-anchor nav item. `section` is a [data-section] value, or 'top'. */
-type AnchorItem = {
-  kind: 'anchor';
+type Mode = 'vault' | 'risk';
+
+/** A live scroll-anchor nav item. `section` is a [data-section] value, or
+ *  'top'; `mode` is the view-mode the item belongs to (cross-mode clicks
+ *  switch mode first, then scroll). */
+type NavItem = {
   label: string;
-  /** [data-section] attribute value the rail scrolls to, or 'top' for the page top. */
+  /** [data-section] attribute value the rail scrolls to, or 'top' for page top. */
   section: string;
+  /** The view-mode this item lives in. */
+  mode: Mode;
 };
-
-/** A disabled nav item — rendered dim with an explanatory tooltip. */
-type DisabledItem = {
-  kind: 'disabled';
-  label: string;
-  tooltip: string;
-};
-
-type NavItem = AnchorItem | DisabledItem;
 
 type NavGroup = {
   label: string;
   items: NavItem[];
 };
 
-// Tooltip copy — verbatim from UI-SPEC §Navigation Contract.
-const TIP_BACKTEST = 'Drawdown replay ships as the static backtest report';
-const TIP_COMPOSABILITY =
-  'Composability detail lives in the project README and demo video';
-
-// Rail item -> anchor map, transcribed exactly from the UI-SPEC Navigation Contract.
+// Rail item -> (mode, anchor) map, transcribed from the 04.2-UI-SPEC Rail
+// Declutter Contract. 6 live items, 2 groups, mode-coupled (LD-6 / OQ-3).
+// The 4 disabled tooltip stubs and the 3 duplicate-anchor items are REMOVED
+// (LD-6); the former Composability + Account groups dissolve entirely.
 const NAV_GROUPS: NavGroup[] = [
   {
     label: 'Vault',
     items: [
-      { kind: 'anchor', label: 'Overview', section: 'top' },
-      { kind: 'anchor', label: 'Positions', section: 'position-viewer' },
-      { kind: 'anchor', label: 'Hedge ladder', section: 'position-viewer' },
-      { kind: 'anchor', label: 'History', section: 'exposure' },
+      { label: 'Overview', section: 'top', mode: 'vault' },
+      { label: 'Deposit', section: 'deposit-withdraw', mode: 'vault' },
+      { label: 'Your position', section: 'position-viewer', mode: 'vault' },
     ],
   },
   {
     label: 'Risk Studio',
     items: [
-      { kind: 'anchor', label: 'SVI surface', section: 'hero' },
-      { kind: 'anchor', label: 'What-if', section: 'what-if' },
-      { kind: 'anchor', label: 'Backtest', section: 'backtest' },
-      { kind: 'disabled', label: 'Drawdown replay', tooltip: TIP_BACKTEST },
-    ],
-  },
-  {
-    label: 'Composability',
-    items: [
-      { kind: 'disabled', label: 'Single PTB', tooltip: TIP_COMPOSABILITY },
-      { kind: 'disabled', label: 'vUSDC share', tooltip: TIP_COMPOSABILITY },
-      { kind: 'disabled', label: 'Integrations', tooltip: TIP_COMPOSABILITY },
-    ],
-  },
-  {
-    label: 'Account',
-    items: [
-      { kind: 'anchor', label: 'Wallet', section: 'deposit-withdraw' },
-      { kind: 'anchor', label: 'Reports', section: 'backtest' },
+      { label: 'SVI surface', section: 'hero', mode: 'risk' },
+      { label: 'What-if', section: 'what-if', mode: 'risk' },
+      { label: 'Backtest', section: 'backtest', mode: 'risk' },
     ],
   },
 ];
 
-// The set of [data-section] values the IntersectionObserver watches.
-const OBSERVED_SECTIONS = [
-  'hero',
-  'exposure',
-  'position-viewer',
-  'what-if',
-  'backtest',
-  'deposit-withdraw',
-];
+// The [data-section] values the IntersectionObserver watches, keyed by mode and
+// reconciled to the anchors App.tsx mounts per mode (04.2-UI-SPEC R-4 / D-2):
+//   vault -> deposit-withdraw, position-viewer  (+ `top` via the fallback)
+//   risk  -> hero, what-if, backtest, event-stream
+// `event-stream` IS observed (it is the real Risk r2 anchor App.tsx renders —
+// the D-2 drift fix); the stale `exposure` mapping is DROPPED (the "History ->
+// exposure" item is removed and no rail item points at `exposure` after the
+// declutter). `top` need not be listed — the "nothing visible -> top" fallback
+// covers it.
+const OBSERVED_BY_MODE: Record<Mode, string[]> = {
+  vault: ['deposit-withdraw', 'position-viewer'],
+  risk: ['hero', 'what-if', 'backtest', 'event-stream'],
+};
 
 /** Smooth-scroll to a [data-section] target, or the page top for 'top'. */
 function scrollToSection(section: string): void {
@@ -115,12 +100,15 @@ function railNetworkLabel(): string {
   return 'testnet';
 }
 
-export function Rail() {
+export function Rail({ mode, setMode }: { mode: Mode; setMode: (m: Mode) => void }) {
   // The currently-active [data-section] (or 'top'). Default = Overview/top.
   const [activeSection, setActiveSection] = useState<string>('top');
 
   // Track which sections are on-screen; the topmost visible one is "active".
+  // Mode-keyed: the observed set is the anchors mounted in the CURRENT mode, so
+  // the effect re-binds when `mode` changes (the prior mode's anchors unmount).
   useEffect(() => {
+    const sections = OBSERVED_BY_MODE[mode];
     const visible = new Set<string>();
     const observer = new IntersectionObserver(
       (entries) => {
@@ -131,102 +119,92 @@ export function Rail() {
           else visible.delete(section);
         }
         // Pick the first observed section (document order) that is visible.
-        const next = OBSERVED_SECTIONS.find((s) => visible.has(s));
+        const next = sections.find((s) => visible.has(s));
         // If nothing is visible, the user is at the very top -> Overview.
         setActiveSection(next ?? 'top');
       },
       { rootMargin: '-96px 0px -55% 0px', threshold: 0 },
     );
 
-    for (const section of OBSERVED_SECTIONS) {
+    for (const section of sections) {
       const el = document.querySelector(`[data-section="${section}"]`);
       if (el) observer.observe(el);
     }
     return () => observer.disconnect();
-  }, []);
+  }, [mode]);
 
   return (
-    <TooltipProvider delayDuration={200}>
-      <aside className="rail">
-        <div className="rail-brand">
-          <svg className="brand-mark" viewBox="0 0 24 24" aria-hidden="true">
-            <rect
-              x="2"
-              y="2"
-              width="20"
-              height="20"
-              rx="3"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            />
-            <path
-              d="M6 8 L12 17 L18 8"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            />
-            <circle cx="12" cy="11" r="1.5" fill="currentColor" />
-          </svg>
-          <span>DeepVault</span>
-        </div>
+    <aside className="rail">
+      <div className="rail-brand">
+        <svg className="brand-mark" viewBox="0 0 24 24" aria-hidden="true">
+          <rect
+            x="2"
+            y="2"
+            width="20"
+            height="20"
+            rx="3"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          />
+          <path
+            d="M6 8 L12 17 L18 8"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          />
+          <circle cx="12" cy="11" r="1.5" fill="currentColor" />
+        </svg>
+        <span>DeepVault</span>
+      </div>
 
-        <nav className="rail-nav" aria-label="Dashboard sections">
-          {NAV_GROUPS.map((group) => (
-            <RailGroup
-              key={group.label}
-              group={group}
-              activeSection={activeSection}
-            />
-          ))}
-        </nav>
+      <nav className="rail-nav" aria-label="Dashboard sections">
+        {NAV_GROUPS.map((group) => (
+          <RailGroup
+            key={group.label}
+            group={group}
+            activeSection={activeSection}
+            mode={mode}
+            setMode={setMode}
+          />
+        ))}
+      </nav>
 
-        <div className="rail-foot">
-          <a className="rail-back" href="/">
-            ← Back to site
-          </a>
-          <div className="rail-meta">
-            <span className="net-dot" />
-            <span className="mono">{railNetworkLabel()}</span>
-          </div>
+      <div className="rail-foot">
+        <a className="rail-back" href="/">
+          ← Back to site
+        </a>
+        <div className="rail-meta">
+          <span className="net-dot" />
+          <span className="mono">{railNetworkLabel()}</span>
         </div>
-      </aside>
-    </TooltipProvider>
+      </div>
+    </aside>
   );
 }
 
 function RailGroup({
   group,
   activeSection,
+  mode,
+  setMode,
 }: {
   group: NavGroup;
   activeSection: string;
+  mode: Mode;
+  setMode: (m: Mode) => void;
 }) {
   return (
     <>
       <span className="rail-k">{group.label}</span>
       {group.items.map((item) => {
-        if (item.kind === 'disabled') {
-          return (
-            <Tooltip key={item.label}>
-              <TooltipTrigger asChild>
-                <span
-                  className="rail-disabled"
-                  aria-disabled="true"
-                  style={{ color: 'var(--dim)', cursor: 'default' }}
-                >
-                  <i className="ri-dot" />
-                  {item.label}
-                </span>
-              </TooltipTrigger>
-              <TooltipContent side="right">{item.tooltip}</TooltipContent>
-            </Tooltip>
-          );
-        }
+        // An item of the inactive mode is never "active"; within the active
+        // mode it is active when its section is the scrolled-to section (or it
+        // is Overview and we are at the page top).
         const isActive =
-          activeSection === item.section ||
-          // Overview owns the page-top state.
-          (item.section === 'top' && activeSection === 'top');
+          item.mode === mode &&
+          (activeSection === item.section ||
+            (item.section === 'top' && activeSection === 'top'));
         return (
           <a
             key={item.label}
@@ -234,7 +212,13 @@ function RailGroup({
             className={isActive ? 'active' : undefined}
             onClick={(e) => {
               e.preventDefault();
-              scrollToSection(item.section);
+              if (item.mode !== mode) {
+                setMode(item.mode);
+                // Target section only mounts after the mode switch — defer one frame.
+                requestAnimationFrame(() => scrollToSection(item.section));
+              } else {
+                scrollToSection(item.section);
+              }
             }}
           >
             <i className="ri-dot" />

@@ -210,7 +210,12 @@ Plans:
   3. The architecture diagram (PNG/SVG, GitHub-renderable) accurately depicts the four tiers (Move package, event relay, dashboard, Python backtest) with data flow arrows.
   4. The strategy whitepaper (Gatheral-style, 6-12 pages) covers SSVI math, hedge price formula, sizing policy bounds, liquidation-under-worst-case-Predict-outcome, and risk disclosures — citations to Gatheral & Jacquier 2014 included.
   5. The submission package is filed on Devpost / Sui Overflow portal by 2026-06-16, with testnet contract addresses, mainnet-readiness toolkit pointer, demo video link, repo URL, and backtest report PDF/HTML attached.
-**Plans**: TBD
+**Plans**: 5 plans
+- [ ] 06-01-PLAN.md (Wave 1) — Force-add the verified backtest report past .gitignore (LD-1 honesty-bar gate) + canonical window-labeled numbers ledger + hand-authored 4-tier architecture.svg (DEPLOY-07)
+- [ ] 06-02-PLAN.md (Wave 2) — Strategy whitepaper docs/WHITEPAPER.md: raw-SVI math + binary hedge price (Gatheral arXiv:1204.0646) + locked sizing bounds + worst-case-Predict liquidation + honest risk disclosures (DEPLOY-08)
+- [ ] 06-03-PLAN.md (Wave 2) — README cold-read polish: fix MAINNET-FUNDING links, fill real testnet addresses, correct stale status, link whitepaper/report/SVG (DEPLOY-06)
+- [ ] 06-04-PLAN.md (Wave 3) — docs/DEMO-SCRIPT.md shot-by-shot make-demo storyboard (two-protocol PTB mock-proven + ~10s mainnet sidebar) + human-action recording checkpoint (DEPLOY-05; autonomous: false)
+- [ ] 06-05-PLAN.md (Wave 3) — docs/DEVPOST-SUBMISSION.md complete paste-ready draft (window-labeled numbers, testnet addresses, placeholders) + human-action portal-filing checkpoint (DEPLOY-10; autonomous: false)
 
 ## Progress
 
@@ -227,7 +232,7 @@ Decimal phases (e.g., 2.1) reserved for urgent insertions and execute between th
 | 4. PLP Risk Studio Dashboard + Relay | 0/TBD | Not started | - |
 | 04.1 Dashboard Visual Polish | 6/6 | Complete   | 2026-06-14 |
 | 5. Testnet Demo Hardening + Mainnet-Readiness Toolkit | 2/5 | In progress | - |
-| 6. Submission Package | 0/TBD | Not started | - |
+| 6. Submission Package | 0/5 | Planned | - |
 
 ## Coverage
 

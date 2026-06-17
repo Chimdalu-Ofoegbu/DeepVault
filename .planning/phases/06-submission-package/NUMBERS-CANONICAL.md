@@ -35,9 +35,10 @@ Supporting full-window numerics (same source): realized σ_ann across priced cyc
 26.3%–60.3% (mean 40.4%, L189); binary put price p (−15% / 14d) 0.0009–0.0939 (mean
 0.028, L190); annual hedge cost 5.43% of NAV (L192).
 
-The full-window total return decomposes exactly as
+The full-window total return decomposes (to component rounding) as
 `total_return = plp_yield − plp_lvr − hedge_cost + hedge_payoff`
-= +7.14% − 4.16% − 5.43% + 9.98% = **+7.52%** (`backtest-assumptions.md` L181, L197).
+= +7.14% − 4.16% − 5.43% + 9.98% ≈ **+7.52%** (the rounded components sum to +7.53%; the
+±0.01 gap is component-rounding, the canonical full-window total is +7.52%) (`backtest-assumptions.md` L181, L197).
 
 ---
 

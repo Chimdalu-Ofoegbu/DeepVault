@@ -283,13 +283,16 @@ window, hedge_ratio = 0.10, run 2026-06-15"). These full-window figures are **no
 | Hedged max drawdown | −1.66% | full-window 365d |
 | Unhedged buy-and-hold BTC max DD | −52.86% | full-window 365d |
 
-The full-window total return decomposes exactly:
+The full-window total return decomposes (to component rounding):
 
 ```
 total_return = plp_yield − plp_lvr − hedge_cost + hedge_payoff
              = +7.14%   − 4.16%   − 5.43%      + 9.98%
-             = +7.52%
+             ≈ +7.52%
 ```
+
+(The rounded components sum to +7.53%; the ±0.01 gap is component-rounding. The canonical
+full-window total return is **+7.52%**, per `NUMBERS-CANONICAL.md`.)
 
 ### 5.2 Out-of-sample holdout (recent 30%) block
 

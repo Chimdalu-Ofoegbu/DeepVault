@@ -13,7 +13,7 @@
 - **Phase 1 — Math Foundation:** three-runtime raw 5-param SVI evaluator (Move + Python + TypeScript) gated by 141 bit-for-bit golden vectors (21 from Gatheral & Jacquier 2014).
 - **Phase 2 — Vault Move package:** deposit / redeem / rebalance with atomic on-chain hedge mint, token-bucket withdrawal limiter, inflation defense, worst-case LTV. **Deployed to Sui testnet 2026-05-16** (addresses below).
 - **Phase 3 — Backtest + two-protocol PTB:** 365-day walk-forward with OOS holdout + lookahead-bias audit; the 5-call Margin+Predict+vault single-PTB shape proven via the `mock_margin_pool` integration test.
-- **Phase 4 — Dashboard:** React + Vite SVI Risk Studio (11 panels: live 3D SVI surface, arb-checker, exposure, what-if simulator, event stream) with a `Vault | Risk Studio` mode split.
+- **Phase 4 — Dashboard:** React + Vite SVI Risk Studio (11 panels: 3D SVI surface (live data; runs locally via `pnpm dev` — not hosted in the submission window), arb-checker, exposure, what-if simulator, event stream) with a `Vault | Risk Studio` mode split.
 - **Phase 5 — Testnet hardening + mainnet-readiness toolkit:** `make demo` smoke test green end-to-end with a dual ±10 bps NAV gate; the mainnet toolkit is committed and lint-clean for a post-submission deploy.
 
 Mainnet deploy is **deferred to post-submission** (DeepBook Predict has not shipped on mainnet during the submission window — see [`docs/MAINNET-READINESS.md`](docs/MAINNET-READINESS.md)). The codebase is **not** audited.
@@ -24,7 +24,7 @@ Mainnet deploy is **deferred to post-submission** (DeepBook Predict has not ship
 
 DeepVault sells "PLP yield minus crash insurance" as a single deposit.
 
-You put USDsui in. The vault routes ~90% to DeepBook Predict's PLP for yield, and ~10% buys binary tail hedges priced from a live SVI volatility surface (Gatheral & Jacquier 2014). When BTC tanks more than ~15%, the hedges pay; otherwise you collect the PLP fees minus a small hedge cost.
+You put USDsui in. The vault routes ~90% to DeepBook Predict's PLP for yield, and ~10% buys binary tail hedges priced from a live SVI volatility surface (Gatheral & Jacquier 2014). When BTC tanks more than ~15%, the hedges pay; otherwise you collect the PLP fees minus a small hedge cost. (The backtest assumes a conservative 8% PLP APY — not a measured Predict yield; see the whitepaper's [model-assumptions section](docs/WHITEPAPER.md#6-model-assumptions).)
 
 The live demo (`make demo`) deposits and mints a **real on-chain Predict hedge** atomically, then redeems — on Sui testnet. The flagship composability target is a single Programmable Transaction Block (PTB) opening three positions atomically — Margin borrow + vault deposit + Predict hedge mint — which is proven via the `mock_margin_pool` integration test and pending a live testnet Margin pool (see [Demo](#demo)). Together they show what "Sui composability" means at the protocol layer.
 
@@ -67,11 +67,11 @@ Full architecture diagram — the four tiers (Move package · event relay/indexe
 
 ## Quick Start
 
-After Phase 0 closes (this commit), the repo is fully reproducible from a fresh clone. Once it lives on GitHub (`gh repo create` is a Phase 0 outstanding human-action checkpoint, see SUMMARY) and CI has run once on `main`, this sequence works end-to-end:
+The repo is public at <https://github.com/Chimdalu-Ofoegbu/DeepVault>. From a fresh clone, this sequence works end-to-end:
 
 ```bash
 git clone https://github.com/Chimdalu-Ofoegbu/DeepVault.git
-cd deepvault
+cd DeepVault
 
 # Install all toolchains (Move, TS, Python) — see docs/DEV-BOOTSTRAP.md if first time
 make install
@@ -104,7 +104,7 @@ Pinned toolchain (every version is exact, no `^`/`~` drift):
 
 - **Sui CLI** `mainnet-v1.71.1` (Move 2024.beta edition)
 - **DeepBookV3** `predict-testnet-4-16` @ `1159d79af33c70e09e406310e1d8f067832ede9d` (vendored via git subtree at `scripts/deepbookv3/`)
-- **Node.js** `>=22 LTS` + **pnpm** `10.0.0` (workspaces; placeholders for indexer/dashboard land in Phase 4)
+- **Node.js** `>=22 LTS` + **pnpm** `10.0.0` (workspaces; indexer + dashboard implemented in Phase 4, run locally)
 - **Python** `>=3.12` via **uv** (numpy 2.4 / pandas 3.0 / scipy 1.17 / pyarrow 24 / matplotlib 3.10)
 - **CI:** GitHub Actions, Ubuntu latest, 5-job matrix (move, ts, python, codegen-drift, parity)
 
@@ -151,8 +151,8 @@ Live on Sui testnet since **2026-05-16**, captured verbatim in [`.planning/phase
 | Path | Purpose | Phase |
 |------|---------|-------|
 | `contracts/` | Sui Move package (`deepvault::`) | Phase 0 + 2 |
-| `indexer/` | Node.js event relay | Phase 4 (placeholder) |
-| `dashboard/` | React + Vite SVI Risk Studio | Phase 4 (placeholder) |
+| `indexer/` | Node.js event relay | Implemented (Phase 4); runs locally |
+| `dashboard/` | React + Vite SVI Risk Studio | Implemented (Phase 4); runs locally |
 | `backtest/` | Python uv project, lookahead audit | Phase 0 + 1 + 3 |
 | `shared/` | `strategy.toml` (source of truth), `golden-vectors.json` | Phase 0 + 1 |
 | `scripts/` | `codegen.py`, `predict-diff.sh`, vendored DeepBookV3 fork | Phase 0 |
@@ -164,12 +164,12 @@ Live on Sui testnet since **2026-05-16**, captured verbatim in [`.planning/phase
 
 | Component | Tier | URL |
 |-----------|------|-----|
-| Dashboard (React + Vite) | Vercel free tier | `[TBD-vercel-subdomain].vercel.app` (filled in Phase 4) |
-| Event relay (Node.js + WS) | Render free tier | `[TBD-render-subdomain].onrender.com` (filled in Phase 4) |
+| Dashboard (React + Vite) | Run locally | Run locally (`pnpm dev`) — not hosted in submission window |
+| Event relay (Node.js + WS) | Run locally | Run locally (`node`) — not hosted in submission window |
 | Sui RPC (testnet) | Public Mysten | `https://fullnode.testnet.sui.io:443` |
 | Sui RPC (mainnet, Phase 5) | Public Mysten | `https://fullnode.mainnet.sui.io:443` |
 
-Per CONTEXT.md D-13/D-15/D-16: default Vercel/Render subdomains, no custom domain. Hosting URLs are filled in `config/{testnet,mainnet}.toml` `[hosting]` section as each component deploys.
+The dashboard and event relay are **not hosted in the submission window** — they run locally (`pnpm dev` / `node`); see [Quick Start](#quick-start). Public hosting (default Vercel/Render subdomains, no custom domain, per CONTEXT.md D-13/D-15/D-16) is post-submission work; the `config/{testnet,mainnet}.toml` `[hosting]` slots are reserved for when each component deploys.
 
 ## Mainnet readiness
 
@@ -211,6 +211,10 @@ Append-only weekly bullets per `CONTRIBUTING.md` build-log discipline. Never edi
 - 5-job CI matrix landed: move + ts + python + codegen-drift + parity. Branch-protection guide ready for one-time GitHub setup.
 - Two-wallet split documented: testnet dev + mainnet deploy (UNFUNDED until Phase 5).
 - Slack remaining: 37 days (Day 2 of 39).
+
+### Weeks 2–4 (2026-05-16 to 2026-06-08)
+
+- Phases 1–4 completed (math foundation, vault Move package + testnet deploy, backtest + two-protocol PTB, dashboard). Per-phase scope and status are summarized under [Status](#status); detailed artifacts live in `.planning/phases/0{1,2,3,4}-*`. (This build log is intentionally terse for these weeks; the phase directories are the system of record.)
 
 ### Week 5 (2026-06-09 to 2026-06-15)
 

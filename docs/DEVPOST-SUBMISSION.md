@@ -69,7 +69,9 @@ vault:
 
 When the underlying tanks more than ~15% within the tenor, the binaries pay and
 cushion the drawdown; in calm markets you collect PLP fees minus a small,
-honest hedge premium.
+honest hedge premium. (Note: the backtest's yield leg assumes a **conservative
+8% PLP APY** — a defensible placeholder, *not* a measured on-chain Predict
+yield; see `docs/WHITEPAPER.md` §6 Model Assumptions.)
 
 **Safe redemption.** Withdrawals go through a per-user **token-bucket** rate
 limiter plus a **1-hour cooldown** (`redeem_request` → wait → `redeem_fulfill`),
@@ -195,6 +197,14 @@ live today rather than faking them.
 
   This small-steady-bleed-in-calm, large-protection-in-a-crash shape **is** the
   "PLP yield minus crash insurance" profile — presented without inflation.
+
+- **A credibility moat, not just a feature list.** What a copycat vault can't
+  trivially clone is the *discipline*: a CI-gated cross-runtime (Move / Python /
+  TypeScript) SVI parity proof — the same number on-chain, in the backtest, and
+  in the dashboard, bit-for-bit — built on the audited Predict oracle math, plus
+  a pre-committed sizing policy and a disclosed out-of-sample holdout that we
+  refused to retro-tune. The "third primitive in the DeepBook stack" claim earns
+  its place through auditable correctness and honest reporting, not marketing.
 
 ---
 

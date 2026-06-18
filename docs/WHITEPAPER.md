@@ -7,8 +7,11 @@
 > in one phrase, *"PLP yield minus crash insurance."* Each deposit routes a fixed 10% to a
 > binary (digital) put bought through Predict, priced off a **raw 5-parameter SVI** volatility
 > slice using the same arbitrage-free machinery deployed on-chain by DeepBook Predict; the
-> remaining 90% earns PLP yield. The hedge pays out on a sharp BTC drawdown and bleeds a small,
-> bounded premium in calm regimes — the honest cost-of-carry of insurance. This document is the
+> remaining 90% earns PLP yield. The hedge is a **real on-chain binary** that pays out on a sharp BTC
+> drawdown and bleeds a small, bounded premium in calm regimes — the honest cost-of-carry of insurance.
+> (In v1 that hedge is custodied in the **depositor's own** PredictManager, and settlement proceeds
+> are **not** yet pooled into the vault — a Predict-ownership constraint disclosed in
+> [§8.1](#81-known-limitation--hedge-custody-under-predicts-ownership-model-pre-mainnet).) This document is the
 > credibility companion to the code: it states the math, the price formula, the locked sizing
 > policy, the worst-case-liquidation analysis, and the risk disclosures, with **every published
 > number window-labeled and traced to a committed artifact**. **This v1 is UNAUDITED, admin-paused,
@@ -446,6 +449,38 @@ worst_case_settlement_haircut_bps = 10000`, line 49.)*
 
 DeepVault v1 is a hackathon submission. It is presented honestly; the following disclosures are
 material.
+
+### 8.1 Known limitation — hedge custody under Predict's ownership model (pre-mainnet)
+
+DeepBook Predict gates `mint`/`redeem` on `ctx.sender() == manager.owner()` (the owner assert at the
+top of `predict::mint`). A shared `Vault` object is **never a transaction sender**, so the vault
+**cannot own and operate a `PredictManager`** of its own. The project's WAVE-0 spike proved this
+empirically: `option_a_vault_owns_manager_supplier_calls_via_vault_aborts` aborts with `ENotOwner`,
+so option (a) "vault owns the manager" is **incompatible** with `predict::mint`. DeepVault therefore
+deliberately uses **option (b): supplier-owned PredictManagers** — each depositor brings (or creates)
+their own manager.
+
+The consequence for hedge custody is material and is disclosed plainly:
+
+- Each deposit's hedge is custodied in the **depositor's own** `PredictManager`, **not** in a
+  vault-held book.
+- On hedge settlement / expiry, `predict::redeem` deposits proceeds back into **that supplier's
+  manager**, **not** pooled into the vault.
+- The vault's NAV therefore carries the hedge leg at **cost basis** (the quote routed to Predict at
+  mint) and does **not** custody or reconcile hedge **proceeds**. (Consistent with this, the
+  worst-case LTV path in [§7.1](#71-worst-case-nav-per-share) values open hedges at zero — it never
+  counts hedge value as a live vault asset.)
+
+True **pooled vault-custody** of the hedge book — where settlement proceeds flow back into the shared
+vault and are reconciled into a pooled NAV that all LPs share pro-rata — would require either a
+Predict-side capability API that lets a shared object operate a manager (not in scope today) or an
+architecture redesign. **This is pre-mainnet work**, not a property of the current testnet build.
+
+*(Source: WAVE-0 spike `contracts/tests/_spike/predict_manager_owner_spike_test.move` (3 cases; the
+option-(a) case is annotated `expected_failure(abort_code = ENotOwner)`); decision recorded in
+`.planning/phases/02-vault-move-package-testnet-deploy/WAVE0-DECISION.md`.)*
+
+### 8.2 Other material disclosures
 
 - **UNAUDITED.** There is **no third-party security audit** of the Move contracts. A formal audit is
   deferred to v2. Do not treat this code as production-grade or audited.

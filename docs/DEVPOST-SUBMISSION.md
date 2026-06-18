@@ -153,6 +153,17 @@ live today rather than faking them.
   `make demo`: deposit + **real on-chain Predict hedge mint** + redeem, with the
   `Supplied` and `HedgeMinted` events and the tx digest visible on Suiscan.
 
+- **Hedge custody is per-supplier, not pooled — by a Predict ownership constraint.**
+  DeepBook Predict gates `mint`/`redeem` on `ctx.sender() == manager.owner()`, and a
+  shared `Vault` object is never a transaction sender, so the vault can't own a
+  `PredictManager` (our WAVE-0 spike,
+  `contracts/tests/_spike/predict_manager_owner_spike_test.move`, proves option (a)
+  aborts with `ENotOwner`). v1 therefore uses **supplier-owned** managers: each deposit's
+  hedge lives in the depositor's own manager and settles back there, so the binaries are
+  **real and on-chain** but **pooled vault-level hedge custody and NAV reconciliation are
+  pre-mainnet** (the vault carries the hedge leg at cost basis today). See
+  `docs/WHITEPAPER.md` §8.1.
+
 - **DeepBook Predict mainnet did not ship inside the submission window.** Mysten
   launched Predict on **testnet** (2026-05-05) and framed mainnet as "later in
   2026." So the demo targets **testnet**, and a ~10-second **mainnet-readiness

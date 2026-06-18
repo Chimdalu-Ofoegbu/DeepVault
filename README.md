@@ -18,6 +18,8 @@
 
 Mainnet deploy is **deferred to post-submission** (DeepBook Predict has not shipped on mainnet during the submission window — see [`docs/MAINNET-READINESS.md`](docs/MAINNET-READINESS.md)). The codebase is **not** audited.
 
+**Known limitations (pre-mainnet).** DeepBook Predict gates `mint`/`redeem` on `ctx.sender() == manager.owner()`, and a shared `Vault` object is never a transaction sender — so the vault cannot own a `PredictManager`. The project's WAVE-0 spike (`contracts/tests/_spike/predict_manager_owner_spike_test.move`) proved this, so DeepVault deliberately uses **supplier-owned** managers: each deposit's hedge is custodied in the **depositor's own** PredictManager, and settlement proceeds settle back to that supplier's manager rather than being **pooled into the vault**. The vault's NAV therefore carries the hedge leg at **cost basis** and does not yet custody or reconcile hedge proceeds; true pooled vault-custody is pre-mainnet work (needs a Predict-side capability API or an architecture redesign). Full disclosure: [`docs/WHITEPAPER.md` §8.1](docs/WHITEPAPER.md#81-known-limitation--hedge-custody-under-predicts-ownership-model-pre-mainnet).
+
 **Ship target:** 2026-06-16 (Sui Overflow 2026 submission). Hard ship: 39 days from 2026-05-09. Code freeze: 2026-05-30.
 
 ## Laypitch
@@ -35,7 +37,7 @@ The live demo (`make demo`) deposits and mints a **real on-chain Predict hedge**
 - **Vault share** — `Coin<VAULT_SHARE>` representing pro-rata claim on vault NAV.
 - **PTB** — Programmable Transaction Block; Sui's atomic multi-call primitive.
 - **Hedge ratio** — Fraction of each new deposit routed to the hedge book (locked at 10% per `docs/HEDGE-POLICY.md`).
-- **NAV** — Net Asset Value per share, anchored to the vault's PLP balance + hedge book mark-to-market.
+- **NAV** — Net Asset Value per share, anchored to the vault's liquid quote balance + the hedge leg at **cost basis** (the vault does not pool or reconcile hedge proceeds in v1 — see [Known limitations](#status)).
 
 ## Architecture at a Glance
 

@@ -10,7 +10,15 @@ import { resolve } from 'node:path';
 
 export default defineConfig({
   plugins: [react()],
-  resolve: { alias: { '@': resolve(__dirname, 'src') } },
+  // Node-builtin shim for the Sui SDK in the browser. @mysten/sui (via bcs)
+  // emits a bare `import ... from "buffer/"` that the browser cannot resolve at
+  // runtime -> module-graph instantiation fails -> blank page. This is
+  // PRODUCTION-ONLY: Vite's dev server pre-bundles `buffer` via esbuild, so dev
+  // rendered fine and the gap was invisible until the hosted build. Aliasing
+  // `buffer/` to the installed `buffer` polyfill lets rollup bundle it, and
+  // `global -> globalThis` covers deps that reference the Node `global`.
+  define: { global: 'globalThis' },
+  resolve: { alias: { '@': resolve(__dirname, 'src'), 'buffer/': 'buffer' } },
   build: {
     // outDir stays the Vite DEFAULT (dashboard/dist). The hosted Vercel build
     // runs `pnpm --filter @deepvault/dashboard build`, and Vercel resolves

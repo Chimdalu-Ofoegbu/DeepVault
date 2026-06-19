@@ -183,8 +183,9 @@ jobs:
         # Plan 04-07 Task 3 (DASH-13): explicit per-push build of the
         # Vite dashboard bundle. `pnpm --filter` keeps the step scoped
         # to the dashboard workspace so a relay-only edit doesn't pay
-        # the Vite build cost twice. Output dir is dashboard/dist; the
-        # vercel.json at repo root points there.
+        # the Vite build cost twice. Build output goes to the repo-root
+        # dist/ (vite build.outDir = ../dist) so Vercel's default "dist"
+        # lookup at the repo-root entrypoint resolves; vercel.json matches.
         working-directory: dashboard
         run: pnpm build
 

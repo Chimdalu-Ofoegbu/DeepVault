@@ -5,6 +5,54 @@
 [![CI](https://github.com/Chimdalu-Ofoegbu/DeepVault/actions/workflows/ci.yml/badge.svg)](https://github.com/Chimdalu-Ofoegbu/DeepVault/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
+## What is DeepVault?
+
+DeepVault is a structured-product vault on Sui's **DeepBook Predict**. A single deposit buys you **"PLP yield minus crash insurance"**: the vault earns **PLP** (Predict Liquidity Provision) fees and, in the same flow, buys binary tail-risk hedges priced off a **live SVI** (Stochastic Volatility Inspired) volatility surface. In calm markets you collect the liquidity-provision yield; when BTC sells off hard, the hedges pay out and cushion the drawdown instead of letting it ride straight through your position.
+
+It ships with an institutional-grade **PLP Risk Studio** dashboard that streams the same on-chain SVI surface the vault prices against — plus exposure, arbitrage checks, and a what-if hedge simulator — the kind of pre-trade risk view an LP desk expects before committing capital.
+
+**Who it's for:** institutional LPs and DeepBook Predict liquidity providers who want PLP yield but cannot carry naked tail risk — and the DeepBook ecosystem itself, as a worked example of protocol-layer composability (the "third primitive in the DeepBook stack"). Built for **Sui Overflow 2026's DeepBook specialized track**.
+
+> **Read this first.** The codebase is **not audited**, mainnet deploy is **deferred to post-submission**, and the vault carries one significant architectural limitation under Predict's ownership model. See [Known limitations](#known-limitations-pre-mainnet) before treating anything here as production-ready.
+
+## How it works
+
+You deposit a quote asset (testnet **DUSDC**). The vault then:
+
+- routes **~90%** to DeepBook Predict's **PLP** book to earn liquidity-provision fees, and
+- spends **~10%** on **binary tail hedges**, priced from a live SVI volatility surface (Gatheral & Jacquier 2014).
+
+When BTC falls more than **~15%** (the hedge strike), the hedges pay out and cushion the loss. In calm markets, you keep the PLP fees minus the smaller cost of carrying the hedges. That trade-off — yield in exchange for a steady insurance premium — *is* the product.
+
+The hedge policy is **locked at 10% allocation / −15% OTM / 14-day tenor / fixed sizing** ([`docs/HEDGE-POLICY.md`](docs/HEDGE-POLICY.md)), frozen against hindsight tuning.
+
+> **Honest caveat:** the backtest assumes a conservative **8% PLP APY** — a modeling assumption, **not** a measured Predict yield (see the whitepaper's [model-assumptions section](docs/WHITEPAPER.md#6-model-assumptions)).
+
+**The composability moment.** The flagship target is a single **PTB** (Programmable Transaction Block) that opens three positions atomically — a Margin borrow + the vault deposit + the Predict hedge mint. The live testnet demo (`make demo`) performs a **real on-chain deposit + Predict hedge mint atomically**, then redeems. The full three-leg Margin + Predict + vault PTB is **architecturally proven via the `mock_margin_pool` integration test** and is **pending a live testnet Margin pool** (there is no DUSDC Margin pool on Sui testnet yet — see [Demo](#demo)). Together these show what "Sui composability" means at the protocol layer.
+
+## What you get
+
+DeepVault is three coordinated pieces:
+
+1. **The vault — on-chain.** A Sui Move package (`deepvault::`): deposit / redeem / rebalance with an **atomic on-chain hedge mint**, a token-bucket withdrawal limiter, inflation-attack defense, and worst-case-LTV accounting. **Live on Sui testnet since 2026-05-16** ([addresses below](#testnet-contracts)).
+2. **PLP Risk Studio — dashboard.** A React + Vite app with a `Vault | Risk Studio` mode split and **11 panels**: a **live 3D SVI surface**, an arbitrage-violation checker, per-oracle exposure, a **what-if hedge simulator**, a live event stream, and the deposit/withdraw flow — all fed by the same on-chain SVI updates the vault prices against. *(Runs locally via `pnpm dev`; not hosted in the submission window.)*
+3. **Backtest harness — Python.** A **365-day walk-forward** with an **out-of-sample (OOS) holdout** and a **lookahead-bias audit**, producing the published, window-labeled performance numbers below.
+
+## Performance (honest)
+
+Every published figure is window-labeled and sourced in [`NUMBERS-CANONICAL.md`](.planning/phases/06-submission-package/NUMBERS-CANONICAL.md):
+
+- **Full-window 365-day total return: `+7.52%`** — one −15% breach fired during the window, and the hedges earned their keep.
+- **Calm out-of-sample holdout: `−2.30%` APY, Sharpe `−1.87`** — the honest cost-of-carry of crash insurance when no breach occurs.
+
+The two numbers *are* the story: in a window containing a crash, the hedge pays for itself; in a calm window, you pay a steady premium for protection you didn't end up needing. Full 365-day walk-forward with OOS holdout and PnL attribution: [`backtest/reports/full-365d-report.html`](backtest/reports/full-365d-report.html). All backtest numbers in the whitepaper are likewise window-labeled — see [`docs/WHITEPAPER.md`](docs/WHITEPAPER.md).
+
+## Known limitations (pre-mainnet)
+
+**Not audited; mainnet deferred.** The codebase is **not** audited. DeepBook Predict has not shipped on mainnet during the submission window (per Mysten's "later in 2026" timeline; testnet launched 2026-05-05), so DeepVault's mainnet deploy is **deferred to post-submission** — see [`docs/MAINNET-READINESS.md`](docs/MAINNET-READINESS.md).
+
+**Per-supplier hedge custody (the main architectural limitation).** DeepBook Predict gates `mint`/`redeem` on `ctx.sender() == manager.owner()`, and a shared `Vault` object is never a transaction sender — so the vault cannot own a `PredictManager`. The project's WAVE-0 spike (`contracts/tests/_spike/predict_manager_owner_spike_test.move`) proved this, so DeepVault deliberately uses **supplier-owned** managers: each deposit's hedge is custodied in the **depositor's own** PredictManager, and settlement proceeds settle back to that supplier's manager rather than being **pooled into the vault**. The vault's NAV therefore carries the hedge leg at **cost basis** and does not yet custody or reconcile hedge proceeds; true pooled vault-custody is pre-mainnet work (needs a Predict-side capability API or an architecture redesign). Full disclosure: [`docs/WHITEPAPER.md` §8.1](docs/WHITEPAPER.md#81-known-limitation--hedge-custody-under-predicts-ownership-model-pre-mainnet).
+
 ## Status
 
 **Submission-ready for Sui Overflow 2026 (DeepBook track).** Phases 0 through 5 are complete plus the PLP Risk Studio dashboard (Phase 04.1 reskin + Phase 04.2 `Vault | Risk Studio` mode split):
@@ -16,19 +64,7 @@
 - **Phase 4 — Dashboard:** React + Vite SVI Risk Studio (11 panels: 3D SVI surface (live data; runs locally via `pnpm dev` — not hosted in the submission window), arb-checker, exposure, what-if simulator, event stream) with a `Vault | Risk Studio` mode split.
 - **Phase 5 — Testnet hardening + mainnet-readiness toolkit:** `make demo` smoke test green end-to-end with a dual ±10 bps NAV gate; the mainnet toolkit is committed and lint-clean for a post-submission deploy.
 
-Mainnet deploy is **deferred to post-submission** (DeepBook Predict has not shipped on mainnet during the submission window — see [`docs/MAINNET-READINESS.md`](docs/MAINNET-READINESS.md)). The codebase is **not** audited.
-
-**Known limitations (pre-mainnet).** DeepBook Predict gates `mint`/`redeem` on `ctx.sender() == manager.owner()`, and a shared `Vault` object is never a transaction sender — so the vault cannot own a `PredictManager`. The project's WAVE-0 spike (`contracts/tests/_spike/predict_manager_owner_spike_test.move`) proved this, so DeepVault deliberately uses **supplier-owned** managers: each deposit's hedge is custodied in the **depositor's own** PredictManager, and settlement proceeds settle back to that supplier's manager rather than being **pooled into the vault**. The vault's NAV therefore carries the hedge leg at **cost basis** and does not yet custody or reconcile hedge proceeds; true pooled vault-custody is pre-mainnet work (needs a Predict-side capability API or an architecture redesign). Full disclosure: [`docs/WHITEPAPER.md` §8.1](docs/WHITEPAPER.md#81-known-limitation--hedge-custody-under-predicts-ownership-model-pre-mainnet).
-
 **Ship target:** 2026-06-16 (Sui Overflow 2026 submission). Hard ship: 39 days from 2026-05-09. Code freeze: 2026-05-30.
-
-## Laypitch
-
-DeepVault sells "PLP yield minus crash insurance" as a single deposit.
-
-You put USDsui in. The vault routes ~90% to DeepBook Predict's PLP for yield, and ~10% buys binary tail hedges priced from a live SVI volatility surface (Gatheral & Jacquier 2014). When BTC tanks more than ~15%, the hedges pay; otherwise you collect the PLP fees minus a small hedge cost. (The backtest assumes a conservative 8% PLP APY — not a measured Predict yield; see the whitepaper's [model-assumptions section](docs/WHITEPAPER.md#6-model-assumptions).)
-
-The live demo (`make demo`) deposits and mints a **real on-chain Predict hedge** atomically, then redeems — on Sui testnet. The flagship composability target is a single Programmable Transaction Block (PTB) opening three positions atomically — Margin borrow + vault deposit + Predict hedge mint — which is proven via the `mock_margin_pool` integration test and pending a live testnet Margin pool (see [Demo](#demo)). Together they show what "Sui composability" means at the protocol layer.
 
 ## Glossary
 
@@ -37,35 +73,7 @@ The live demo (`make demo`) deposits and mints a **real on-chain Predict hedge**
 - **Vault share** — `Coin<VAULT_SHARE>` representing pro-rata claim on vault NAV.
 - **PTB** — Programmable Transaction Block; Sui's atomic multi-call primitive.
 - **Hedge ratio** — Fraction of each new deposit routed to the hedge book (locked at 10% per `docs/HEDGE-POLICY.md`).
-- **NAV** — Net Asset Value per share, anchored to the vault's liquid quote balance + the hedge leg at **cost basis** (the vault does not pool or reconcile hedge proceeds in v1 — see [Known limitations](#status)).
-
-## Architecture at a Glance
-
-| Doc | Purpose |
-|-----|---------|
-| [`.planning/PROJECT.md`](.planning/PROJECT.md) | Scope, core value, cut-lines, key decisions |
-| [`.planning/ROADMAP.md`](.planning/ROADMAP.md) | 7-phase plan (Setup → Math → Vault → Backtest+PTB → Dashboard → Mainnet → Submission), success criteria, hard policy locks |
-| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Five hard policy locks: code freeze, no-refactor, no-dashboard-before-vault, hedge ratio, weekly Monday sweep |
-| [`docs/HEDGE-POLICY.md`](docs/HEDGE-POLICY.md) | Locked hedge-ratio ADR (10% / -15% OTM / 14-day / fixed) — strategy frozen against hindsight tuning |
-| [`docs/WHITEPAPER.md`](docs/WHITEPAPER.md) | Strategy whitepaper: SVI math, binary hedge-price formula, sizing bounds, worst-case liquidation, risk disclosures (all backtest numbers window-labeled) |
-| [`docs/MAINNET-READINESS.md`](docs/MAINNET-READINESS.md) | Why mainnet is deferred + the post-submission ≤30-min deploy procedure (preserves the original funding playbook: budget, two-wallet split, AdminCap discipline) |
-| [`docs/CI-BRANCH-PROTECTION.md`](docs/CI-BRANCH-PROTECTION.md) | One-time GitHub setup: 5 required status checks, UI + gh CLI paths |
-| [`docs/DEV-BOOTSTRAP.md`](docs/DEV-BOOTSTRAP.md) | One-shot dev-machine setup (Sui CLI, pnpm, uv, wallets) |
-
-```
-shared/strategy.toml ──> codegen.py ──┬──> contracts/sources/strategy_constants.move
-                                      ├──> backtest/src/deepvault/strategy_constants.py
-                                      └──> dashboard/src/lib/strategy_constants.ts
-
-vault::supply / redeem / rebalance ──> predict::supply / mint
-                                  └──> oracle_svi::OracleSVIUpdated event ──> indexer ──ws──> dashboard
-```
-
-Full architecture diagram — the four tiers (Move package · event relay/indexer · React dashboard · Python backtest) with data-flow arrows and the two-protocol single-PTB composability moment:
-
-![DeepVault architecture: four tiers and the Margin + Predict + vault single-PTB open](docs/architecture.svg)
-
-[`docs/architecture.svg`](docs/architecture.svg) is committed (GitHub-renderable, no build step). For the prose deep-dive see [`.planning/research/ARCHITECTURE.md`](.planning/research/ARCHITECTURE.md).
+- **NAV** — Net Asset Value per share, anchored to the vault's liquid quote balance + the hedge leg at **cost basis** (the vault does not pool or reconcile hedge proceeds in v1 — see [Known limitations](#known-limitations-pre-mainnet)).
 
 ## Quick Start
 
@@ -148,6 +156,34 @@ Live on Sui testnet since **2026-05-16**, captured verbatim in [`.planning/phase
 
 `make demo` consumes the same `TESTNET-DEPLOY.json`, so the deployed vault above is exactly what the smoke test exercises.
 
+## Architecture at a Glance
+
+| Doc | Purpose |
+|-----|---------|
+| [`.planning/PROJECT.md`](.planning/PROJECT.md) | Scope, core value, cut-lines, key decisions |
+| [`.planning/ROADMAP.md`](.planning/ROADMAP.md) | 7-phase plan (Setup → Math → Vault → Backtest+PTB → Dashboard → Mainnet → Submission), success criteria, hard policy locks |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Five hard policy locks: code freeze, no-refactor, no-dashboard-before-vault, hedge ratio, weekly Monday sweep |
+| [`docs/HEDGE-POLICY.md`](docs/HEDGE-POLICY.md) | Locked hedge-ratio ADR (10% / -15% OTM / 14-day / fixed) — strategy frozen against hindsight tuning |
+| [`docs/WHITEPAPER.md`](docs/WHITEPAPER.md) | Strategy whitepaper: SVI math, binary hedge-price formula, sizing bounds, worst-case liquidation, risk disclosures (all backtest numbers window-labeled) |
+| [`docs/MAINNET-READINESS.md`](docs/MAINNET-READINESS.md) | Why mainnet is deferred + the post-submission ≤30-min deploy procedure (preserves the original funding playbook: budget, two-wallet split, AdminCap discipline) |
+| [`docs/CI-BRANCH-PROTECTION.md`](docs/CI-BRANCH-PROTECTION.md) | One-time GitHub setup: 5 required status checks, UI + gh CLI paths |
+| [`docs/DEV-BOOTSTRAP.md`](docs/DEV-BOOTSTRAP.md) | One-shot dev-machine setup (Sui CLI, pnpm, uv, wallets) |
+
+```
+shared/strategy.toml ──> codegen.py ──┬──> contracts/sources/strategy_constants.move
+                                      ├──> backtest/src/deepvault/strategy_constants.py
+                                      └──> dashboard/src/lib/strategy_constants.ts
+
+vault::supply / redeem / rebalance ──> predict::supply / mint
+                                  └──> oracle_svi::OracleSVIUpdated event ──> indexer ──ws──> dashboard
+```
+
+Full architecture diagram — the four tiers (Move package · event relay/indexer · React dashboard · Python backtest) with data-flow arrows and the two-protocol single-PTB composability moment:
+
+![DeepVault architecture: four tiers and the Margin + Predict + vault single-PTB open](docs/architecture.svg)
+
+[`docs/architecture.svg`](docs/architecture.svg) is committed (GitHub-renderable, no build step). For the prose deep-dive see [`.planning/research/ARCHITECTURE.md`](.planning/research/ARCHITECTURE.md).
+
 ## Repository layout
 
 | Path | Purpose | Phase |
@@ -229,8 +265,8 @@ Append-only weekly bullets per `CONTRIBUTING.md` build-log discipline. Never edi
 ## References
 
 - **For developers:** `docs/DEV-BOOTSTRAP.md` (one-shot setup), `CONTRIBUTING.md` (rules)
-- **For judges:** Laypitch above, [`docs/WHITEPAPER.md`](docs/WHITEPAPER.md) (SVI math + strategy), [`docs/HEDGE-POLICY.md`](docs/HEDGE-POLICY.md) (strategy lock), [`backtest/reports/full-365d-report.html`](backtest/reports/full-365d-report.html) (365-day walk-forward, OOS holdout, PnL attribution), demo video (Phase 6)
-- **For backtest numbers:** every published figure is window-labeled and sourced in [`.planning/phases/06-submission-package/NUMBERS-CANONICAL.md`](.planning/phases/06-submission-package/NUMBERS-CANONICAL.md) — full-window 365d total return **+7.52%** (one −15% breach fired) vs the calm OOS-holdout net cost (APY **−2.30%**, Sharpe −1.87): the honest cost-of-carry of crash insurance.
+- **For judges:** [What is DeepVault?](#what-is-deepvault) + [How it works](#how-it-works) above, [`docs/WHITEPAPER.md`](docs/WHITEPAPER.md) (SVI math + strategy), [`docs/HEDGE-POLICY.md`](docs/HEDGE-POLICY.md) (strategy lock), [`backtest/reports/full-365d-report.html`](backtest/reports/full-365d-report.html) (365-day walk-forward, OOS holdout, PnL attribution), demo video (Phase 6)
+- **For backtest numbers:** see [Performance (honest)](#performance-honest) above; every published figure is window-labeled and sourced in [`NUMBERS-CANONICAL.md`](.planning/phases/06-submission-package/NUMBERS-CANONICAL.md).
 - **For deploy:** `docs/MAINNET-READINESS.md` (why-deferred + post-submission playbook), `docs/CI-BRANCH-PROTECTION.md` (one-time CI setup)
 - **For research:** `.planning/research/SUMMARY.md`, `.planning/research/STACK.md`, `.planning/research/PITFALLS.md`
 - **For roadmap:** `.planning/ROADMAP.md`, `.planning/REQUIREMENTS.md`

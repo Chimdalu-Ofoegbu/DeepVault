@@ -242,6 +242,11 @@ live today rather than faking them.
 
 - **Network:** Sui **testnet** (DeepBook Predict is testnet-only in the
   submission window).
+- **Live dashboard:** <https://deep-vault-dashboard.vercel.app> — the hosted PLP
+  Risk Studio (live 3D SVI surface + vault state, streamed from the hosted
+  relay). The relay runs on Render's free tier and sleeps after ~15 min idle, so
+  the first load after idle cold-boots (~30–60s) then reconnects automatically;
+  open it a minute ahead for a guaranteed-warm view.
 - **Demo:** `make demo` → deposit + real on-chain Predict hedge mint + 1h-cooldown
   redeem; emits `Supplied` + `HedgeMinted`; tx digest viewable on Suiscan.
 - **Demo video:** `<DEMO-VIDEO-URL-PLACEHOLDER>`  *(fill with the recording's

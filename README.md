@@ -35,7 +35,7 @@ The hedge policy is **locked at 10% allocation / −15% OTM / 14-day tenor / fix
 DeepVault is three coordinated pieces:
 
 1. **The vault — on-chain.** A Sui Move package (`deepvault::`): deposit / redeem / rebalance with an **atomic on-chain hedge mint**, a token-bucket withdrawal limiter, inflation-attack defense, and worst-case-LTV accounting. **Live on Sui testnet since 2026-05-16** ([addresses below](#testnet-contracts)).
-2. **PLP Risk Studio — dashboard.** A React + Vite app with a `Vault | Risk Studio` mode split and **11 panels**: a **live 3D SVI surface**, an arbitrage-violation checker, per-oracle exposure, a **what-if hedge simulator**, a live event stream, and the deposit/withdraw flow — all fed by the same on-chain SVI updates the vault prices against. *(Runs locally via `pnpm dev`; not hosted in the submission window.)*
+2. **PLP Risk Studio — dashboard.** A React + Vite app with a `Vault | Risk Studio` mode split and **11 panels**: a **live 3D SVI surface**, an arbitrage-violation checker, per-oracle exposure, a **what-if hedge simulator**, a live event stream, and the deposit/withdraw flow — all fed by the same on-chain SVI updates the vault prices against. *(Live at <https://deep-vault-dashboard.vercel.app> — also runs locally via `pnpm dev`.)*
 3. **Backtest harness — Python.** A **365-day walk-forward** with an **out-of-sample (OOS) holdout** and a **lookahead-bias audit**, producing the published, window-labeled performance numbers below.
 
 ## Performance (honest)
@@ -61,7 +61,7 @@ The two numbers *are* the story: in a window containing a crash, the hedge pays 
 - **Phase 1 — Math Foundation:** three-runtime raw 5-param SVI evaluator (Move + Python + TypeScript) gated by 141 bit-for-bit golden vectors (21 from Gatheral & Jacquier 2014).
 - **Phase 2 — Vault Move package:** deposit / redeem / rebalance with atomic on-chain hedge mint, token-bucket withdrawal limiter, inflation defense, worst-case LTV. **Deployed to Sui testnet 2026-05-16** (addresses below).
 - **Phase 3 — Backtest + two-protocol PTB:** 365-day walk-forward with OOS holdout + lookahead-bias audit; the 5-call Margin+Predict+vault single-PTB shape proven via the `mock_margin_pool` integration test.
-- **Phase 4 — Dashboard:** React + Vite SVI Risk Studio (11 panels: 3D SVI surface (live data; runs locally via `pnpm dev` — not hosted in the submission window), arb-checker, exposure, what-if simulator, event stream) with a `Vault | Risk Studio` mode split.
+- **Phase 4 — Dashboard:** React + Vite SVI Risk Studio (11 panels: 3D SVI surface (live data; hosted on Vercel at <https://deep-vault-dashboard.vercel.app> + also runs locally via `pnpm dev`), arb-checker, exposure, what-if simulator, event stream) with a `Vault | Risk Studio` mode split.
 - **Phase 5 — Testnet hardening + mainnet-readiness toolkit:** `make demo` smoke test green end-to-end with a dual ±10 bps NAV gate; the mainnet toolkit is committed and lint-clean for a post-submission deploy.
 
 **Ship target:** 2026-06-16 (Sui Overflow 2026 submission). Hard ship: 39 days from 2026-05-09. Code freeze: 2026-05-30.
@@ -202,12 +202,12 @@ Full architecture diagram — the four tiers (Move package · event relay/indexe
 
 | Component | Tier | URL |
 |-----------|------|-----|
-| Dashboard (React + Vite) | Run locally | Run locally (`pnpm dev`) — not hosted in submission window |
-| Event relay (Node.js + WS) | Run locally | Run locally (`node`) — not hosted in submission window |
+| Dashboard (React + Vite) | **Live — Vercel** | <https://deep-vault-dashboard.vercel.app> |
+| Event relay (Node.js + WS) | **Live — Render** (free tier; sleeps ~15 min idle) | `wss://deepvault-relay.onrender.com` |
 | Sui RPC (testnet) | Public Mysten | `https://fullnode.testnet.sui.io:443` |
 | Sui RPC (mainnet, Phase 5) | Public Mysten | `https://fullnode.mainnet.sui.io:443` |
 
-The dashboard and event relay are **not hosted in the submission window** — they run locally (`pnpm dev` / `node`); see [Quick Start](#quick-start). Public hosting (default Vercel/Render subdomains, no custom domain, per CONTEXT.md D-13/D-15/D-16) is post-submission work; the `config/{testnet,mainnet}.toml` `[hosting]` slots are reserved for when each component deploys.
+The dashboard is **live on Vercel** at <https://deep-vault-dashboard.vercel.app> (static build — always up) and the event relay is **live on Render's free tier** at `wss://deepvault-relay.onrender.com`. Both also run locally (`pnpm dev` / `node`); see [Quick Start](#quick-start). **Honest free-tier caveat:** the Render relay sleeps after ~15 min idle, so the first load after idle cold-boots (~30–60s); the dashboard reconnects automatically (a brief RECONNECTING pill, never a broken UI), and a [keepalive workflow](.github/workflows/keepalive-relay.yml) pings it during the demo window. For a guaranteed-warm demo, open the dashboard ~1 min ahead.
 
 ## Mainnet readiness
 

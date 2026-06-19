@@ -1,0 +1,49 @@
+name: keepalive-relay
+
+# Free-tier Render web services sleep after ~15 minutes of inactivity; the first
+# request after idle cold-boots the instance (~30-60s). This best-effort cron
+# pings the relay's /healthz to keep it warm during the demo / submission window.
+#
+# HONEST CAVEATS (do not over-trust this):
+#   - GitHub Actions cron is BEST-EFFORT: scheduled runs can be delayed 5-15+ min
+#     or skipped under load, so this does NOT guarantee the relay never sleeps.
+#     Before a live demo, open the dashboard (or curl /healthz) ~1 min ahead to
+#     guarantee a warm relay.
+#   - A cold-boot is graceful, not breakage: the indexer resumes from cursor=null
+#     and the dashboard re-derives state from the WS snapshot on reconnect, so the
+#     UI shows a brief RECONNECTING pill rather than an error.
+#   - The repo is public, so GitHub Actions minutes are free — the */10 cadence is
+#     fine. Disable this workflow (Actions tab -> keepalive-relay -> Disable) once
+#     the submission/demo window is over.
+
+on:
+  schedule:
+    # Every 10 minutes — margin under the ~15-min Render idle-sleep even if a run
+    # is delayed a few minutes.
+    - cron: '*/10 * * * *'
+  workflow_dispatch: {}   # manual warm-up button before a demo
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    name: Ping relay /healthz
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Warm the relay
+        run: |
+          URL="https://deepvault-relay.onrender.com/healthz"
+          echo "Pinging $URL ..."
+          # -m 90 absorbs a full cold-boot; retry twice in case the first hit
+          # lands mid-wake. A non-200 is logged as a warning, not a hard failure:
+          # the dashboard's reconnect logic tolerates transient relay downtime.
+          code=$(curl -sS -m 90 --retry 2 --retry-delay 5 \
+                   -o healthz.json -w "%{http_code}" "$URL" || echo "000")
+          echo "HTTP $code"
+          cat healthz.json 2>/dev/null || true
+          echo ""
+          if [ "$code" != "200" ]; then
+            echo "::warning::relay /healthz returned $code (cold-boot or down) — dashboard reconnect handles transient unavailability"
+          fi

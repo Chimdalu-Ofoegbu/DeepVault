@@ -12,16 +12,14 @@ export default defineConfig({
   plugins: [react()],
   resolve: { alias: { '@': resolve(__dirname, 'src') } },
   build: {
-    // Emit to the repo-root `dist/` (NOT dashboard/dist). Vercel resolves the
-    // output directory as "dist" relative to the build entrypoint (the repo
-    // root, since Root Directory is "."), and it ignores vercel.json's
-    // `outputDirectory` for this monorepo import — so writing here is what
-    // makes the hosted build's output discoverable without a dashboard-side
-    // Root Directory setting. `emptyOutDir` is required because outDir is
-    // outside the Vite root. Repo-root `dist/` is already covered by
-    // .gitignore's `dist/` rule, so no build artifact is ever committed.
-    outDir: resolve(__dirname, '..', 'dist'),
-    emptyOutDir: true,
+    // outDir stays the Vite DEFAULT (dashboard/dist). The hosted Vercel build
+    // runs `pnpm --filter @deepvault/dashboard build`, and Vercel resolves
+    // vercel.json#outputDirectory ("dist") relative to the FILTERED package dir
+    // (dashboard/) -> dashboard/dist, which is exactly where the default outDir
+    // writes. Do NOT set outDir to ../dist (repo-root): Vercel does not look
+    // there and fails with `No Output Directory named "dist"`. Verified against
+    // build logs dpl_4mHYSEZt (root/dist) + dpl_uUkzmnjbf (../dist) — both
+    // failed; default dashboard/dist is the only location Vercel matches.
     rollupOptions: {
       output: {
         manualChunks: {
